@@ -7,11 +7,10 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
-// import { useNavigation } from "@react-navigation/native";
-// import NAVIGATION from "../Navigations/index";
+import { useNavigation } from "@react-navigation/native";
 
 const Login = () => {
-  //   const navigation = useNavigation();
+  const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -27,9 +26,7 @@ const Login = () => {
         </TouchableOpacity>
         <View style={styles.registerContainer}>
           <Text style={styles.registerText}>Don't have an account?</Text>
-          <TouchableOpacity
-          // onPress={() => navigation.navigate(NAVIGATION.AUTH.REGISTER)}
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("Register")}>
             <Text style={styles.registerLink}>Register</Text>
           </TouchableOpacity>
         </View>
