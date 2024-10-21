@@ -1,7 +1,9 @@
 const NAVIGATION = {
   AUTH: {
+    INDEX: "Auth",
     LOGIN: "Login",
-    REGISTER: "Register",
+    INVESTOR_REGISTER: "InvestorRegister",
+    INVENTOR_REGISTER: "InventorRegister",
   },
 };
 
