@@ -3,9 +3,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigation from "./src/navigations/AuthNav/AuthNavigation";
 import UserContext from "./src/context/UserContext";
 import { getToken } from "./src/api/storage";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Children } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Text } from "react-native";
+import { Button, View } from "react-native";
 import { logout } from "./src/api/auth";
 import Invention from "./src/screens/Invention";
 export default function App() {
@@ -24,19 +24,28 @@ export default function App() {
     checkToken();
   }, []);
 
+  console.log(user);
   return (
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <UserContext.Provider value={[user, setUser]}>
           {/* <SafeAreaView style={{ flex: 1 }}>
             {user ? (
-              <Button
-                title="Logout"
-                onPress={() => {
-                  logout();
-                  setUser(false);
+              <View
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
-              />
+              >
+                <Button
+                  title="Logout"
+                  onPress={() => {
+                    logout();
+                    setUser(false);
+                  }}
+                />
+              </View>
             ) : (
               <AuthNavigation />
             )}
