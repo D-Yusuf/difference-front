@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigation from "./src/navigations/AuthNav/AuthNavigation";
-import  UserContext  from "./src/context/UserContext";
+import UserContext from "./src/context/UserContext";
 import { getToken } from "./src/api/storage";
 import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -27,9 +27,18 @@ export default function App() {
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <UserContext.Provider value={[user, setUser]}>
-          <SafeAreaView style={{flex:1}}>
-            
-            {user ? <Button title="Logout" onPress={()=>{logout();setUser(false)}}/>:<AuthNavigation />}
+          <SafeAreaView style={{ flex: 1 }}>
+            {user ? (
+              <Button
+                title="Logout"
+                onPress={() => {
+                  logout();
+                  setUser(false);
+                }}
+              />
+            ) : (
+              <AuthNavigation />
+            )}
           </SafeAreaView>
         </UserContext.Provider>
       </QueryClientProvider>
