@@ -21,12 +21,15 @@ const Login = () => {
   const {mutate} = useMutation({
     mutationKey: ["login"],
     mutationFn: ()=> login(email, password),
-    onSuccess: (data)=>{
+    onSuccess: ()=>{
       setUser(true)
     },
+    onError: (error)=>{
+      alert(error)
+    }
   
     
-  })
+  })   
   const validateInputs = () => {
     if (!email || !password) {
       alert("Please fill in all fields");

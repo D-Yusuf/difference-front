@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { createInvention } from "../api/Auth/InventionApi"; // Assuming this is the correct path
+import { createInvention } from "../api/invention";
 
 const Invention = () => {
   const [invention, setInvention] = useState({});

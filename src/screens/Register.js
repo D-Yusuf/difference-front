@@ -41,6 +41,9 @@ const Register = () => {
     mutationFn: ()=> register(userInfo),
     onSuccess: (data)=>{
       setUser(true)
+    },
+    onError: (error)=>{
+      alert(error)
     }
   })
 
