@@ -6,27 +6,47 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
+  Image,
 } from "react-native";
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
 import { createInvention } from "../api/invention";
-
 const Invention = () => {
   const [invention, setInvention] = useState({});
+  const [images, setImages] = useState([]);
   const { mutate } = useMutation({
     mutationFn: () => createInvention(invention),
     mutationKey: ["create-invention"],
     onSuccess: () => {
       console.log("Invention created successfully");
-      console.log(invention);
     },
     onError: (error) => {
       console.log(error);
     },
   });
 
-  const handleChange = (key) => (text) => {
-    setInvention((prev) => ({ ...prev, [key]: text }));
+  const handleImagePicker = async () => {
+    // Request permission to access the media library
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsMultipleSelection: true, // Allow multiple selection
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImages(result.assets);
+      setInvention({ ...invention, images: result.assets });
+    }
   };
 
   return (
@@ -38,7 +58,7 @@ const Invention = () => {
           <TextInput
             style={styles.input}
             placeholder="Enter invention title"
-            onChangeText={handleChange("name")}
+            onChangeText={(text) => setInvention({ ...invention, name: text })}
           />
         </View>
         <View style={styles.inputContainer}>
@@ -49,7 +69,9 @@ const Invention = () => {
             multiline={true}
             numberOfLines={6}
             textAlignVertical="top"
-            onChangeText={handleChange("description")}
+            onChangeText={(text) =>
+              setInvention({ ...invention, description: text })
+            }
           />
         </View>
         <View style={styles.inputContainer}>
@@ -58,8 +80,20 @@ const Invention = () => {
             style={styles.input}
             placeholder="Enter amount in KWD"
             keyboardType="numeric"
-            onChangeText={handleChange("price")}
+            onChangeText={(text) => setInvention({ ...invention, price: text })}
           />
+        </View>
+        <TouchableOpacity style={styles.button} onPress={handleImagePicker}>
+          <Text style={styles.buttonText}>Upload Images</Text>
+        </TouchableOpacity>
+        <View style={styles.imageContainer}>
+          {images.map((image, index) => (
+            <Image
+              key={index}
+              source={{ uri: image.uri }}
+              style={styles.image}
+            />
+          ))}
         </View>
         <TouchableOpacity style={styles.button} onPress={mutate}>
           <Text style={styles.buttonText}>Create Invention</Text>
@@ -118,11 +152,23 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     padding: 12,
     borderRadius: 8,
+    marginVertical: 10,
   },
   buttonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
+  },
+  imageContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginVertical: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    margin: 5,
+    borderRadius: 8,
   },
 });
