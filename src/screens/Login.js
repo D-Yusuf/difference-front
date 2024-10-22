@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -9,44 +9,40 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import login from "../api/Auth/login";
-import { useContext } from "react";
-import UserContext from "../../Context/UserContext";
+import { login } from "../api/auth";
+import UserContext from "../context/UserContext";
+import { useMutation } from "@tanstack/react-query";
 
 const Login = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setUser } = useContext(UserContext);
-
+  const [user, setUser] = useContext(UserContext);
+  const {mutate} = useMutation({
+    mutationKey: ["login"],
+    mutationFn: ()=> login(email, password),
+    onSuccess: (data)=>{
+      setUser(true)
+    },
+  
+    
+  })
   const validateInputs = () => {
     if (!email || !password) {
-      Alert.alert("Please fill in all fields");
+      alert("Please fill in all fields");
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(email)) {
-      Alert.alert("Please enter a valid email address");
+      alert("Please enter a valid email address");
       return false;
     }
     if (password.length < 6) {
-      Alert.alert("Password must be at least 6 characters long");
+      alert("Password must be at least 6 characters long");
       return false;
     }
     return true;
   };
 
-  const handleLogin = async () => {
-    if (!validateInputs()) return;
-
-    try {
-      const response = await login(email, password);
-      setUser(true);
-      console.log(response);
-      // Handle successful login (e.g., navigate to main screen)
-    } catch (error) {
-      Alert.alert("Login failed: " + error.message);
-    }
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -55,18 +51,19 @@ const Login = () => {
           style={styles.input}
           placeholder="Email"
           value={email}
-          onChangeText={setEmail}
+          onChangeText={(text)=>setEmail(text)}
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
           secureTextEntry
           value={password}
-          onChangeText={setPassword}
+          onChangeText={(text)=>setPassword(text)}
         />
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+        <TouchableOpacity style={styles.loginButton} onPress={mutate}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
+
         <View style={styles.registerContainer}>
           <Text style={styles.registerText}>Don't have an account?</Text>
           <TouchableOpacity onPress={() => navigation.navigate("Register")}>

@@ -1,65 +1,54 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  SafeAreaView,
-  Modal,
-  FlatList,
-} from "react-native";
-import register from "../api/Auth/register";
+import {View, Text, Image, TextInput,TouchableOpacity,StyleSheet,KeyboardAvoidingView,Platform,ScrollView,SafeAreaView,Modal,FlatList,} from "react-native";
+import { register } from "../api/auth";
 import { useContext } from "react";
-import UserContext from "../../Context/UserContext";
-
-const roles = [
-  { label: "Select Role", value: "" },
-  { label: "Admin", value: "admin" },
-  { label: "Investor", value: "investor" },
-  { label: "Inventor", value: "inventor" },
-  { label: "Guest", value: "guest" },
-];
+import UserContext from "../context/UserContext";
+import { useNavigation } from "@react-navigation/native";
+import { useMutation } from "@tanstack/react-query";
+import * as ImagePicker from 'expo-image-picker';
 
 const Register = () => {
-  const { setUser } = useContext(UserContext);
-  const [role, setRole] = useState("");
+  const roles = [
+    { label: "Select Role", value: "" },
+    { label: "Admin", value: "admin" },
+    { label: "Investor", value: "investor" },
+    { label: "Inventor", value: "inventor" },
+    { label: "Guest", value: "guest" },
+  ];
+  const [user, setUser]= useContext(UserContext);
   const [modalVisible, setModalVisible] = useState(false);
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [password, setPassword] = useState("");
+  const [userInfo, setUserInfo] = useState({});
   const [image, setImage] = useState(null);
 
-  const handleRegister = async () => {
-    try {
-      const response = await register(
-        email,
-        firstName,
-        lastName,
-        password,
-        role,
-        image
-      );
-      setUser(response.user);
-      console.log(response);
-      // Handle successful registration (e.g., navigate to login screen)
-    } catch (error) {
-      console.error("Registration failed:", error);
-      // Add user-facing error message
-      // Alert.alert("Registration Failed", error.message);
-      // Handle registration error (e.g., show error message to user)
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+
+    if (!result.canceled) {
+        setImage(result.assets[0].uri)
+      setUserInfo({...userInfo, image: result.assets[0].uri});
     }
   };
+
+  const {mutate} = useMutation({
+    mutationKey: ["register"],
+    mutationFn: ()=> register(userInfo),
+    onSuccess: (data)=>{
+      setUser(true)
+    }
+  })
 
   const renderRoleItem = ({ item }) => (
     <TouchableOpacity
       style={styles.roleItem}
       onPress={() => {
-        setRole(item.value);
+        setUserInfo({...userInfo, role: item.value});
         setModalVisible(false);
       }}
     >
@@ -68,7 +57,7 @@ const Register = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingView}
@@ -80,7 +69,7 @@ const Register = () => {
             onPress={() => setModalVisible(true)}
           >
             <Text style={styles.dropdownButtonText}>
-              {role ? roles.find((r) => r.value === role).label : "Select Role"}
+              {userInfo.role ? roles.find((r) => r.value === userInfo.role).label : "Select Role"}
             </Text>
           </TouchableOpacity>
 
@@ -89,38 +78,40 @@ const Register = () => {
             placeholder="Email"
             keyboardType="email-address"
             placeholderTextColor="#888"
-            value={email}
-            onChangeText={setEmail}
+            value={userInfo.email}
+            onChangeText={(text)=> setUserInfo({...userInfo, email: text})}
           />
           <TextInput
             style={styles.input}
             placeholder="First Name"
             placeholderTextColor="#888"
-            value={firstName}
-            onChangeText={setFirstName}
+            value={userInfo.firstName}
+            onChangeText={(text)=> setUserInfo({...userInfo, firstName: text})}
           />
           <TextInput
             style={styles.input}
             placeholder="Last Name"
             placeholderTextColor="#888"
-            value={lastName}
-            onChangeText={setLastName}
+            value={userInfo.lastName}
+            onChangeText={(text)=> setUserInfo({...userInfo, lastName: text})}
           />
+          <TouchableOpacity onPress={pickImage}><Text>Pick Image</Text></TouchableOpacity>
+          {image && <Image source={{uri: image}} style={{width: 100, height: 100}}/>}
           <TextInput
             style={styles.input}
             placeholder="Password"
             secureTextEntry
             placeholderTextColor="#888"
-            value={password}
-            onChangeText={setPassword}
+            value={userInfo.password}
+            onChangeText={(text)=> setUserInfo({...userInfo, password: text})}
             // Add autoCapitalize prop for better UX
             autoCapitalize="none"
           />
 
           <TouchableOpacity
-            style={[styles.button, !role && styles.buttonDisabled]}
-            disabled={!role}
-            onPress={handleRegister}
+            style={[styles.button, !userInfo.role && styles.buttonDisabled]}
+            disabled={!userInfo.role}
+            onPress={mutate}
           >
             <Text style={styles.buttonText}>Register</Text>
           </TouchableOpacity>
@@ -141,7 +132,7 @@ const Register = () => {
           />
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 
