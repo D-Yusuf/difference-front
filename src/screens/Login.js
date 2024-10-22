@@ -18,18 +18,23 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useContext(UserContext);
-  const {mutate} = useMutation({
+  const { mutate } = useMutation({
     mutationKey: ["login"],
-    mutationFn: ()=> login(email, password),
-    onSuccess: ()=>{
-      setUser(true)
+    mutationFn: () => login(email, password),
+    onSuccess: () => {
+      setUser(true);
     },
-    onError: (error)=>{
-      alert(error)
+    onError: (error) => {
+      Alert.alert("Login Error", error.message);
+    },
+  });
+
+  const handleLogin = () => {
+    if (validateInputs()) {
+      mutate();
     }
-  
-    
-  })   
+  };
+
   const validateInputs = () => {
     if (!email || !password) {
       alert("Please fill in all fields");
@@ -46,7 +51,6 @@ const Login = () => {
     return true;
   };
 
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -54,16 +58,16 @@ const Login = () => {
           style={styles.input}
           placeholder="Email"
           value={email}
-          onChangeText={(text)=>setEmail(text)}
+          onChangeText={(text) => setEmail(text)}
         />
         <TextInput
           style={styles.input}
           placeholder="Password"
           secureTextEntry
           value={password}
-          onChangeText={(text)=>setPassword(text)}
+          onChangeText={(text) => setPassword(text)}
         />
-        <TouchableOpacity style={styles.loginButton} onPress={mutate}>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
 
