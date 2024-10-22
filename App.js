@@ -7,6 +7,7 @@ import { useState, useEffect, Children } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, View } from "react-native";
 import { logout } from "./src/api/auth";
+import Invention from "./src/screens/Invention";
 export default function App() {
   const queryClient = new QueryClient();
 
@@ -28,7 +29,7 @@ export default function App() {
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <UserContext.Provider value={[user, setUser]}>
-          <SafeAreaView style={{ flex: 1 }}>
+          {/* <SafeAreaView style={{ flex: 1 }}>
             {user ? (
               <View
                 style={{
@@ -48,7 +49,8 @@ export default function App() {
             ) : (
               <AuthNavigation />
             )}
-          </SafeAreaView>
+          </SafeAreaView> */}
+          <Invention />
         </UserContext.Provider>
       </QueryClientProvider>
     </NavigationContainer>
