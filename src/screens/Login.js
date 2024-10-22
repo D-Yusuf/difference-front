@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -6,22 +6,65 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import login from "../api/Auth/login";
+import { useContext } from "react";
+import UserContext from "../../Context/UserContext";
 
 const Login = () => {
   const navigation = useNavigation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { setUser } = useContext(UserContext);
+
+  const validateInputs = () => {
+    if (!email || !password) {
+      Alert.alert("Please fill in all fields");
+      return false;
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      Alert.alert("Please enter a valid email address");
+      return false;
+    }
+    if (password.length < 6) {
+      Alert.alert("Password must be at least 6 characters long");
+      return false;
+    }
+    return true;
+  };
+
+  const handleLogin = async () => {
+    if (!validateInputs()) return;
+
+    try {
+      const response = await login(email, password);
+      setUser(true);
+      console.log(response);
+      // Handle successful login (e.g., navigate to main screen)
+    } catch (error) {
+      Alert.alert("Login failed: " + error.message);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <TextInput style={styles.input} placeholder="Email" />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={email}
+          onChangeText={setEmail}
+        />
         <TextInput
           style={styles.input}
           placeholder="Password"
           secureTextEntry
+          value={password}
+          onChangeText={setPassword}
         />
-        <TouchableOpacity style={styles.loginButton}>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
         <View style={styles.registerContainer}>
