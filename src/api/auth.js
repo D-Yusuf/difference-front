@@ -1,0 +1,38 @@
+import instance from ".";
+import { storeToken, removeToken } from "./storage";
+export const login = async (email, password) => {
+  try {
+    const {data} = await instance.post("/auth/login", { email, password });
+    alert(data)
+    await storeToken(data.token);
+    // alert(data.message)
+    return data;
+  } catch (error) {
+    return error.response.data.error
+  }
+};
+
+export const register = async (userInfo) => {
+  try {
+    const formData = new FormData();
+    for(let key in userInfo){
+      if(key !== "image") formData.append(key, userInfo[key])
+    }
+    formData.append("image", {
+        name: "image.jpg",
+        type: "image/jpeg",
+        uri: userInfo.image,
+      });
+      const {data} = await instance.post("/auth/register", formData);
+      await storeToken(data.token);
+      return data;
+  } catch (error) {
+    return error.response.data.error
+  }
+  };
+
+  export const logout = async () => {
+    await removeToken();
+  }
+
+
