@@ -86,9 +86,18 @@ const Invention = () => {
           <Text style={styles.label}>Needed Funds</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter amount in KWD"
+            placeholder="Total Costs in KWD"
             keyboardType="numeric"
             onChangeText={(text) => setInvention({ ...invention, cost: text })}
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Shares Count</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Number of shares you want for your invention"
+            keyboardType="numeric"
+            onChangeText={(text) => setInvention({ ...invention, shares: text })}
           />
         </View>
         <TouchableOpacity style={styles.button} onPress={handleImagePicker}>
