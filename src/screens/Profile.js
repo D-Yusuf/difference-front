@@ -14,8 +14,9 @@ import { getInventions } from "../api/invention";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "../api";
 import InventionList from "../components/InventionList";
-
+import { useNavigation } from "@react-navigation/native";
 const Profile = () => {
+  const navigation = useNavigation();
   const { data: profile } = useQuery({
     queryKey: ["profile"],
     queryFn: () => getProfile(),
@@ -33,7 +34,10 @@ const Profile = () => {
         nestedScrollEnabled={true}
       >
         <View style={styles.card}>
-          <TouchableOpacity style={styles.editButton}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate("EditProfile")}
+          >
             <MaterialIcons name="edit" size={24} color="black" />
           </TouchableOpacity>
           <Image
@@ -53,7 +57,10 @@ const Profile = () => {
           <TouchableOpacity style={styles.cvButton}>
             <Text style={styles.actionButtonText}>Go to CV</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.addInventionButton}>
+          <TouchableOpacity
+            style={styles.addInventionButton}
+            onPress={() => navigation.navigate("AddInvention")}
+          >
             <Text style={styles.actionButtonText}>Add Invention +</Text>
           </TouchableOpacity>
         </View>
