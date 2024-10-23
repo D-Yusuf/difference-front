@@ -3,54 +3,27 @@ import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigation from "./src/navigations/AuthNav/AuthNavigation";
 import UserContext from "./src/context/UserContext";
 import { getToken } from "./src/api/storage";
-import { useState, useEffect, Children } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, View } from "react-native";
-import { logout } from "./src/api/auth";
-import Invention from "./src/screens/Invention";
+import MainNavigation from "./src/navigations/AppNav/MainNavigation";
+import { useState, useEffect } from "react";
+
 export default function App() {
   const queryClient = new QueryClient();
-
   const [user, setUser] = useState(false);
 
-  const checkToken = async () => {
-    const token = await getToken();
-    if (token) {
-      setUser(true);
-    }
-  };
-
   useEffect(() => {
+    const checkToken = async () => {
+      const token = await getToken();
+      setUser(token ? true : false);
+    };
     checkToken();
   }, []);
 
-  console.log(user);
   return (
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <UserContext.Provider value={[user, setUser]}>
-          {/* <SafeAreaView style={{ flex: 1 }}>
-            {user ? (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Button
-                  title="Logout"
-                  onPress={() => {
-                    logout();
-                    setUser(false);
-                  }}
-                />
-              </View>
-            ) : (
-              <AuthNavigation />
-            )}
-          </SafeAreaView> */}
-          <Invention />
+          {user ? <MainNavigation /> : <AuthNavigation />}
+          {/* here i want to check if the user is logged in or not and if not then show the AuthNavigation */}
         </UserContext.Provider>
       </QueryClientProvider>
     </NavigationContainer>
