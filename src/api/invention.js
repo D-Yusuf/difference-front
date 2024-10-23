@@ -10,13 +10,13 @@ export const createInvention = async (inventionData) => {
     inventionData.images.forEach((image, index) => {
       formData.append("images", {
         uri: image.uri,
-        type: 'image/jpeg', // Adjust this if you need to support other image types
+        type: "image/jpeg", // Adjust this if you need to support other image types
         name: `image${index}.jpg`,
       });
     });
     const { data } = await index.post("/inventions", formData, {
       headers: {
-        'Content-Type': 'multipart/form-data',
+        "Content-Type": "multipart/form-data",
       },
     });
     return data;
@@ -26,4 +26,11 @@ export const createInvention = async (inventionData) => {
   }
 };
 
-export default { createInvention };
+export const getInventions = async () => {
+  try {
+    const { data } = await index.get("/inventions");
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
