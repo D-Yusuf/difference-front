@@ -1,3 +1,4 @@
+import React from "react";
 import {
   View,
   Text,
@@ -5,12 +6,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  ScrollView,
 } from "react-native";
-import React from "react";
 import { MaterialIcons } from "@expo/vector-icons"; // Import the icon library
 import { getProfile } from "../api/profile";
+import { getInventions } from "../api/invention";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "../api";
+import InventionList from "../components/InventionList";
 
 const Profile = () => {
   const { data: profile } = useQuery({
@@ -18,33 +21,48 @@ const Profile = () => {
     queryFn: () => getProfile(),
   });
 
+  const { data: inventions } = useQuery({
+    queryKey: ["inventions"],
+    queryFn: () => getInventions(),
+  });
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.card}>
-        <TouchableOpacity style={styles.editButton}>
-          <MaterialIcons name="edit" size={24} color="black" />
-        </TouchableOpacity>
-        <Image
-          source={profile?.image && { uri: BASE_URL + profile.image }}
-          style={styles.image}
-        />
-        <Text style={styles.name}>
-          {profile?.firstName} {profile?.lastName}
-        </Text>
-        <Text style={styles.email}>{profile?.email}</Text>
-        <Text style={styles.roleText}>
-          {`You signed up as `}
-          <Text style={styles.role}>{profile?.role}</Text>
-        </Text>
-        <Text style={styles.bio}>Bio: Lorem ipsum dolor sit amet.</Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        nestedScrollEnabled={true}
+      >
+        <View style={styles.card}>
+          <TouchableOpacity style={styles.editButton}>
+            <MaterialIcons name="edit" size={24} color="black" />
+          </TouchableOpacity>
+          <Image
+            source={profile?.image && { uri: BASE_URL + profile.image }}
+            style={styles.image}
+          />
+          <Text style={styles.name}>
+            {profile?.firstName} {profile?.lastName}
+          </Text>
+          <Text style={styles.email}>{profile?.email}</Text>
+          <Text style={styles.roleText}>
+            {`You signed up as `}
+            <Text style={styles.role}>{profile?.role}</Text>
+          </Text>
+          <Text style={styles.bio}>Bio: Lorem ipsum dolor sit amet.</Text>
 
-        <TouchableOpacity style={styles.cvButton}>
-          <Text style={styles.actionButtonText}>Go to CV</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.addInventionButton}>
-          <Text style={styles.actionButtonText}>Add Invention +</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity style={styles.cvButton}>
+            <Text style={styles.actionButtonText}>Go to CV</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.addInventionButton}>
+            <Text style={styles.actionButtonText}>Add Invention +</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.inventionsSection}>
+          <Text style={styles.sectionTitle}>My Inventions</Text>
+          <InventionList inventions={inventions || []} />
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -131,5 +149,17 @@ const styles = StyleSheet.create({
     color: "black",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+  inventionsSection: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
 });

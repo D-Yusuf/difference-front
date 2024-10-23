@@ -8,5 +8,3 @@ export const getProfile = async () => {
     throw error;
   }
 };
-
-export default { getProfile };
