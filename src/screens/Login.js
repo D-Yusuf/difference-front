@@ -85,7 +85,8 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "lightgray",
+    paddingHorizontal: 20, // Add horizontal padding for white space
     justifyContent: "center",
     alignItems: "center",
   },

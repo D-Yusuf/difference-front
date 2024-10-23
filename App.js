@@ -5,7 +5,6 @@ import UserContext from "./src/context/UserContext";
 import { getToken } from "./src/api/storage";
 import MainNavigation from "./src/navigations/AppNav/MainNavigation";
 import { useState, useEffect } from "react";
-
 export default function App() {
   const queryClient = new QueryClient();
   const [user, setUser] = useState(false);
