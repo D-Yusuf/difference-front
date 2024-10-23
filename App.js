@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Text } from "react-native";
 import { logout } from "./src/api/auth";
 import Invention from "./src/screens/Invention";
+import Profile from "./src/screens/Profile";
 export default function App() {
   const queryClient = new QueryClient();
 
@@ -41,7 +42,8 @@ export default function App() {
               <AuthNavigation />
             )}
           </SafeAreaView> */}
-          <Invention />
+          {/* <Invention /> */}
+          <Profile />
         </UserContext.Provider>
       </QueryClientProvider>
     </NavigationContainer>

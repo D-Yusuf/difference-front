@@ -1,8 +1,10 @@
 import axios from "axios";
 import { getToken } from "./storage";
+
+const BASE_URL = "http://192.168.8.131:8000/";
+
 const instance = axios.create({
-  baseURL: "http://192.168.2.235:8000/api",
-  // baseURL: "http://127.0.0.1:8000/api",
+  baseURL: BASE_URL + "api",
 });
 instance.interceptors.request.use(async (config) => {
   const token = await getToken();
@@ -10,3 +12,4 @@ instance.interceptors.request.use(async (config) => {
   return config;
 });
 export default instance;
+export { BASE_URL };
