@@ -50,7 +50,7 @@ const Invention = () => {
   };
 
   const handleCreateInvention = () => {
-    if(images.length === 0){
+    if (images.length === 0) {
       alert("Please upload at least one image");
       return;
     }
@@ -103,8 +103,11 @@ const Invention = () => {
             />
           ))}
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleCreateInvention}>
-          <Text style={styles.buttonText}>Create Invention</Text>
+        <TouchableOpacity
+          style={styles.createInventionbutton}
+          onPress={handleCreateInvention}
+        >
+          <Text style={styles.buttonText}>Post Invention</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -158,6 +161,12 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "black",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 10,
+  },
+  createInventionbutton: {
+    backgroundColor: "#34A853",
     padding: 12,
     borderRadius: 8,
     marginVertical: 10,
