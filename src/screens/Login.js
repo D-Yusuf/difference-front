@@ -25,9 +25,16 @@ const Login = () => {
       setUser(true);
     },
     onError: (error) => {
-      alert(error);
+      Alert.alert("Login Error", error.message);
     },
   });
+
+  const handleLogin = () => {
+    if (validateInputs()) {
+      mutate();
+    }
+  };
+
   const validateInputs = () => {
     if (!email || !password) {
       alert("Please fill in all fields");
@@ -60,7 +67,7 @@ const Login = () => {
           value={password}
           onChangeText={(text) => setPassword(text)}
         />
-        <TouchableOpacity style={styles.loginButton} onPress={mutate}>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Login</Text>
         </TouchableOpacity>
 
