@@ -19,7 +19,7 @@ const Invention = () => {
     mutationFn: () => createInvention(invention),
     mutationKey: ["create-invention"],
     onSuccess: () => {
-      console.log("Invention created successfully");
+      alert("Invention created successfully");
     },
     onError: (error) => {
       console.log(error);
@@ -49,12 +49,20 @@ const Invention = () => {
     }
   };
 
+  const handleCreateInvention = () => {
+    if(images.length === 0){
+      alert("Please upload at least one image");
+      return;
+    }
+    mutate();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
         <Text style={styles.title}>New Invention</Text>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Title</Text>
+          <Text style={styles.label}>Invention Name</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter invention title"
@@ -80,7 +88,7 @@ const Invention = () => {
             style={styles.input}
             placeholder="Enter amount in KWD"
             keyboardType="numeric"
-            onChangeText={(text) => setInvention({ ...invention, price: text })}
+            onChangeText={(text) => setInvention({ ...invention, cost: text })}
           />
         </View>
         <TouchableOpacity style={styles.button} onPress={handleImagePicker}>
@@ -95,7 +103,7 @@ const Invention = () => {
             />
           ))}
         </View>
-        <TouchableOpacity style={styles.button} onPress={mutate}>
+        <TouchableOpacity style={styles.button} onPress={handleCreateInvention}>
           <Text style={styles.buttonText}>Create Invention</Text>
         </TouchableOpacity>
       </ScrollView>

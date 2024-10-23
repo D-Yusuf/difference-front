@@ -31,8 +31,8 @@ const Login = () => {
 
   const handleLogin = () => {
     if (validateInputs()) {
-      mutate();
     }
+    mutate();
   };
 
   const validateInputs = () => {
