@@ -1,28 +1,25 @@
-import instance from "./index";
+import index from "./index"; // Ensure this path is correct
 
-export const createInvention = async (data) => {
+export const createInvention = async (inventionData) => {
   try {
     const formData = new FormData();
-    for (let key in data) {
-      if (key !== "images") formData.append(key, data[key]);
+    for (let key in inventionData) {
+      if (key !== "images") formData.append(key, inventionData[key]);
     }
-
-    // Handle multiple images as a single array
-    const imagesArray = data.images.map((image, index) => ({
-      uri: image.uri,
-      type: "image/jpeg",
-      name: `image${index}.jpg`,
-    }));
-
-    formData.append("images", JSON.stringify(imagesArray));
-
-    console.log("formData", formData);
-    const response = await instance.post("/inventions", formData, {
+    // Append each image file individually
+    inventionData.images.forEach((image, index) => {
+      formData.append("images", {
+        uri: image.uri,
+        type: 'image/jpeg', // Adjust this if you need to support other image types
+        name: `image${index}.jpg`,
+      });
+    });
+    const { data } = await index.post("/inventions", formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data;
+    return data;
   } catch (error) {
     console.log("error", error);
     throw error;
