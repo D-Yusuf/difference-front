@@ -1,9 +1,17 @@
 const NAVIGATION = {
+  HOME: {
+    INDEX: "HomeIndex",
+    HOME: "Home",
+  },
   AUTH: {
-    INDEX: "Auth",
+    INDEX: "AuthIndex",
     LOGIN: "Login",
-    INVESTOR_REGISTER: "InvestorRegister",
-    INVENTOR_REGISTER: "InventorRegister",
+    REGISTER: "Register",
+  },
+  PROFILE: {
+    INDEX: "Profile",
+    PROFILE: "Profile",
+    EDIT_PROFILE: "EditProfile",
   },
 };
 
