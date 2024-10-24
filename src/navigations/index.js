@@ -9,7 +9,7 @@ const NAVIGATION = {
     REGISTER: "Register",
   },
   PROFILE: {
-    INDEX: "Profile",
+    INDEX: "ProfileIndex",
     PROFILE: "Profile",
     EDIT_PROFILE: "EditProfile",
   },
