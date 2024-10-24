@@ -26,7 +26,17 @@ export const createInvention = async (inventionData) => {
   }
 };
 
-export const getInventions = async () => {
+export const getInventions = async (userId) => {
+  try {
+    const { data } = await index.get(`/inventions/user/${userId}`);
+    return data;
+  } catch (error) {
+    console.error("Error fetching inventions:", error);
+    throw error;
+  }
+};
+
+export const getAllInventions = async () => {
   try {
     const { data } = await index.get("/inventions");
     return data;

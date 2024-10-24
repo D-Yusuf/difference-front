@@ -15,17 +15,26 @@ import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "../api";
 import InventionList from "../components/InventionList";
 import { useNavigation } from "@react-navigation/native";
+
 const Profile = () => {
   const navigation = useNavigation();
-  const { data: profile } = useQuery({
+  const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: () => getProfile(),
   });
 
-  const { data: inventions } = useQuery({
-    queryKey: ["inventions"],
-    queryFn: () => getInventions(),
+  const { data: inventions, isLoading: inventionsLoading } = useQuery({
+    queryKey: ["inventions", profile?._id],
+    queryFn: () => getInventions(profile?._id),
+    enabled: !!profile?._id, // this is to prevent the query from running when the profile is not loaded
   });
+
+  console.log("Profile:", profile);
+  console.log("Inventions:", inventions);
+
+  if (profileLoading || inventionsLoading) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,7 +78,7 @@ const Profile = () => {
 
         <View style={styles.inventionsSection}>
           <Text style={styles.sectionTitle}>My Inventions</Text>
-          <InventionList inventions={inventions || []} />
+          <InventionList profile={profile} />
         </View>
       </ScrollView>
     </SafeAreaView>
