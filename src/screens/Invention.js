@@ -114,7 +114,7 @@ const Invention = () => {
           <Text style={styles.label}>Needed Funds</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter amount in KWD"
+            placeholder="Total Costs in KWD"
             keyboardType="numeric"
             onChangeText={(text) => setInvention({ ...invention, cost: text })}
           />
