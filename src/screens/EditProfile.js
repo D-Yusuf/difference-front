@@ -1,8 +1,16 @@
-import { StyleSheet, Text, View, SafeAreaView, TextInput } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  SafeAreaView,
+  TextInput,
+  Image,
+} from "react-native";
 import React, { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
-import { updateProfile } from "../api/profile";
+import { getProfile, updateProfile } from "../api/profile";
+import { BASE_URL } from "../api";
 
 const EditProfile = () => {
   const [userInfo, setUserInfo] = useState({
@@ -10,7 +18,10 @@ const EditProfile = () => {
     lastName: "",
     bio: "",
   });
-
+  const { data: profile } = useQuery({
+    queryKey: ["profile-image"],
+    queryFn: () => getProfile(),
+  });
   const { mutate: updateProfileMutate } = useMutation({
     mutationFn: () => updateProfile(userInfo),
     mutationKey: ["update-profile"],
@@ -26,6 +37,12 @@ const EditProfile = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inputContainer}>
+        <TouchableOpacity>
+          <Image
+            source={profile?.image && { uri: BASE_URL + profile.image }}
+            style={styles.image}
+          />
+        </TouchableOpacity>
         <TextInput
           style={styles.input}
           placeholder="Update First Name"
@@ -63,6 +80,13 @@ const styles = StyleSheet.create({
     backgroundColor: "lightgray", // Light background color
     paddingHorizontal: 20, // Add horizontal padding for white space
     paddingTop: 20, // Optional: Add some top padding
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 20,
+    marginBottom: 10,
+    alignSelf: "center",
   },
   inputContainer: {
     marginBottom: 20,
