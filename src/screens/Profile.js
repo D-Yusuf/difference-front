@@ -36,7 +36,9 @@ const Profile = () => {
         <View style={styles.card}>
           <TouchableOpacity
             style={styles.editButton}
-            onPress={() => navigation.navigate("EditProfile")}
+            onPress={() =>
+              navigation.navigate("EditProfile", { userId: profile._id })
+            } // Pass the user ID
           >
             <MaterialIcons name="edit" size={24} color="black" />
           </TouchableOpacity>
@@ -52,7 +54,7 @@ const Profile = () => {
             {`You signed up as `}
             <Text style={styles.role}>{profile?.role}</Text>
           </Text>
-          <Text style={styles.bio}>Bio: Lorem ipsum dolor sit amet.</Text>
+          <Text style={styles.bio}>{profile?.bio}</Text>
 
           <TouchableOpacity style={styles.cvButton}>
             <Text style={styles.actionButtonText}>Go to CV</Text>

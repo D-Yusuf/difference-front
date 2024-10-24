@@ -8,3 +8,14 @@ export const getProfile = async () => {
     throw error;
   }
 };
+export const updateProfile = async (userInfo) => {
+  // Accept userId
+  try {
+    const response = await instance.put(`/auth/profile/`, userInfo); // Use userId in the URL
+
+    return response.data;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
