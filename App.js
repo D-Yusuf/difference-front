@@ -5,6 +5,7 @@ import UserContext from "./src/context/UserContext";
 import { getToken } from "./src/api/storage";
 import MainNavigation from "./src/navigations/MainNavigation";
 import { useState, useEffect } from "react";
+import Invest from "./src/screens/Invest";
 export default function App() {
   const queryClient = new QueryClient();
   const [user, setUser] = useState(false);
@@ -22,6 +23,7 @@ export default function App() {
       <QueryClientProvider client={queryClient}>
         <UserContext.Provider value={[user, setUser]}>
           {user ? <MainNavigation /> : <AuthNavigation />}
+          {/* {user ? <Invest /> : <AuthNavigation />} */}
           {/* here i want to check if the user is logged in or not and if not then show the AuthNavigation */}
         </UserContext.Provider>
       </QueryClientProvider>

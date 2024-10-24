@@ -7,39 +7,50 @@ import {
   Image,
 } from "react-native";
 import React, { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
 import { getProfile, updateProfile } from "../api/profile";
 import { BASE_URL } from "../api";
-
+import * as ImagePicker from 'expo-image-picker';
 const EditProfile = () => {
-  const [userInfo, setUserInfo] = useState({
-    firstName: "",
-    lastName: "",
-    bio: "",
-  });
+  const queryClient = useQueryClient();
+  const [userInfo, setUserInfo] = useState({});
+  const [image, setImage] = useState(null);
   const { data: profile } = useQuery({
     queryKey: ["profile-image"],
     queryFn: () => getProfile(),
-  });
+  }); // do navbigate and put user image inside of it noo need to do new usequery
   const { mutate: updateProfileMutate } = useMutation({
     mutationFn: () => updateProfile(userInfo),
     mutationKey: ["update-profile"],
     onSuccess: () => {
       alert("Profile updated successfully");
+      queryClient.invalidateQueries(["profile"]);
     },
     onError: (error) => {
-      console.log(userInfo);
-      console.log(error);
+      alert(userInfo.firstName);
+      // alert(error);
     },
   });
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
 
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+      setUserInfo({ ...userInfo, image });
+    }
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inputContainer}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={pickImage}>
           <Image
-            source={profile?.image && { uri: BASE_URL + profile.image }}
+            source={userInfo.image ? { uri: userInfo.image } : profile?.image && { uri: BASE_URL + profile.image }}
             style={styles.image}
           />
         </TouchableOpacity>
@@ -87,6 +98,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 10,
     alignSelf: "center",
+    borderWidth: 2,
+    borderColor: "black",
   },
   inputContainer: {
     marginBottom: 20,

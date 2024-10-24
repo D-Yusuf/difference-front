@@ -13,7 +13,7 @@ import {
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
-import { createInvention } from "../api/invention";
+import { createInvention } from "../api/inventions";
 
 const Invention = () => {
   const phases = [

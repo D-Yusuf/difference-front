@@ -9,9 +9,21 @@ export const getProfile = async () => {
   }
 };
 export const updateProfile = async (userInfo) => {
-  // Accept userId
   try {
-    const response = await instance.put(`/auth/profile/`, userInfo); // Use userId in the URL
+    const formData = new FormData();
+    for(let key in userInfo) {
+      if(key!== 'image') {
+        formData.append(key, userInfo[key]);
+      }
+    }
+  
+      formData.append('image', {
+        name: "image.jpg",
+        type: "image/jpeg",
+        uri: userInfo.image,
+    });
+    console.log(formData);
+    const response = await instance.put(`/auth/profile`, formData); // Use userId in the URL
 
     return response.data;
   } catch (error) {
