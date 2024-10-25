@@ -21,12 +21,19 @@ const InventionList = ({ profile }) => {
   const renderItem = ({ item }) => <InventionCard invention={item} />;
 
   return (
-    <FlatList
-      data={userInventions}
-      renderItem={renderItem}
-      keyExtractor={(item) => item._id.toString()}
-      contentContainerStyle={styles.container}
-    />
+    // <FlatList
+
+    //   data={userInventions}
+    //   renderItem={renderItem}
+    //   keyExtractor={(item) => item._id.toString()}
+    //   contentContainerStyle={styles.container}
+    // />
+
+    <View>
+      {userInventions.map((invention) => (
+        <InventionCard key={invention._id} invention={invention} />
+      ))}
+    </View>
   );
 };
 
