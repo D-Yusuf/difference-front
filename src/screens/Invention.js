@@ -7,14 +7,26 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Modal,
+  FlatList,
 } from "react-native";
 import React, { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
-import { createInvention } from "../api/invention";
+import { createInvention } from "../api/inventions";
+
 const Invention = () => {
+  const phases = [
+    { label: "Idea", value: "idea" },
+    { label: "Testing", value: "testing" },
+    { label: "Market Ready", value: "market_ready" },
+  ];
+
   const [invention, setInvention] = useState({});
   const [images, setImages] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPhase, setSelectedPhase] = useState(null);
+
   const { mutate } = useMutation({
     mutationFn: () => createInvention(invention),
     mutationKey: ["create-invention"],
@@ -27,7 +39,6 @@ const Invention = () => {
   });
 
   const handleImagePicker = async () => {
-    // Request permission to access the media library
     const permissionResult =
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -38,7 +49,7 @@ const Invention = () => {
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsMultipleSelection: true, // Allow multiple selection
+      allowsMultipleSelection: true,
       aspect: [4, 3],
       quality: 1,
     });
@@ -50,12 +61,29 @@ const Invention = () => {
   };
 
   const handleCreateInvention = () => {
-    if(images.length === 0){
+    if (images.length === 0) {
       alert("Please upload at least one image");
+      return;
+    }
+    if (!selectedPhase) {
+      alert("Please select a phase for your invention");
       return;
     }
     mutate();
   };
+
+  const renderPhaseItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.roleItem}
+      onPress={() => {
+        setSelectedPhase(item.value);
+        setInvention({ ...invention, phase: item.value });
+        setModalVisible(false);
+      }}
+    >
+      <Text style={styles.roleItemText}>{item.label}</Text>
+    </TouchableOpacity>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -86,11 +114,21 @@ const Invention = () => {
           <Text style={styles.label}>Needed Funds</Text>
           <TextInput
             style={styles.input}
-            placeholder="Enter amount in KWD"
+            placeholder="Total Costs in KWD"
             keyboardType="numeric"
             onChangeText={(text) => setInvention({ ...invention, cost: text })}
           />
         </View>
+        <TouchableOpacity
+          style={styles.dropdownButton}
+          onPress={() => setModalVisible(true)}
+        >
+          <Text style={styles.dropdownButtonText}>
+            {selectedPhase
+              ? phases.find((p) => p.value === selectedPhase).label
+              : "Select Phase"}
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={handleImagePicker}>
           <Text style={styles.buttonText}>Upload Images</Text>
         </TouchableOpacity>
@@ -103,10 +141,28 @@ const Invention = () => {
             />
           ))}
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleCreateInvention}>
-          <Text style={styles.buttonText}>Create Invention</Text>
+        <TouchableOpacity
+          style={styles.createInventionbutton}
+          onPress={handleCreateInvention}
+        >
+          <Text style={styles.buttonText}>Post Invention</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalView}>
+          <FlatList
+            data={phases}
+            renderItem={renderPhaseItem}
+            keyExtractor={(item) => item.value}
+          />
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -162,6 +218,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: 10,
   },
+  createInventionbutton: {
+    backgroundColor: "#34A853",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 10,
+  },
   buttonText: {
     color: "white",
     fontSize: 16,
@@ -178,5 +240,42 @@ const styles = StyleSheet.create({
     height: 100,
     margin: 5,
     borderRadius: 8,
+  },
+  dropdownButton: {
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 20,
+  },
+  dropdownButtonText: {
+    fontSize: 16,
+    color: "#333",
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  roleItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+    width: "100%",
+  },
+  roleItemText: {
+    fontSize: 16,
+    color: "#333",
   },
 });

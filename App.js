@@ -3,7 +3,9 @@ import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigation from "./src/navigations/AuthNav/AuthNavigation";
 import UserContext from "./src/context/UserContext";
 import { getToken } from "./src/api/storage";
+import MainNavigation from "./src/navigations/AppNav/MainNavigation";
 import { useState, useEffect } from "react";
+import Invest from "./src/screens/Invest";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Text } from "react-native";
 import { logout } from "./src/api/auth";
@@ -28,20 +30,9 @@ export default function App() {
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <UserContext.Provider value={[user, setUser]}>
-          <SafeAreaView style={{ flex: 1 }}>
-            {/* {user ? (
-              <Button
-                title="Logout"
-                onPress={() => {
-                  logout();
-                  setUser(false);
-                }}
-              />
-            ) : (
-              <AuthNavigation />
-            )} */}
-            <Home />
-          </SafeAreaView>
+          {user ? <MainNavigation /> : <AuthNavigation />}
+
+          {/* here i want to check if the user is logged in or not and if not then show the AuthNavigation */}
         </UserContext.Provider>
       </QueryClientProvider>
     </NavigationContainer>

@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { login } from "../api/auth";
 import UserContext from "../context/UserContext";
 import { useMutation } from "@tanstack/react-query";
+import NAVIGATION from "../navigations/index";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -73,7 +74,9 @@ const Login = () => {
 
         <View style={styles.registerContainer}>
           <Text style={styles.registerText}>Don't have an account?</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate(NAVIGATION.AUTH.REGISTER)}
+          >
             <Text style={styles.registerLink}>Register</Text>
           </TouchableOpacity>
         </View>
