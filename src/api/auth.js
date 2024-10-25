@@ -2,12 +2,11 @@ import instance from ".";
 import { storeToken, removeToken } from "./storage";
 export const login = async (email, password) => {
   try {
-    const {data} = await instance.post("/auth/login", { email, password });
+    const { data } = await instance.post("/auth/login", { email, password });
     await storeToken(data.token);
-    alert(data.message)
+    alert(data.message);
   } catch (error) {
-    return error.response.data.error
-    
+    return error.response.data.error;
   }
 };
 
@@ -30,12 +29,10 @@ export const register = async (userInfo) => {
       await storeToken(data.token);
       return data;
   } catch (error) {
-    return error.response.data.error
+    return error.response.data.error;
   }
-  };
+};
 
-  export const logout = async () => {
-    await removeToken();
-  }
-
-
+export const logout = async () => {
+  await removeToken();
+};
