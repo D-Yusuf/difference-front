@@ -136,7 +136,6 @@ const Register = () => {
             placeholder="Email"
             keyboardType="email-address"
             placeholderTextColor="#888"
-            value={userInfo.email}
             onChangeText={(text) => setUserInfo({ ...userInfo, email: text })}
           />
           {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
@@ -145,7 +144,6 @@ const Register = () => {
             style={[styles.input, errors.firstName && styles.inputError]}
             placeholder="First Name"
             placeholderTextColor="#888"
-            value={userInfo.firstName}
             onChangeText={(text) =>
               setUserInfo({ ...userInfo, firstName: text })
             }
@@ -158,7 +156,6 @@ const Register = () => {
             style={[styles.input, errors.lastName && styles.inputError]}
             placeholder="Last Name"
             placeholderTextColor="#888"
-            value={userInfo.lastName}
             onChangeText={(text) =>
               setUserInfo({ ...userInfo, lastName: text })
             }
@@ -181,7 +178,6 @@ const Register = () => {
             placeholder="Password"
             secureTextEntry
             placeholderTextColor="#888"
-            value={userInfo.password}
             onChangeText={(text) =>
               setUserInfo({ ...userInfo, password: text })
             }
