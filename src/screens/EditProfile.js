@@ -12,23 +12,24 @@ import { TouchableOpacity } from "react-native";
 import { getProfile, updateProfile } from "../api/profile";
 import { BASE_URL } from "../api";
 import * as ImagePicker from 'expo-image-picker';
-const EditProfile = () => {
+const EditProfile = ({route}) => {
   const queryClient = useQueryClient();
   const [userInfo, setUserInfo] = useState({});
   const [image, setImage] = useState(null);
-  const { data: profile } = useQuery({
-    queryKey: ["profile-image"],
-    queryFn: () => getProfile(),
-  }); // do navbigate and put user image inside of it noo need to do new usequery
+  const { profile } = route.params;
+  // const { data: profile } = useQuery({
+  //   queryKey: ["profile-image"],
+  //   queryFn: () => getProfile(),
+  // }); // do navbigate and put user image inside of it noo need to do new usequery
   const { mutate: updateProfileMutate } = useMutation({
     mutationFn: () => updateProfile(userInfo),
     mutationKey: ["update-profile"],
     onSuccess: () => {
-      alert("Profile updated successfully");
+      // alert("Profile updated successfully");
       queryClient.invalidateQueries(["profile"]);
     },
     onError: (error) => {
-      alert(userInfo.firstName);
+      alert(userInfo);
       // alert(error);
     },
   });
@@ -42,7 +43,7 @@ const EditProfile = () => {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-      setUserInfo({ ...userInfo, image });
+      setUserInfo({ ...userInfo, image: result.assets[0].uri });
     }
   }
   return (
@@ -50,7 +51,7 @@ const EditProfile = () => {
       <View style={styles.inputContainer}>
         <TouchableOpacity onPress={pickImage}>
           <Image
-            source={userInfo.image ? { uri: userInfo.image } : profile?.image && { uri: BASE_URL + profile.image }}
+            source={image ? { uri: image } : profile?.image && { uri: BASE_URL + profile.image }}
             style={styles.image}
           />
         </TouchableOpacity>
@@ -75,7 +76,7 @@ const EditProfile = () => {
       </View>
       <TouchableOpacity
         style={styles.button}
-        onPress={() => updateProfileMutate()}
+        onPress={updateProfileMutate}
       >
         <Text style={styles.buttonText}>Update Profile</Text>
       </TouchableOpacity>

@@ -20,19 +20,15 @@ const Profile = () => {
   const navigation = useNavigation();
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile"],
-    queryFn: () => getProfile(),
+    queryFn: getProfile,
   });
 
-  const { data: inventions, isLoading: inventionsLoading } = useQuery({
-    queryKey: ["inventions", profile?._id],
-    queryFn: () => getInventions(profile?._id),
-    enabled: !!profile?._id, // this is to prevent the query from running when the profile is not loaded
-  });
+
 
   console.log("Profile:", profile);
-  console.log("Inventions:", inventions);
+  // console.log("Inventions:", inventions);
 
-  if (profileLoading || inventionsLoading) {
+  if (profileLoading) {
     return <Text>Loading...</Text>;
   }
 
@@ -46,7 +42,7 @@ const Profile = () => {
           <TouchableOpacity
             style={styles.editButton}
             onPress={() =>
-              navigation.navigate("EditProfile", { userId: profile._id })
+              navigation.navigate("EditProfile", { profile })
             } // Pass the user ID
           >
             <MaterialIcons name="edit" size={24} color="black" />
