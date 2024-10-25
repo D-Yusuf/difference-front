@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import AuthNavigation from "./src/navigations/AuthNav/AuthNavigation";
 import UserContext from "./src/context/UserContext";
 import { getToken } from "./src/api/storage";
-import MainNavigation from "./src/navigations/AppNav/MainNavigation";
+import MainNavigation from "./src/navigations/MainNavigation";
 import { useState, useEffect } from "react";
 import Invest from "./src/screens/Invest";
 import { SafeAreaView } from "react-native-safe-area-context";
