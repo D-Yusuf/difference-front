@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, Picker, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { createOrder } from '../api/orders';
-import {getAllInventions} from '../api/inventions';
+import { getAllInventions } from '../api/invention';
 import { BASE_URL } from '../api';
 const Invest = () => {
     const [selectedInvention, setSelectedInvention] = useState('');

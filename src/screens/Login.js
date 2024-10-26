@@ -19,21 +19,31 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useContext(UserContext);
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationKey: ["login"],
     mutationFn: () => login(email, password),
-    onSuccess: () => {
-      setUser(true);
+    onSuccess: (data) => {
+      console.log("sas")
+      // setUser(true);
+      // if(data){
+
+      // }
     },
     onError: (error) => {
-      Alert.alert("Login Error", error.message);
+      alert("Login Error", error);
     },
   });
 
   const handleLogin = () => {
+<<<<<<< HEAD
     // if (validateInputs()) {
     // }
     mutate();
+=======
+    if (validateInputs()) {
+      mutate();
+    }
+>>>>>>> difference-front/invest
   };
 
   const validateInputs = () => {
@@ -45,10 +55,10 @@ const Login = () => {
       alert("Please enter a valid email address");
       return false;
     }
-    if (password.length < 6) {
-      alert("Password must be at least 6 characters long");
-      return false;
-    }
+    // if (password.length < 6) {
+    //   alert("Password must be at least 6 characters long");
+    //   return false;
+    // }
     return true;
   };
 
