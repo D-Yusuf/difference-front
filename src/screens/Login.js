@@ -23,8 +23,8 @@ const Login = () => {
     mutationKey: ["login"],
     mutationFn: () => login(email, password),
     onSuccess: (data) => {
-      console.log("sas")
-      // setUser(true);
+      console.log(data.message)
+      setUser(true);
       // if(data){
 
       // }
@@ -35,15 +35,9 @@ const Login = () => {
   });
 
   const handleLogin = () => {
-<<<<<<< HEAD
-    // if (validateInputs()) {
-    // }
-    mutate();
-=======
     if (validateInputs()) {
       mutate();
     }
->>>>>>> difference-front/invest
   };
 
   const validateInputs = () => {
