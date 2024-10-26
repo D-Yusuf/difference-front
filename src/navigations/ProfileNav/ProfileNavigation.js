@@ -1,7 +1,7 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Profile from "../../screens/Profile";
-import EditProfile from "../../screens/EditProfile";
+import Profile from "../../screens/Profile/Profile";
+import EditProfile from "../../screens/Profile/EditProfile";
 import invention from "../../screens/Invention";
 import NAVIGATION from "..";
 

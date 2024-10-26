@@ -13,13 +13,13 @@ import {
   Modal,
   FlatList,
 } from "react-native";
-import { register } from "../api/auth";
+import { register } from "../../api/auth";
 import { useContext } from "react";
-import UserContext from "../context/UserContext";
+import UserContext from "../../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
-import { validateEmail, validatePassword } from "../utils/validation";
+import { validateEmail, validatePassword } from "../../utils/validation";
 
 const Register = () => {
   const roles = [

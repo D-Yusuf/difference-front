@@ -86,7 +86,7 @@ const Invention = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
         <Text style={styles.title}>New Invention</Text>
         <View style={styles.inputContainer}>
@@ -163,7 +163,7 @@ const Invention = () => {
           />
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 

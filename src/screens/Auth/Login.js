@@ -9,10 +9,10 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { login } from "../api/auth";
-import UserContext from "../context/UserContext";
+import { login } from "../../api/auth";
+import UserContext from "../../context/UserContext";
 import { useMutation } from "@tanstack/react-query";
-import NAVIGATION from "../navigations/index";
+import NAVIGATION from "../../navigations/index";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -57,7 +57,6 @@ const Login = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <TextInput
           style={styles.input}
@@ -85,7 +84,6 @@ const Login = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </SafeAreaView>
   );
 };
 

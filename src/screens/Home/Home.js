@@ -1,20 +1,20 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { logout } from "../api/auth";
-import CategoryList from "../components/CategoryList";
-import UserContext  from "../context/UserContext";
+import { logout } from "../../api/auth";
+import CategoryList from "../../components/CategoryList";
+import UserContext  from "../../context/UserContext";
 
 const Home = () => {
   const [user, setUser] = useContext(UserContext);
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <Text>Choose A Category</Text>
       <CategoryList />
       <Button title="Logout" onPress={()=>{logout(); setUser(false)}} />
       <Text style={styles.title}>Welcome Home</Text>
       <Text style={styles.subtitle}>This is a simple home page</Text>
-    </SafeAreaView>
+    </View>
   );
 };
 
