@@ -3,10 +3,22 @@ import { storeToken, removeToken } from "./storage";
 export const login = async (email, password) => {
   try {
     const {data} = await instance.post("/auth/login", { email, password });
+    console.log(email,password)
     await storeToken(data.token);
-    alert(data.message)
+    console.log(data)
+    return data
   } catch (error) {
-    return error.response.data.error
+    if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      return (error.response.data.message || 'Authentication failed');
+    } else if (error.request) {
+      // The request was made but no response was received
+      return ('No response from server');
+    } else {
+      // Something happened in setting up the request that triggered an Error
+      return ('Error setting up the request');
+    }
     
   }
 };

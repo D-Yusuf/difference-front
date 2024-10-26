@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // Import the icon library
 import { getProfile } from "../api/profile";
-import { getInventions } from "../api/inventions";
+import { getInventions } from "../api/invention";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "../api";
 import InventionList from "../components/InventionList";

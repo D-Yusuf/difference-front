@@ -6,13 +6,14 @@ import { getToken } from "./src/api/storage";
 import MainNavigation from "./src/navigations/MainNavigation";
 import { useState, useEffect } from "react";
 import Invest from "./src/screens/Invest";
+import { logout } from "./src/api/auth";
 export default function App() {
   const queryClient = new QueryClient();
   const [user, setUser] = useState(false);
-
   useEffect(() => {
     const checkToken = async () => {
       const token = await getToken();
+      console.log(token)
       setUser(token ? true : false);
     };
     checkToken();
