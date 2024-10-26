@@ -10,7 +10,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Text } from "react-native";
 import { logout } from "./src/api/auth";
 import Home from "./src/screens/Home";
-import { logout } from "./src/api/auth";
 export default function App() {
   const queryClient = new QueryClient();
 
