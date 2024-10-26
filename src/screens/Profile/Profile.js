@@ -9,11 +9,11 @@ import {
   ScrollView,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons"; // Import the icon library
-import { getProfile } from "../api/profile";
-import { getInventions } from "../api/invention";
+import { getProfile } from "../../api/profile";
+import { getInventions } from "../../api/invention";
 import { useQuery } from "@tanstack/react-query";
-import { BASE_URL } from "../api";
-import InventionList from "../components/InventionList";
+import { BASE_URL } from "../../api";
+import InventionList from "../../components/InventionList";
 import { useNavigation } from "@react-navigation/native";
 
 const Profile = () => {
@@ -33,7 +33,6 @@ const Profile = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         nestedScrollEnabled={true}
@@ -77,7 +76,6 @@ const Profile = () => {
           <InventionList profile={profile} />
         </View>
       </ScrollView>
-    </SafeAreaView>
   );
 };
 

@@ -9,8 +9,8 @@ import {
 import React, { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
-import { getProfile, updateProfile } from "../api/profile";
-import { BASE_URL } from "../api";
+import { getProfile, updateProfile } from "../../api/profile";
+import { BASE_URL } from "../../api";
 import * as ImagePicker from 'expo-image-picker';
 const EditProfile = ({route}) => {
   const queryClient = useQueryClient();
@@ -47,7 +47,7 @@ const EditProfile = ({route}) => {
     }
   }
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.inputContainer}>
         <TouchableOpacity onPress={pickImage}>
           <Image
@@ -80,7 +80,7 @@ const EditProfile = ({route}) => {
       >
         <Text style={styles.buttonText}>Update Profile</Text>
       </TouchableOpacity>
-    </SafeAreaView>
+    </View>
   );
 };
 
