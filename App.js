@@ -5,11 +5,7 @@ import UserContext from "./src/context/UserContext";
 import { getToken } from "./src/api/storage";
 import MainNavigation from "./src/navigations/MainNavigation";
 import { useState, useEffect } from "react";
-import Invest from "./src/screens/Invest/Invest";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Button, Text } from "react-native";
-import { logout } from "./src/api/auth";
-import Home from "./src/screens/Home/Home";
+import { SafeAreaView } from "react-native";
 export default function App() {
   const queryClient = new QueryClient();
 
@@ -34,14 +30,8 @@ export default function App() {
             {/* {user ? <Invest /> : <AuthNavigation />} */}
             {user ? <MainNavigation /> : <AuthNavigation />}
           </UserContext.Provider>
-      </SafeAreaView>
-    </QueryClientProvider>
+        </SafeAreaView>
+      </QueryClientProvider>
     </NavigationContainer>
   );
 }
-//-----
-
-/* <Login />
-<InvestorRegister/> */
-
-//------
