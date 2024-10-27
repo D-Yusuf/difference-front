@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { View, Text, StyleSheet, Button } from "react-native";
 import { logout } from "../../api/auth";
-import CategoryList from "../../Components/CategoryList";
+import CategoryList from "../../components/CategoryList";
 import UserContext from "../../context/UserContext";
 
 const Home = () => {

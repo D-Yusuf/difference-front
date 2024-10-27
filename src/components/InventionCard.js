@@ -1,28 +1,40 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { BASE_URL } from "../api/index";
+import { useNavigation } from "@react-navigation/native";
+import NAVIGATION from "../navigations";
 
 const InventionCard = ({ invention }) => {
-  console.log("inv", `${BASE_URL}${invention.images[0]?.replace(/\\/g, "/")}`);
+  const navigation = useNavigation();
   return (
-    <View style={styles.card}>
-      <Image
-        source={{
-          uri: `${BASE_URL}${invention.images[0]?.replace(/\\/g, "/")}`,
-        }}
-        style={styles.image}
-        width={100}
-        height={100}
-        resizeMode="cover"
-      />
-      <View style={styles.content}>
-        <Text style={styles.name}>{invention.name}</Text>
-        <Text style={styles.description} numberOfLines={2}>
-          {invention.description}
-        </Text>
-        <Text style={styles.cost}>Funding needed: ${invention.cost}</Text>
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate(NAVIGATION.PROFILE.INVENTION_DETAILS, {
+          inventionId: invention._id,
+          image: `${BASE_URL}${invention.images[0]?.replace(/\\/g, "/")}`,
+        })
+      }
+      key={invention._id}
+    >
+      <View style={styles.card}>
+        <Image
+          source={{
+            uri: `${BASE_URL}${invention.images[0]?.replace(/\\/g, "/")}`,
+          }}
+          style={styles.image}
+          width={100}
+          height={100}
+          resizeMode="cover"
+        />
+        <View style={styles.content}>
+          <Text style={styles.name}>{invention.name}</Text>
+          <Text style={styles.description} numberOfLines={2}>
+            {invention.description}
+          </Text>
+          <Text style={styles.cost}>Funding needed: ${invention.cost}</Text>
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
