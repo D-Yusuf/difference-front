@@ -35,6 +35,15 @@ export const getInventions = async (userId) => {
     throw error;
   }
 };
+export const getInvention = async (inventionId) => {
+  try {
+    const { data } = await index.get(`/inventions/${inventionId}`);
+    return data;
+  } catch (error) {
+    console.error("Error fetching invention:", error);
+    throw error;
+  }
+};
 
 export const getAllInventions = async () => {
   try {
