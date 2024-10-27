@@ -3,22 +3,16 @@ import { StyleSheet, FlatList, View, Text } from "react-native";
 import InventionCard from "./InventionCard";
 import { BASE_URL } from "../api/index";
 
-const InventionList = ({ profile }) => {
-  console.log("InventionList props:", { profile });
+const InventionList = ({ inventions }) => {
 
-  if (!profile) {
-    return <Text>Loading profile...</Text>;
+
+
+
+
+  if (inventions.length === 0 || !inventions) {
+    return <Text>No inventions found.</Text>;
   }
 
-  const userInventions = profile.inventions || [];
-
-  console.log("User inventions:", userInventions);
-
-  if (userInventions.length === 0) {
-    return <Text>No inventions found for this user.</Text>;
-  }
-
-  const renderItem = ({ item }) => <InventionCard invention={item} />;
 
   return (
     // <FlatList
@@ -30,7 +24,7 @@ const InventionList = ({ profile }) => {
     // />
 
     <View>
-      {userInventions.map((invention) => (
+      {inventions.map((invention) => (
         <InventionCard key={invention._id} invention={invention} />
       ))}
     </View>

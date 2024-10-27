@@ -13,7 +13,7 @@ import { getProfile } from "../../api/profile";
 import { getInventions } from "../../api/invention";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "../../api";
-import InventionList from "../../Components/InventionList"; // Corrected casing
+import InventionList from "../../components/InventionList"; // Corrected casing
 import { useNavigation } from "@react-navigation/native";
 
 const Profile = () => {
