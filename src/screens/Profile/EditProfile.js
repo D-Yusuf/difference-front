@@ -11,12 +11,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
 import { getProfile, updateProfile } from "../../api/profile";
 import { BASE_URL } from "../../api";
-import * as ImagePicker from 'expo-image-picker';
-const EditProfile = ({route}) => {
+import * as ImagePicker from "expo-image-picker";
+const EditProfile = ({ route, navigation }) => {
   const queryClient = useQueryClient();
-  const [userInfo, setUserInfo] = useState({});
-  const [image, setImage] = useState(null);
   const { profile } = route.params;
+  const [userInfo, setUserInfo] = useState({
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    bio: profile.bio,
+  });
+  const [image, setImage] = useState(null);
   // const { data: profile } = useQuery({
   //   queryKey: ["profile-image"],
   //   queryFn: () => getProfile(),
@@ -25,8 +29,9 @@ const EditProfile = ({route}) => {
     mutationFn: () => updateProfile(userInfo),
     mutationKey: ["update-profile"],
     onSuccess: () => {
-      // alert("Profile updated successfully");
+      alert("Profile updated successfully");
       queryClient.invalidateQueries(["profile"]);
+      navigation.goBack();
     },
     onError: (error) => {
       alert(userInfo);
@@ -45,39 +50,57 @@ const EditProfile = ({route}) => {
       setImage(result.assets[0].uri);
       setUserInfo({ ...userInfo, image: result.assets[0].uri });
     }
-  }
+  };
+  const handleUpdateProfile = () => {
+    if (validateInputs()) {
+      updateProfileMutate();
+    }
+  };
+
+  const validateInputs = () => {
+    if (!userInfo.firstName || !userInfo.lastName) {
+      alert("Please fill in first name and last name");
+      return false;
+    }
+
+    return true;
+  };
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
         <TouchableOpacity onPress={pickImage}>
           <Image
-            source={image ? { uri: image } : profile?.image && { uri: BASE_URL + profile.image }}
+            source={
+              image
+                ? { uri: image }
+                : profile?.image && { uri: BASE_URL + profile.image }
+            }
             style={styles.image}
           />
         </TouchableOpacity>
         <TextInput
           style={styles.input}
           placeholder="Update First Name"
+          value={userInfo.firstName}
           maxLength={20}
           onChangeText={(text) => setUserInfo({ ...userInfo, firstName: text })}
         />
         <TextInput
           style={styles.input}
           placeholder="Update Last Name"
+          value={userInfo.lastName}
           maxLength={20}
           onChangeText={(text) => setUserInfo({ ...userInfo, lastName: text })}
         />
         <TextInput
           style={styles.input}
-          placeholder="Add Bio"
+          placeholder="Add or Update Bio"
+          value={userInfo.bio}
           maxLength={50}
           onChangeText={(text) => setUserInfo({ ...userInfo, bio: text })}
         />
       </View>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={updateProfileMutate}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
         <Text style={styles.buttonText}>Update Profile</Text>
       </TouchableOpacity>
     </View>
