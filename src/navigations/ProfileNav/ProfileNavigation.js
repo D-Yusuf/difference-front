@@ -3,7 +3,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Profile from "../../screens/Profile/Profile";
 import EditProfile from "../../screens/Profile/EditProfile";
 import invention from "../../screens/Invention";
-import NAVIGATION from "..";
+import NAVIGATION from "../index";
+import InventionDetails from "../../components/InventionDetails";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +17,10 @@ const ProfileNavigation = () => {
         component={EditProfile}
       />
       <Stack.Screen name="AddInvention" component={invention} />
+      <Stack.Screen
+        name={NAVIGATION.PROFILE.INVENTION_DETAILS}
+        component={InventionDetails}
+      />
     </Stack.Navigator>
   );
 };
