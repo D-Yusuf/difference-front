@@ -13,7 +13,7 @@ import { getProfile } from "../../api/profile";
 import { getInventions } from "../../api/invention";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "../../api";
-import InventionList from "../../components/InventionList";
+import InventionList from "../../Components/InventionList"; // Corrected casing
 import { useNavigation } from "@react-navigation/native";
 
 const Profile = () => {
@@ -23,8 +23,6 @@ const Profile = () => {
     queryFn: getProfile,
   });
 
-
-
   console.log("Profile:", profile);
   // console.log("Inventions:", inventions);
 
@@ -33,49 +31,47 @@ const Profile = () => {
   }
 
   return (
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        nestedScrollEnabled={true}
-      >
-        <View style={styles.card}>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() =>
-              navigation.navigate("EditProfile", { profile })
-            } // Pass the user ID
-          >
-            <MaterialIcons name="edit" size={24} color="black" />
-          </TouchableOpacity>
-          <Image
-            source={profile?.image && { uri: BASE_URL + profile.image }}
-            style={styles.image}
-          />
-          <Text style={styles.name}>
-            {profile?.firstName} {profile?.lastName}
-          </Text>
-          <Text style={styles.email}>{profile?.email}</Text>
-          <Text style={styles.roleText}>
-            {`You signed up as `}
-            <Text style={styles.role}>{profile?.role}</Text>
-          </Text>
-          <Text style={styles.bio}>{profile?.bio}</Text>
+    <ScrollView
+      contentContainerStyle={styles.scrollContent}
+      nestedScrollEnabled={true}
+    >
+      <View style={styles.card}>
+        <TouchableOpacity
+          style={styles.editButton}
+          onPress={() => navigation.navigate("EditProfile", { profile })} // Pass the user ID
+        >
+          <MaterialIcons name="edit" size={24} color="black" />
+        </TouchableOpacity>
+        <Image
+          source={profile?.image && { uri: BASE_URL + profile.image }}
+          style={styles.image}
+        />
+        <Text style={styles.name}>
+          {profile?.firstName} {profile?.lastName}
+        </Text>
+        <Text style={styles.email}>{profile?.email}</Text>
+        <Text style={styles.roleText}>
+          {`You signed up as `}
+          <Text style={styles.role}>{profile?.role}</Text>
+        </Text>
+        <Text style={styles.bio}>{profile?.bio}</Text>
 
-          <TouchableOpacity style={styles.cvButton}>
-            <Text style={styles.actionButtonText}>Go to CV</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.addInventionButton}
-            onPress={() => navigation.navigate("AddInvention")}
-          >
-            <Text style={styles.actionButtonText}>Add Invention +</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.cvButton}>
+          <Text style={styles.actionButtonText}>Go to CV</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.addInventionButton}
+          onPress={() => navigation.navigate("AddInvention")}
+        >
+          <Text style={styles.actionButtonText}>Add Invention +</Text>
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.inventionsSection}>
-          <Text style={styles.sectionTitle}>My Inventions</Text>
-          <InventionList profile={profile} />
-        </View>
-      </ScrollView>
+      <View style={styles.inventionsSection}>
+        <Text style={styles.sectionTitle}>My Inventions</Text>
+        <InventionList profile={profile} />
+      </View>
+    </ScrollView>
   );
 };
 
