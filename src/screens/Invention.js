@@ -15,7 +15,7 @@ import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { createInvention } from "../api/invention";
 
-const Invention = () => {
+const Invention = ({ navigation }) => {
   const phases = [
     { label: "Idea", value: "idea" },
     { label: "Testing", value: "testing" },
@@ -32,6 +32,7 @@ const Invention = () => {
     mutationKey: ["create-invention"],
     onSuccess: () => {
       alert("Invention created successfully");
+      navigation.goBack();
     },
     onError: (error) => {
       console.log(error);
