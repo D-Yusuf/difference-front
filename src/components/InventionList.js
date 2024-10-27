@@ -5,6 +5,7 @@ import { BASE_URL } from "../api/index";
 
 const InventionList = ({ inventions }) => {
 
+  console.log("InventionList props:", { inventions });
 
 
 
