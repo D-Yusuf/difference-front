@@ -14,7 +14,6 @@ const InventionDetails = () => {
   const route = useRoute();
   const { inventionId, image } = route.params;
   console.log("Image URI:", image); // Add this to debug
-
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention"],
     queryFn: () => getInvention(inventionId),
@@ -27,7 +26,7 @@ const InventionDetails = () => {
   const isOwner =
     invention.inventors.find((inventor) => inventor._id === user._id) ||
     user.role === "admin";
-  const canInvest = user.role === "investor" && user.role === "admin";
+  const canInvest = user.role === "investor" || user.role === "admin";
   return (
     <ScrollView style={styles.container}>
       <View style={styles.contentContainer}>
