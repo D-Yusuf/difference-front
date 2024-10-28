@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
 import { getProfile } from "../api/profile"; // Import the getProfile function
 import UserContext from "../context/UserContext";
-
+import { BASE_URL } from "../api";
 const InventionDetails = () => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
@@ -27,7 +27,7 @@ const InventionDetails = () => {
   const isOwner =
     invention.inventors.find((inventor) => inventor._id === user._id) ||
     user.role === "admin";
-
+  const canInvest = user.role === "investor" && user.role === "admin";
   return (
     <ScrollView style={styles.container}>
       <View style={styles.contentContainer}>
@@ -37,7 +37,7 @@ const InventionDetails = () => {
           {invention?.inventors?.map((inventor) => (
             <View key={inventor._id} style={styles.inventorRow}>
               <Image
-                source={{ uri: inventor.image }}
+                source={{ uri: BASE_URL + inventor.image }}
                 style={styles.inventorImage}
               />
               <Text style={styles.inventor}>
@@ -48,7 +48,7 @@ const InventionDetails = () => {
         </View>
         <Text style={styles.description}>{invention?.description}</Text>
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
-        {conditionalEdit && (
+        {isOwner && (
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate("EditInvention", { invention })}
@@ -57,7 +57,7 @@ const InventionDetails = () => {
           </TouchableOpacity>
         )}
 
-        {isOwner && (
+        {canInvest && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
             onPress={() => navigation.navigate("Invest")}
