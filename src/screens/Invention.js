@@ -32,6 +32,7 @@ const Invention = ({ navigation }) => {
     mutationKey: ["create-invention"],
     onSuccess: () => {
       alert("Invention created successfully");
+
       navigation.goBack();
     },
     onError: (error) => {
