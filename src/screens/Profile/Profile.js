@@ -69,7 +69,7 @@ const Profile = () => {
 
       <View style={styles.inventionsSection}>
         <Text style={styles.sectionTitle}>My Inventions</Text>
-        <InventionList inventions={profile.inventions} />
+        <InventionList inventions={profile?.inventions} />
       </View>
     </ScrollView>
   );
