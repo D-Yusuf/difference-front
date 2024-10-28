@@ -23,11 +23,8 @@ const Login = () => {
     mutationKey: ["login"],
     mutationFn: () => login(email, password),
     onSuccess: (data) => {
-      console.log(data.message)
+      console.log(data.message);
       setUser(true);
-      // if(data){
-
-      // }
     },
     onError: (error) => {
       alert("Login Error", error);
@@ -50,15 +47,13 @@ const Login = () => {
       alert("Please enter a valid email address");
       return false;
     }
-    // if (password.length < 6) {
-    //   alert("Password must be at least 6 characters long");
-    //   return false;
-    // }
     return true;
   };
 
   return (
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
+        <Text style={styles.title}>Login</Text>
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -85,6 +80,7 @@ const Login = () => {
           </TouchableOpacity>
         </View>
       </View>
+    </SafeAreaView>
   );
 };
 
@@ -92,9 +88,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "lightgray",
-    paddingHorizontal: 20, // Add horizontal padding for white space
     justifyContent: "center",
     alignItems: "center",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
   },
   content: {
     width: "80%",
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 40,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "black",
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 15,

@@ -9,7 +9,7 @@ const InventionCard = ({ invention }) => {
   return (
     <TouchableOpacity
       onPress={() =>
-        navigation.navigate(NAVIGATION.PROFILE.INVENTION_DETAILS, {
+        navigation.navigate(NAVIGATION.INVENTION.INVENTION_DETAILS, {
           inventionId: invention._id,
           image: `${BASE_URL}${invention.images[0]?.replace(/\\/g, "/")}`,
         })

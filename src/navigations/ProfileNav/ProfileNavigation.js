@@ -4,8 +4,8 @@ import Profile from "../../screens/Profile/Profile";
 import EditProfile from "../../screens/Profile/EditProfile";
 import invention from "../../screens/Invention";
 import NAVIGATION from "../index";
+import InventionNavigation from "../InventionNav/InventionNavigation";
 import InventionDetails from "../../components/InventionDetails";
-import EditInvention from "../../screens/EditInvention";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,10 +19,9 @@ const ProfileNavigation = () => {
       />
       <Stack.Screen name="AddInvention" component={invention} />
       <Stack.Screen
-        name={NAVIGATION.PROFILE.INVENTION_DETAILS}
+        name={NAVIGATION.INVENTION.INVENTION_DETAILS}
         component={InventionDetails}
       />
-      <Stack.Screen name={"EditInvention"} component={EditInvention} />
     </Stack.Navigator>
   );
 };

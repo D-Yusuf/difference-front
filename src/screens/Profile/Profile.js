@@ -15,13 +15,16 @@ import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "../../api";
 import InventionList from "../../components/InventionList"; // Corrected casing
 import { useNavigation } from "@react-navigation/native";
-
+import { logout } from "../../api/auth";
+import { useContext } from "react";
+import UserContext from "../../context/UserContext";
 const Profile = () => {
   const navigation = useNavigation();
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: getProfile,
   });
+  const [user, setUser] = useContext(UserContext);
 
   console.log("Profile:", profile);
   // console.log("Inventions:", inventions);
@@ -29,7 +32,10 @@ const Profile = () => {
   if (profileLoading) {
     return <Text>Loading...</Text>;
   }
-
+  const signOut = () => {
+    logout();
+    setUser(false);
+  };
   return (
     <ScrollView
       contentContainerStyle={styles.scrollContent}
@@ -64,6 +70,9 @@ const Profile = () => {
           onPress={() => navigation.navigate("AddInvention")}
         >
           <Text style={styles.actionButtonText}>Add Invention +</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.logoutButton} onPress={() => signOut()}>
+          <Text style={styles.actionButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
 
@@ -169,5 +178,15 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+  },
+  logoutButton: {
+    backgroundColor: "red", // i used this green for add invention button, we can change it to any color we want.
+    padding: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "black",
+    width: "100%",
+    alignItems: "center",
+    marginTop: 10,
   },
 });
