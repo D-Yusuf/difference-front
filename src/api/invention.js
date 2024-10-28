@@ -1,4 +1,4 @@
-import index from "./index"; // Ensure this path is correct
+import instance from "./index"; // Ensure this path is correct
 
 export const createInvention = async (inventionData) => {
   try {
@@ -14,7 +14,7 @@ export const createInvention = async (inventionData) => {
         name: `image${index}.jpg`,
       });
     });
-    const { data } = await index.post("/inventions", formData, {
+    const { data } = await instance.post("/inventions", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
@@ -28,7 +28,7 @@ export const createInvention = async (inventionData) => {
 
 export const getInventions = async (userId) => {
   try {
-    const { data } = await index.get(`/inventions/user/${userId}`);
+    const { data } = await instance.get(`/inventions/user/${userId}`);
     return data;
   } catch (error) {
     console.error("Error fetching inventions:", error);
@@ -37,7 +37,7 @@ export const getInventions = async (userId) => {
 };
 export const getInvention = async (inventionId) => {
   try {
-    const { data } = await index.get(`/inventions/${inventionId}`);
+    const { data } = await instance.get(`/inventions/${inventionId}`);
     return data;
   } catch (error) {
     console.error("Error fetching invention:", error);
@@ -47,7 +47,25 @@ export const getInvention = async (inventionId) => {
 
 export const getAllInventions = async () => {
   try {
-    const { data } = await index.get("/inventions");
+    const { data } = await instance.get("/inventions");
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const toggleLikeInvention = async (inventionId) => {
+  try {
+    const { data } = await instance.put(`/inventions/${inventionId}/like`);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const toggleInterestedInvention = async (inventionId) => {
+  try {
+    const { data } = await instance.put(`/inventions/${inventionId}/interested`);
     return data;
   } catch (error) {
     throw error;
