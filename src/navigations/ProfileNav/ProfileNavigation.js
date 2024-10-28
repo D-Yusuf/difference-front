@@ -4,8 +4,10 @@ import Profile from "../../screens/Profile/Profile";
 import EditProfile from "../../screens/Profile/EditProfile";
 import invention from "../../screens/Invention";
 import NAVIGATION from "../index";
-import InventionNavigation from "../InventionNav/InventionNavigation";
-import InventionDetails from "../../components/InventionDetails";
+
+import InventionDetails from "../../Components/InventionDetails";
+import EditInvention from "../../screens/EditInvention";
+
 
 const Stack = createNativeStackNavigator();
 
