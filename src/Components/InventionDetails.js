@@ -1,37 +1,30 @@
 import { StyleSheet, Text, View, Image } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getInvention } from "../api/invention";
 import { useQuery } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
 import { getProfile } from "../api/profile"; // Import the getProfile function
+import UserContext from "../context/UserContext";
 
 const InventionDetails = () => {
   const navigation = useNavigation();
-
+  const [user, setUser] = useContext(UserContext);
   const route = useRoute();
   const { inventionId, image } = route.params;
 
-  const { data: invention } = useQuery({
+  const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention"],
     queryFn: () => getInvention(inventionId),
   });
-
-  const [userProfile, setUserProfile] = useState(null);
-  console.log(`here is the user profile id ${userProfile?._id}`);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const profileData = await getProfile();
-      setUserProfile(profileData);
-    };
-    fetchProfile();
-  }, []);
+  if (inventionPending) {
+    return <Text>Loading...</Text>;
+  }
 
   // We will check if the user is the inventor or admin appear the edit button for him.
-  const conditionalEdit =
-    userProfile?._id === invention?.inventors[0]?._id ||
-    userProfile?.role === "admin";
+  alert(user._id);
+  const isOwner =
+    invention.inventors.includes(user._id) || user.role === "admin";
   return (
     <View style={styles.container}>
       <Image source={{ uri: image }} style={styles.image} />
@@ -42,9 +35,9 @@ const InventionDetails = () => {
           ?.map((inventor) => inventor.firstName + " " + inventor.lastName)
           .join(", ")}
       </Text>
-      <Text style={styles.description}>{invention?.description}</Text>
-      <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
-      {conditionalEdit && (
+      <Text style={styles.description}>{invention.description}</Text>
+      <Text style={styles.cost}>Funds Needed: {invention.cost} KWD</Text>
+      {isOwner && (
         <TouchableOpacity style={styles.button}>
           <Text
             style={styles.buttonText}
