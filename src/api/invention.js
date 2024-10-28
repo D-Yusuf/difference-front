@@ -53,6 +53,14 @@ export const getAllInventions = async () => {
     throw error;
   }
 };
+export const updateInvention = async (inventionId, data) => {
+  try {
+    const { data } = await index.put(`/inventions/${inventionId}`, data);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const toggleLikeInvention = async (inventionId) => {
   try {
@@ -66,14 +74,6 @@ export const toggleLikeInvention = async (inventionId) => {
 export const toggleInterestedInvention = async (inventionId) => {
   try {
     const { data } = await instance.put(`/inventions/${inventionId}/interested`);
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
-export const updateInvention = async (inventionId, data) => {
-  try {
-    const { data } = await index.put(`/inventions/${inventionId}`, data);
     return data;
   } catch (error) {
     throw error;
