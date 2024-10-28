@@ -2,6 +2,7 @@ import instance from "./index";
 
 export const getProfile = async () => {
   try {
+    console.log("get profile",response)
     const response = await instance.get(`/auth/profile`);
     return response.data;
   } catch (error) {

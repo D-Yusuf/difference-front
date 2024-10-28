@@ -14,8 +14,10 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllInventions } from "../../api/invention";
 import { getCategories } from "../../api/categories";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 import InventionList from "../../components/InventionList";
 import { getProfile } from "../../api/profile";
+
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");

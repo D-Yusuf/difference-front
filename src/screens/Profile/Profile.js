@@ -13,7 +13,7 @@ import { getProfile } from "../../api/profile";
 import { getInventions } from "../../api/invention";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "../../api";
-import InventionList from "../../components/InventionList"; // Corrected casing
+import InventionList from "../../components/InventionList";
 import { useNavigation } from "@react-navigation/native";
 import { logout } from "../../api/auth";
 import { useContext } from "react";
@@ -81,7 +81,7 @@ const Profile = () => {
 
       <View style={styles.inventionsSection}>
         <Text style={styles.sectionTitle}>My Inventions</Text>
-        <InventionList inventions={profile.inventions} />
+        <InventionList inventions={profile?.inventions} />
       </View>
     </ScrollView>
   );

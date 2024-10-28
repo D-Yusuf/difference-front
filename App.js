@@ -6,6 +6,7 @@ import { getToken } from "./src/api/storage";
 import MainNavigation from "./src/navigations/MainNavigation";
 import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native";
+import { logout } from "./src/api/auth";
 export default function App() {
   const queryClient = new QueryClient();
 
