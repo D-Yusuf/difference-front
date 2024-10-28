@@ -53,3 +53,11 @@ export const getAllInventions = async () => {
     throw error;
   }
 };
+export const updateInvention = async (inventionId, data) => {
+  try {
+    const { data } = await index.put(`/inventions/${inventionId}`, data);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};

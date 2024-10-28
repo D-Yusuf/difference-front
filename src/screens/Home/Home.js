@@ -1,5 +1,12 @@
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, Button, TextInput, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  TextInput,
+  ScrollView,
+} from "react-native";
 import { logout } from "../../api/auth";
 import CategoryList from "../../components/CategoryList";
 import UserContext from "../../context/UserContext";
@@ -15,39 +22,40 @@ const Home = () => {
     queryKey: ["inventions"],
     queryFn: getAllInventions,
   });
-  const {
-    data: categories,
-    isPending: categoriesPending
-  } = useQuery({
+  const { data: categories, isPending: categoriesPending } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
   });
   return (
-    <SafeAreaView style={{flex: 1}}>
-    <View style={{flex: 1, alignItems: "center", paddingVertical: 20, paddingHorizontal: 10, gap: 10}}>
-  
-        <TextInput style={styles.searchInput}
-        placeholder="🔍 Search"
-        />
+    <SafeAreaView style={{ flex: 1 }}>
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          paddingTop: 20,
+          paddingHorizontal: 10,
+          gap: 10,
+        }}
+      >
+        <TextInput style={styles.searchInput} placeholder="🔍 Search" />
         <ScrollView horizontal>
-          {categories ? <CategoryList categories={categories} /> : <Text style={{fontSize: 8}}>Loading Categories...</Text>}
-
+          {categories ? (
+            <CategoryList categories={categories} />
+          ) : (
+            <Text style={{ fontSize: 8 }}>Loading Categories...</Text>
+          )}
         </ScrollView>
-        
-        
-      {/* <Button
+
+        {/* <Button
         title="Logout"
         onPress={() => {
           logout();
           setUser(false);
         }}
       /> */}
-  
-        <ScrollView vertical>
 
-          {
-            inventions && <InventionList inventions={inventions} />
-          }
+        <ScrollView vertical>
+          {inventions && <InventionList inventions={inventions} />}
         </ScrollView>
       </View>
     </SafeAreaView>
@@ -57,15 +65,15 @@ const Home = () => {
 const styles = StyleSheet.create({
   searchInput: {
     fontSize: 16,
-    color: '#888',
+    color: "#888",
     marginRight: 10,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 10,
     paddingLeft: 20,
     borderRadius: 20,
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 20,
   },
   container: {

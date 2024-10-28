@@ -4,16 +4,11 @@ import InventionCard from "./InventionCard";
 import { BASE_URL } from "../api/index";
 
 const InventionList = ({ inventions }) => {
-
   console.log("InventionList props:", { inventions });
-
-
-
 
   if (inventions.length === 0 || !inventions) {
     return <Text>No inventions found.</Text>;
   }
-
 
   return (
     // <FlatList

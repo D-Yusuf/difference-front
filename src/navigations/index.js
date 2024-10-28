@@ -13,6 +13,7 @@ const NAVIGATION = {
     PROFILE: "Profile",
     EDIT_PROFILE: "EditProfile",
     INVENTION_DETAILS: "InventionDetails",
+    EDIT_INVENTION: "EditInvention",
   },
   INVEST: {
     INDEX: "InvestIndex",
