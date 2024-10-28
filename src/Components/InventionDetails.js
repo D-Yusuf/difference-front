@@ -1,35 +1,31 @@
+
 import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
+
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getInvention } from "../api/invention";
 import { useQuery } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
 import { getProfile } from "../api/profile"; // Import the getProfile function
+import UserContext from "../context/UserContext";
 
 const InventionDetails = () => {
   const navigation = useNavigation();
-
+  const [user, setUser] = useContext(UserContext);
   const route = useRoute();
   const { inventionId, image } = route.params;
   console.log("Image URI:", image); // Add this to debug
 
-  const { data: invention } = useQuery({
+  const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention"],
     queryFn: () => getInvention(inventionId),
   });
-
-  const [userProfile, setUserProfile] = useState(null);
-  console.log(`here is the user profile id ${userProfile?._id}`);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const profileData = await getProfile();
-      setUserProfile(profileData);
-    };
-    fetchProfile();
-  }, []);
+  if (inventionPending) {
+    return <Text>Loading...</Text>;
+  }
 
   // We will check if the user is the inventor or admin appear the edit button for him.
+
   const conditionalEdit =
     userProfile?._id === invention?.inventors[0]?._id ||
     userProfile?.role === "admin";
@@ -63,6 +59,7 @@ const InventionDetails = () => {
         {conditionalEdit && (
           <TouchableOpacity
             style={styles.button}
+
             onPress={() => navigation.navigate("EditInvention", { invention })}
           >
             <Text style={styles.buttonText}>Edit</Text>

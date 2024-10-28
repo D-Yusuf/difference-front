@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -15,9 +15,28 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllInventions } from "../../api/invention";
 import { getCategories } from "../../api/categories";
 import { SafeAreaView } from "react-native-safe-area-context";
-import InventionList from "../../Components/InventionList";
+
+import InventionList from "../../components/InventionList";
+import { getProfile } from "../../api/profile";
+
+
 const Home = () => {
   const [user, setUser] = useContext(UserContext);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const { data: profile, isPending: profilePending } = useQuery({
+    queryKey: ["home-profile"],
+
+    queryFn: () => getProfile(),
+    onSuccess: (data) => {
+      alert("daaaaa");
+      setUser({ ...user, _id: data._id, role: data.role });
+      console.log("SET USER");
+    },
+    onError: (error) => {
+      alert(error);
+    },
+  });
   const { data: inventions, isPending: inventionsPending } = useQuery({
     queryKey: ["inventions"],
     queryFn: getAllInventions,
@@ -26,6 +45,16 @@ const Home = () => {
     queryKey: ["categories"],
     queryFn: getCategories,
   });
+
+  // Filter inventions based on the search term
+  const filteredInventions = inventions?.filter((invention) =>
+    invention.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (inventionsPending) {
+    return <Text>Loading...</Text>;
+  }
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View
@@ -37,7 +66,12 @@ const Home = () => {
           gap: 10,
         }}
       >
-        <TextInput style={styles.searchInput} placeholder="🔍 Search" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="🔍 Search"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+        />
         <ScrollView horizontal>
           {categories ? (
             <CategoryList categories={categories} />
@@ -55,7 +89,11 @@ const Home = () => {
       /> */}
 
         <ScrollView vertical>
-          {inventions && <InventionList inventions={inventions} />}
+          {filteredInventions.length > 0 ? (
+            <InventionList inventions={filteredInventions} />
+          ) : (
+            <Text style={{ fontSize: 16 }}>No inventions found.</Text>
+          )}
         </ScrollView>
       </View>
     </SafeAreaView>
