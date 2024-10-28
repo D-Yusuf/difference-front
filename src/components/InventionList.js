@@ -11,19 +11,11 @@ const InventionList = ({ inventions }) => {
   }
 
   return (
-    // <FlatList
-
-    //   data={userInventions}
-    //   renderItem={renderItem}
-    //   keyExtractor={(item) => item._id.toString()}
-    //   contentContainerStyle={styles.container}
-    // />
-
-    <View>
-      {inventions.map((invention) => (
-        <InventionCard key={invention._id} invention={invention} />
-      ))}
-    </View>
+    <FlatList
+      data={inventions}
+      renderItem={({ item }) => <InventionCard invention={item} />}
+      keyExtractor={(item) => item._id.toString()}
+    />
   );
 };
 

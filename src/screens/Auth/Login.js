@@ -24,7 +24,7 @@ const Login = () => {
     mutationFn: () => login(email, password),
     onSuccess: (data) => {
       console.log(data.message);
-      setUser(true);
+      setUser({ ...user, loggedIn: true, _id: data._id, role: data.role });
     },
     onError: (error) => {
       alert("Login Error", error);

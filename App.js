@@ -9,12 +9,17 @@ import { SafeAreaView } from "react-native";
 import { logout } from "./src/api/auth";
 export default function App() {
   const queryClient = new QueryClient();
-  const [user, setUser] = useState(false);
+
+  const [user, setUser] = useState({
+    loggedIn: false,
+    _id: null,
+    role: null,
+  });
 
   const checkToken = async () => {
     const token = await getToken();
     if (token) {
-      setUser(true);
+      setUser({ ...user, loggedIn: true });
     }
   };
 
@@ -28,7 +33,7 @@ export default function App() {
         <SafeAreaView style={{ flex: 1 }}>
           <UserContext.Provider value={[user, setUser]}>
             {/* {user ? <Invest /> : <AuthNavigation />} */}
-            {user ? <MainNavigation /> : <AuthNavigation />}
+            {user.loggedIn ? <MainNavigation /> : <AuthNavigation />}
           </UserContext.Provider>
         </SafeAreaView>
       </QueryClientProvider>

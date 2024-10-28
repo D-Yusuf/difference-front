@@ -1,4 +1,3 @@
-
 import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 
@@ -25,16 +24,9 @@ const InventionDetails = () => {
   }
 
   // We will check if the user is the inventor or admin appear the edit button for him.
-
-  const conditionalEdit =
-    userProfile?._id === invention?.inventors[0]?._id ||
-    userProfile?.role === "admin";
-
-  // Add this check alongside the existing conditionalEdit
-  const canInvest =
-    userProfile?.role === "investor" ||
-    (userProfile?.role === "admin" &&
-      userProfile?._id !== invention?.inventors[0]?._id); // Ensure inventor can't invest in their own invention
+  const isOwner =
+    invention.inventors.find((inventor) => inventor._id === user._id) ||
+    user.role === "admin";
 
   return (
     <ScrollView style={styles.container}>
@@ -59,14 +51,13 @@ const InventionDetails = () => {
         {conditionalEdit && (
           <TouchableOpacity
             style={styles.button}
-
             onPress={() => navigation.navigate("EditInvention", { invention })}
           >
             <Text style={styles.buttonText}>Edit</Text>
           </TouchableOpacity>
         )}
 
-        {canInvest && (
+        {isOwner && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
             onPress={() => navigation.navigate("Invest")}

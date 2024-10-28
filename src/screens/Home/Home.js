@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { logout } from "../../api/auth";
 import CategoryList from "../../components/CategoryList";
-import UserContext from "../../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { getAllInventions } from "../../api/invention";
@@ -21,17 +20,16 @@ import { getProfile } from "../../api/profile";
 
 
 const Home = () => {
-  const [user, setUser] = useContext(UserContext);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const { data: profile, isPending: profilePending } = useQuery({
+  const {
+    data: profile,
+    isPending: profilePending,
+    isSuccess: profileSuccess,
+  } = useQuery({
     queryKey: ["home-profile"],
-
-    queryFn: () => getProfile(),
+    queryFn: getProfile,
     onSuccess: (data) => {
-      alert("daaaaa");
-      setUser({ ...user, _id: data._id, role: data.role });
-      console.log("SET USER");
+      console.log(data);
     },
     onError: (error) => {
       alert(error);
