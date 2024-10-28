@@ -8,14 +8,14 @@ import {
   ScrollView,
 } from "react-native";
 import { logout } from "../../api/auth";
-import CategoryList from "../../components/CategoryList";
+import CategoryList from "../../Components/CategoryList";
 import UserContext from "../../context/UserContext";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { getAllInventions } from "../../api/invention";
 import { getCategories } from "../../api/categories";
 import { SafeAreaView } from "react-native-safe-area-context";
-import InventionList from "../../components/InventionList";
+import InventionList from "../../Components/InventionList";
 const Home = () => {
   const [user, setUser] = useContext(UserContext);
   const { data: inventions, isPending: inventionsPending } = useQuery({
