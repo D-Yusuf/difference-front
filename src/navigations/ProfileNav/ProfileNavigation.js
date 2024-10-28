@@ -5,7 +5,7 @@ import EditProfile from "../../screens/Profile/EditProfile";
 import invention from "../../screens/Invention";
 import NAVIGATION from "../index";
 
-import InventionDetails from "../../Components/InventionDetails";
+import InventionDetails from "../../components/InventionDetails";
 import EditInvention from "../../screens/EditInvention";
 
 

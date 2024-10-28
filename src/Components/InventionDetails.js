@@ -1,6 +1,6 @@
 
 import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getInvention } from "../api/invention";
