@@ -22,9 +22,10 @@ const InventionDetails = () => {
   }
 
   // We will check if the user is the inventor or admin appear the edit button for him.
-  alert(user._id);
   const isOwner =
-    invention.inventors.includes(user._id) || user.role === "admin";
+    invention.inventors.find((inventor) => inventor._id === user._id) ||
+    user.role === "admin";
+
   return (
     <View style={styles.container}>
       <Image source={{ uri: image }} style={styles.image} />

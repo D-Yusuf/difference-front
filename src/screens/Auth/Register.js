@@ -54,7 +54,7 @@ const Register = () => {
     mutationKey: ["register"],
     mutationFn: () => register(userInfo),
     onSuccess: (data) => {
-      setUser(true);
+      setUser({ ...user, loggedIn: true, _id: data._id, role: data.role });
     },
     onError: (error) => {
       alert(error);

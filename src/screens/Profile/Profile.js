@@ -23,6 +23,9 @@ const Profile = () => {
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: getProfile,
+    onSuccess: (data) => {
+      console.log("found");
+    },
   });
   const [user, setUser] = useContext(UserContext);
 
