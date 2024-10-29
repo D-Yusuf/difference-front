@@ -59,7 +59,6 @@ export const getInventionById = async (inventionId) => {
     throw error;
   }
 }; //i know yusef i have 2 of these functions but its too late to change
-
 export const getAllInventions = async () => {
   try {
     const { data } = await instance.get("/inventions");
