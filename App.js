@@ -7,9 +7,9 @@ import MainNavigation from "./src/navigations/MainNavigation";
 import { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native";
 import { logout } from "./src/api/auth";
+import { getProfile } from "./src/api/profile";
 export default function App() {
   const queryClient = new QueryClient();
-
   const [user, setUser] = useState({
     loggedIn: false,
     _id: null,
@@ -19,8 +19,11 @@ export default function App() {
   const checkToken = async () => {
     const token = await getToken();
     if (token) {
-      setUser({ ...user, loggedIn: true });
+      const profile = await getProfile();
+      setUser({ loggedIn: true, _id: profile._id, role: profile.role });
     }
+
+    
   };
 
   useEffect(() => {
