@@ -13,7 +13,7 @@ import { getProfile } from "../../api/profile";
 import { getInventions } from "../../api/invention";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "../../api";
-import InventionList from "../../components/InventionList";
+import InventionList from "../../Components/InventionList";
 import { useNavigation } from "@react-navigation/native";
 import { logout } from "../../api/auth";
 import { useContext } from "react";

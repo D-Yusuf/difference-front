@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import NAVIGATION from "..";
 import Invest from "../../screens/Invest/Invest";
 import InvestDetails from "../../screens/Invest/InvestDetails";
-import InventionDetails from "../../components/InventionDetails";
+import InventionDetails from "../../Components/InventionDetails";
 
 const Stack = createNativeStackNavigator();
 
