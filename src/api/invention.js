@@ -1,10 +1,12 @@
 import instance from "./index"; // Ensure this path is correct
 
 export const createInvention = async (inventionData) => {
+  inventionData.inventors = ["67189c8629a471689f676f07", "6718bc3311abf0128e187d16"];
   try {
     const formData = new FormData();
     for (let key in inventionData) {
       if (key !== "images") formData.append(key, inventionData[key]);
+      // if (key === "inventors") formData.append(key, JSON.stringify(inventionData[key]));
     }
     // Append each image file individually
     inventionData.images.forEach((image, index) => {
@@ -53,9 +55,27 @@ export const getAllInventions = async () => {
     throw error;
   }
 };
-export const updateInvention = async (inventionId, data) => {
+export const updateInvention = async (inventionId, inventionData) => {
   try {
-    const { data } = await index.put(`/inventions/${inventionId}`, data);
+    const formData = new FormData();
+    for (let key in inventionData) {
+      if (key !== "images") formData.append(key, inventionData[key]);
+    }
+    // Append each image file individually
+    if (inventionData.images) {
+    inventionData.images.forEach((image, index) => {
+      formData.append("images", {
+        uri: image.uri,
+        type: "image/jpeg", // Adjust this if you need to support other image types
+        name: `image${index}.jpg`,
+      });
+    });
+    }
+    const { data } = await instance.put(`/inventions/${inventionId}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
     return data;
   } catch (error) {
     throw error;

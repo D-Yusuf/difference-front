@@ -10,10 +10,10 @@ import UserContext from "../context/UserContext";
 import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
 
-const InventionDetails = () => {
+const InventionDetails = ({route}) => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
-  const route = useRoute();
+  
   const { inventionId, image } = route.params;
   console.log("Image URI:", image); // Add this to debug
   const { data: invention, isPending: inventionPending } = useQuery({
@@ -29,6 +29,11 @@ const InventionDetails = () => {
     invention.inventors.find((inventor) => inventor._id === user._id) ||
     user.role === "admin";
   const canInvest = user.role === "investor" || user.role === "admin";
+
+  // Add these state variables after other useState declarations
+  const [isLiked, setIsLiked] = useState(false);
+  const [isInterested, setIsInterested] = useState(false);
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.contentContainer}>
@@ -49,11 +54,45 @@ const InventionDetails = () => {
         </View>
         <Text style={styles.description}>{invention?.description}</Text>
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
+
+        <View style={styles.actionButtonsContainer}>
+          <TouchableOpacity
+            style={[styles.actionButton, isLiked && styles.actionButtonActive]}
+            onPress={() => setIsLiked(!isLiked)}
+          >
+            <Text
+              style={[
+                styles.actionButtonText,
+                isLiked && styles.actionButtonTextActive,
+              ]}
+            >
+              {isLiked ? "Liked" : "Like"}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.actionButton,
+              isInterested && styles.actionButtonActive,
+            ]}
+            onPress={() => setIsInterested(!isInterested)}
+          >
+            <Text
+              style={[
+                styles.actionButtonText,
+                isInterested && styles.actionButtonTextActive,
+              ]}
+            >
+              {isInterested ? "Interested" : "Interest"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         {isOwner && (
           <TouchableOpacity
             style={styles.button}
             onPress={() =>
-              navigation.navigate(NAVIGATION.INVENTION.EDIT_INVENTION)
+              navigation.navigate(NAVIGATION.INVENTION.EDIT_INVENTION, {invention})
             }
           >
             <Text style={styles.buttonText}>Edit</Text>
@@ -170,5 +209,32 @@ const styles = StyleSheet.create({
   investButton: {
     backgroundColor: "#16a34a", // Green color for invest button
     marginTop: 12, // Smaller margin since it follows another button
+  },
+  actionButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 20,
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    padding: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#2563eb",
+  },
+  actionButtonActive: {
+    backgroundColor: "#2563eb",
+  },
+  actionButtonText: {
+    color: "#2563eb",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  actionButtonTextActive: {
+    color: "#ffffff",
   },
 });
