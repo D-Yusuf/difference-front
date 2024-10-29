@@ -11,9 +11,10 @@ import {
   FlatList,
 } from "react-native";
 import React, { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { createInvention } from "../api/invention";
+import { getCategories } from "../api/categories";
 
 const Invention = ({ navigation }) => {
   const phases = [
@@ -25,14 +26,21 @@ const Invention = ({ navigation }) => {
   const [invention, setInvention] = useState({});
   const [images, setImages] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [selectedPhase, setSelectedPhase] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [phaseModalVisible, setPhaseModalVisible] = useState(false);
+
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+  });
 
   const { mutate } = useMutation({
     mutationFn: () => createInvention(invention),
     mutationKey: ["create-invention"],
     onSuccess: () => {
       alert("Invention created successfully");
-
       navigation.goBack();
     },
     onError: (error) => {
@@ -67,6 +75,10 @@ const Invention = ({ navigation }) => {
       alert("Please upload at least one image");
       return;
     }
+    if (!selectedCategory) {
+      alert("Please select a category for your invention");
+      return;
+    }
     if (!selectedPhase) {
       alert("Please select a phase for your invention");
       return;
@@ -80,10 +92,23 @@ const Invention = ({ navigation }) => {
       onPress={() => {
         setSelectedPhase(item.value);
         setInvention({ ...invention, phase: item.value });
-        setModalVisible(false);
+        setPhaseModalVisible(false);
       }}
     >
       <Text style={styles.roleItemText}>{item.label}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderCategoryItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.roleItem}
+      onPress={() => {
+        setSelectedCategory(item._id);
+        setInvention({ ...invention, category: item._id });
+        setCategoryModalVisible(false);
+      }}
+    >
+      <Text style={styles.roleItemText}>{item.name}</Text>
     </TouchableOpacity>
   );
 
@@ -123,7 +148,17 @@ const Invention = ({ navigation }) => {
         </View>
         <TouchableOpacity
           style={styles.dropdownButton}
-          onPress={() => setModalVisible(true)}
+          onPress={() => setCategoryModalVisible(true)}
+        >
+          <Text style={styles.dropdownButtonText}>
+            {selectedCategory
+              ? categories.find((c) => c._id === selectedCategory).name
+              : "Select Category"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.dropdownButton}
+          onPress={() => setPhaseModalVisible(true)}
         >
           <Text style={styles.dropdownButtonText}>
             {selectedPhase
@@ -154,8 +189,22 @@ const Invention = ({ navigation }) => {
       <Modal
         animationType="slide"
         transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
+        visible={categoryModalVisible}
+        onRequestClose={() => setCategoryModalVisible(false)}
+      >
+        <View style={styles.modalView}>
+          <FlatList
+            data={categories}
+            renderItem={renderCategoryItem}
+            keyExtractor={(item) => item._id}
+          />
+        </View>
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={phaseModalVisible}
+        onRequestClose={() => setPhaseModalVisible(false)}
       >
         <View style={styles.modalView}>
           <FlatList

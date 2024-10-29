@@ -7,21 +7,28 @@ import Icon from "react-native-vector-icons/FontAwesome";
 
 const InventionCard = ({ invention }) => {
   const navigation = useNavigation();
+  console.log("Invention data in card:", invention); // Debug log
+
+  if (!invention || !invention._id) {
+    return null;
+  }
+
+  const imageUrl = invention.images?.[0]
+    ? `${BASE_URL}${invention.images[0]}`.replace(/\\/g, "/")
+    : "https://via.placeholder.com/150";
+
   return (
     <TouchableOpacity
       onPress={() =>
         navigation.navigate(NAVIGATION.INVENTION.INVENTION_DETAILS, {
           inventionId: invention._id,
-          image: `${BASE_URL}${invention.images[0]?.replace(/\\/g, "/")}`,
+          image: imageUrl,
         })
       }
-      key={invention._id}
     >
       <View style={styles.card}>
         <Image
-          source={{
-            uri: `${BASE_URL}${invention.images[0]?.replace(/\\/g, "/")}`,
-          }}
+          source={{ uri: imageUrl }}
           style={styles.image}
           resizeMode="cover"
         />
@@ -30,13 +37,13 @@ const InventionCard = ({ invention }) => {
           <Text style={styles.description} numberOfLines={2}>
             {invention.description}
           </Text>
-          <Text style={styles.cost}>Funding needed: ${invention.cost}</Text>
+          <Text style={styles.cost}>Funding needed: {invention.cost} KWD</Text>
           <View style={styles.icons}>
             <TouchableOpacity style={styles.likeButton}>
-              <Icon name="heart" size={30} color="red" />
+              <Icon name="heart" size={24} color="#FF4D4D" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.thumbsUpButton}>
-              <Icon name="thumbs-up" size={30} color="blue" />
+              <Icon name="thumbs-up" size={24} color="#4D79FF" />
             </TouchableOpacity>
           </View>
         </View>
@@ -47,21 +54,23 @@ const InventionCard = ({ invention }) => {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    backgroundColor: "white",
+    borderRadius: 12,
+    marginVertical: 8,
+    marginHorizontal: 16,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    marginBottom: 16,
-    width: "100%",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+    overflow: "hidden",
   },
   image: {
     width: "100%",
-    height: 200,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
+    height: 180,
   },
   content: {
     padding: 16,
@@ -69,28 +78,34 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: "bold",
+    color: "#333",
     marginBottom: 8,
   },
   description: {
     fontSize: 14,
     color: "#666",
     marginBottom: 8,
+    lineHeight: 20,
   },
   cost: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 4,
+    color: "#2E7D32",
+    marginBottom: 12,
   },
   icons: {
     flexDirection: "row",
-    marginTop: 10,
-    gap: 15,
+    justifyContent: "space-around",
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    paddingTop: 12,
+    marginTop: 4,
   },
   likeButton: {
-    alignItems: "center",
+    padding: 8,
   },
   thumbsUpButton: {
-    alignItems: "center",
+    padding: 8,
   },
 });
 

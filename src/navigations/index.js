@@ -12,6 +12,7 @@ const NAVIGATION = {
     INDEX: "ProfileIndex",
     PROFILE: "Profile",
     EDIT_PROFILE: "EditProfile",
+    USER_PROFILE: "UserProfile",
   },
   INVEST: {
     INDEX: "InvestIndex",
