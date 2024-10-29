@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   View,
   Text,
@@ -8,188 +8,199 @@ import {
   SafeAreaView,
   ScrollView,
 } from "react-native";
-import { MaterialIcons } from "@expo/vector-icons"; // Import the icon library
-import { getProfile } from "../../api/profile";
-import { getInventions } from "../../api/invention";
+import Icon from "react-native-vector-icons/Ionicons";
 import { useQuery } from "@tanstack/react-query";
+import { getProfile } from "../../api/profile";
 import { BASE_URL } from "../../api";
 import InventionList from "../../components/InventionList";
-import { useNavigation } from "@react-navigation/native";
-import { logout } from "../../api/auth";
-import { useContext } from "react";
 import UserContext from "../../context/UserContext";
-const Profile = () => {
-  const navigation = useNavigation();
+import { logout } from "../../api/auth";
+
+const Profile = ({ navigation }) => {
+  const [user, setUser] = useContext(UserContext);
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: getProfile,
-    onSuccess: (data) => {
-      console.log("found");
-    },
   });
-  const [user, setUser] = useContext(UserContext);
 
-  console.log("Profile:", profile);
-  // console.log("Inventions:", inventions);
-
-  if (profileLoading) {
-    return <Text>Loading...</Text>;
-  }
   const signOut = () => {
     logout();
     setUser(false);
   };
+
+  if (profileLoading) {
+    return <Text>Loading...</Text>;
+  }
+
   return (
-    <ScrollView
-      contentContainerStyle={styles.scrollContent}
-      nestedScrollEnabled={true}
-    >
-      <View style={styles.card}>
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => navigation.navigate("EditProfile", { profile })} // Pass the user ID
-        >
-          <MaterialIcons name="edit" size={24} color="black" />
-        </TouchableOpacity>
-        <Image
-          source={profile?.image && { uri: BASE_URL + profile.image }}
-          style={styles.image}
-        />
-        <Text style={styles.name}>
-          {profile?.firstName} {profile?.lastName}
-        </Text>
-        <Text style={styles.email}>{profile?.email}</Text>
-        <Text style={styles.roleText}>
-          {`You signed up as `}
-          <Text style={styles.role}>{profile?.role}</Text>
-        </Text>
-        <Text style={styles.bio}>{profile?.bio}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        <View style={styles.headerContainer}>
+          <View style={styles.glassCard}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => navigation.navigate("EditProfile", { profile })}
+            >
+              <Icon name="create-outline" size={24} color="#003863" />
+            </TouchableOpacity>
 
-        <TouchableOpacity style={styles.cvButton}>
-          <Text style={styles.actionButtonText}>Go to CV</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.addInventionButton}
-          onPress={() => navigation.navigate("AddInvention")}
-        >
-          <Text style={styles.actionButtonText}>Add Invention +</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.logoutButton} onPress={() => signOut()}>
-          <Text style={styles.actionButtonText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
+            <Image
+              source={profile?.image && { uri: BASE_URL + profile.image }}
+              style={styles.profileImage}
+            />
 
-      <View style={styles.inventionsSection}>
-        <Text style={styles.sectionTitle}>My Inventions</Text>
-        <InventionList inventions={profile?.inventions} />
-      </View>
-    </ScrollView>
+            <Text style={styles.name}>
+              {profile?.firstName} {profile?.lastName}
+            </Text>
+            <Text style={styles.email}>{profile?.email}</Text>
+            <Text style={styles.roleText}>{profile?.role}</Text>
+            <Text style={styles.bio}>{profile?.bio}</Text>
+
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.cvButton]}
+                onPress={() => {
+                  /* CV handler */
+                }}
+              >
+                <Icon name="document-text-outline" size={20} color="#003863" />
+                <Text style={styles.buttonText}>View CV</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.actionButton, styles.addButton]}
+                onPress={() => navigation.navigate("AddInvention")}
+              >
+                <Icon name="add-circle-outline" size={20} color="#003863" />
+                <Text style={styles.buttonText}>Add Invention</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.inventionsContainer}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>My Inventions</Text>
+            <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+              <Icon name="log-out-outline" size={24} color="#FF4444" />
+            </TouchableOpacity>
+          </View>
+          <InventionList inventions={profile?.inventions} numColumns={2} />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
-export default Profile;
-
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#88B3D4",
+  },
   container: {
     flex: 1,
-    backgroundColor: "lightgray",
-    paddingHorizontal: 20, // Add horizontal padding for white space
+    backgroundColor: "#88B3D4",
   },
-  card: {
-    backgroundColor: "white",
-    borderRadius: 15,
-    padding: 15,
+  headerContainer: {
+    padding: 20,
+    paddingTop: 10,
+  },
+  glassCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    borderRadius: 25,
+    padding: 20,
     alignItems: "center",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 2,
-    borderColor: "gray",
-    marginHorizontal: 20,
-    position: "relative",
+    shadowColor: "#003863",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    elevation: 8,
   },
   editButton: {
-    position: "absolute", // Position the button absolutely
-    top: 10, // Adjust top position
-    right: 10, // Adjust right position
-    padding: 5,
+    position: "absolute",
+    top: 20,
+    right: 20,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    padding: 8,
+    borderRadius: 20,
+    shadowColor: "#003863",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 15,
+    borderWidth: 4,
+    borderColor: "#ffffff",
   },
   name: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "black",
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#003863",
     marginBottom: 5,
   },
   email: {
-    fontSize: 14,
-    color: "gray",
+    fontSize: 16,
+    color: "#666",
     marginBottom: 5,
   },
   roleText: {
     fontSize: 14,
-    color: "gray",
-    marginBottom: 5,
-  },
-  role: {
-    fontWeight: "bold",
-    color: "black",
+    color: "#88B3D4",
+    fontWeight: "600",
+    marginBottom: 10,
   },
   bio: {
-    fontSize: 14,
-    color: "black",
-    marginBottom: 10,
-  },
-  cvButton: {
-    backgroundColor: "lightgray",
-    padding: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "black",
-    marginTop: 10,
-    width: "100%",
-    alignItems: "center",
-  },
-  addInventionButton: {
-    backgroundColor: "lightgreen", // i used this green for add invention button, we can change it to any color we want.
-    padding: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "black",
-    width: "100%",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  actionButtonText: {
-    color: "black",
     fontSize: 16,
-    fontWeight: "bold",
+    color: "#444",
+    textAlign: "center",
+    marginBottom: 20,
+    paddingHorizontal: 10,
   },
-  scrollContent: {
-    flexGrow: 1,
+  buttonContainer: {
+    flexDirection: "row",
+    gap: 15,
+    marginTop: 10,
   },
-  inventionsSection: {
+  actionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 12,
+    gap: 8,
+    backgroundColor: "rgba(136, 179, 212, 0.1)",
+  },
+  buttonText: {
+    color: "#003863",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  inventionsContainer: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    padding: 20,
     marginTop: 20,
-    paddingHorizontal: 20,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#003863",
   },
   logoutButton: {
-    backgroundColor: "red", // i used this green for add invention button, we can change it to any color we want.
-    padding: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "black",
-    width: "100%",
-    alignItems: "center",
-    marginTop: 10,
+    padding: 8,
   },
 });
+
+export default Profile;
