@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TextInput, ScrollView } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TextInput } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { getAllInventions } from "../../api/invention";
 import InventionList from "../../components/InventionList";
@@ -28,13 +28,7 @@ const Home = () => {
         value={searchTerm}
         onChangeText={setSearchTerm}
       />
-      <ScrollView vertical>
-        {filteredInventions.length > 0 ? (
-          <InventionList inventions={filteredInventions} />
-        ) : (
-          <Text style={{ fontSize: 16 }}>No inventions found.</Text>
-        )}
-      </ScrollView>
+      <InventionList inventions={filteredInventions} />
     </View>
   );
 };
