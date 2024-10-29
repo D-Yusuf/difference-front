@@ -10,10 +10,10 @@ import UserContext from "../context/UserContext";
 import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
 
-const InventionDetails = () => {
+const InventionDetails = ({route}) => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
-  const route = useRoute();
+  
   const { inventionId, image } = route.params;
   console.log("Image URI:", image); // Add this to debug
   const { data: invention, isPending: inventionPending } = useQuery({
@@ -53,7 +53,7 @@ const InventionDetails = () => {
           <TouchableOpacity
             style={styles.button}
             onPress={() =>
-              navigation.navigate(NAVIGATION.INVENTION.EDIT_INVENTION)
+              navigation.navigate(NAVIGATION.INVENTION.EDIT_INVENTION, {invention})
             }
           >
             <Text style={styles.buttonText}>Edit</Text>

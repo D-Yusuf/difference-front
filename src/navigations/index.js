@@ -21,6 +21,8 @@ const NAVIGATION = {
   INVENTION: {
     INDEX: "InventionIndex",
     INVENTION_DETAILS: "InventionDetails",
+    CREATE_INVENTION: "CreateInvention",
+    INVEST: "InvestInInvention",
     EDIT_INVENTION: "EditInvention",
   },
 };
