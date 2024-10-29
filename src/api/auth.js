@@ -3,7 +3,6 @@ import { storeToken, removeToken } from "./storage";
 export const login = async (email, password) => {
   try {
     const { data } = await instance.post("/auth/login", { email, password });
-    console.log(data.token)
     await storeToken(data.token);
     return data
   } catch (error) {
