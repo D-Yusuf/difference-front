@@ -1,5 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Icon from "react-native-vector-icons/Ionicons";
 import Invention from "../screens/Invention";
 import Home from "../screens/Home/Home";
 import ProfileNavigation from "./ProfileNav/ProfileNavigation";
@@ -7,17 +8,53 @@ import NAVIGATION from "./index";
 import InvestNavigation from "./InvestNav/InvestNavigation";
 import HomeNavigation from "./HomeNav/HomeNavigation";
 import InventionNavigation from "./InventionNav/InventionNavigation";
-const tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator();
 const MainNavigation = () => {
   return (
-    <tab.Navigator screenOptions={{ headerShown: false }}>
-      <tab.Screen name={NAVIGATION.HOME.INDEX} component={HomeNavigation} />
-      <tab.Screen
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: "#ffffff",
+          borderTopWidth: 0,
+          elevation: 8,
+          shadowColor: "#003863",
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          height: 60,
+          paddingBottom: 8,
+          paddingTop: 8,
+        },
+        tabBarActiveTintColor: "#003863",
+        tabBarInactiveTintColor: "#88B3D4",
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+      }}
+    >
+      <Tab.Screen
+        name={NAVIGATION.HOME.INDEX}
+        component={HomeNavigation}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="home-outline" size={24} color={color} />
+          ),
+          tabBarLabel: "Discover",
+        }}
+      />
+      <Tab.Screen
         name={NAVIGATION.PROFILE.INDEX}
         component={ProfileNavigation}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="person-outline" size={24} color={color} />
+          ),
+          tabBarLabel: "Profile",
+        }}
       />
-      {/* <tab.Screen name={NAVIGATION.INVEST.INDEX} component={InvestNavigation} /> */}
-    </tab.Navigator>
+    </Tab.Navigator>
   );
 };
 export default MainNavigation;

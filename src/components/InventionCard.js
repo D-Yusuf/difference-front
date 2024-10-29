@@ -5,9 +5,8 @@ import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigations";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-const InventionCard = ({ invention }) => {
+const InventionCard = ({ invention, compact }) => {
   const navigation = useNavigation();
-  console.log("Invention data in card:", invention); // Debug log
 
   if (!invention || !invention._id) {
     return null;
@@ -26,24 +25,31 @@ const InventionCard = ({ invention }) => {
         })
       }
     >
-      <View style={styles.card}>
+      <View style={[styles.card, compact && styles.compactCard]}>
         <Image
           source={{ uri: imageUrl }}
-          style={styles.image}
+          style={[styles.image, compact && styles.compactImage]}
           resizeMode="cover"
         />
-        <View style={styles.content}>
-          <Text style={styles.name}>{invention.name}</Text>
-          <Text style={styles.description} numberOfLines={2}>
+        <View style={[styles.content, compact && styles.compactContent]}>
+          <Text style={[styles.name, compact && styles.compactName]}>
+            {invention.name}
+          </Text>
+          <Text
+            style={[styles.description, compact && styles.compactDescription]}
+            numberOfLines={compact ? 1 : 2}
+          >
             {invention.description}
           </Text>
-          <Text style={styles.cost}>Funding needed: {invention.cost} KWD</Text>
-          <View style={styles.icons}>
+          <Text style={[styles.cost, compact && styles.compactCost]}>
+            {invention.cost} KWD
+          </Text>
+          <View style={[styles.icons, compact && styles.compactIcons]}>
             <TouchableOpacity style={styles.likeButton}>
-              <Icon name="heart" size={24} color="#FF4D4D" />
+              <Icon name="heart" size={compact ? 16 : 24} color="#FF4D4D" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.thumbsUpButton}>
-              <Icon name="thumbs-up" size={24} color="#4D79FF" />
+              <Icon name="thumbs-up" size={compact ? 16 : 24} color="#4D79FF" />
             </TouchableOpacity>
           </View>
         </View>
@@ -57,7 +63,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 12,
     marginVertical: 8,
-    marginHorizontal: 16,
+    marginHorizontal: 8,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -68,12 +74,22 @@ const styles = StyleSheet.create({
     elevation: 4,
     overflow: "hidden",
   },
+  compactCard: {
+    marginVertical: 4,
+    marginHorizontal: 4,
+  },
   image: {
     width: "100%",
     height: 180,
   },
+  compactImage: {
+    height: 90,
+  },
   content: {
     padding: 16,
+  },
+  compactContent: {
+    padding: 8,
   },
   name: {
     fontSize: 18,
@@ -81,17 +97,30 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 8,
   },
+  compactName: {
+    fontSize: 14,
+    marginBottom: 4,
+  },
   description: {
     fontSize: 14,
     color: "#666",
     marginBottom: 8,
     lineHeight: 20,
   },
+  compactDescription: {
+    fontSize: 12,
+    marginBottom: 4,
+    lineHeight: 16,
+  },
   cost: {
     fontSize: 16,
     fontWeight: "600",
     color: "#2E7D32",
     marginBottom: 12,
+  },
+  compactCost: {
+    fontSize: 13,
+    marginBottom: 6,
   },
   icons: {
     flexDirection: "row",
@@ -100,6 +129,10 @@ const styles = StyleSheet.create({
     borderTopColor: "#eee",
     paddingTop: 12,
     marginTop: 4,
+  },
+  compactIcons: {
+    paddingTop: 6,
+    marginTop: 2,
   },
   likeButton: {
     padding: 8,
