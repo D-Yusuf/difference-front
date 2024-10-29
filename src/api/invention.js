@@ -57,25 +57,27 @@ export const getAllInventions = async () => {
 };
 export const updateInvention = async (inventionId, inventionData) => {
   try {
+    console.log(inventionData);
     const formData = new FormData();
     for (let key in inventionData) {
       if (key !== "images") formData.append(key, inventionData[key]);
     }
     // Append each image file individually
-    if (inventionData.images) {
-    inventionData.images.forEach((image, index) => {
-      formData.append("images", {
-        uri: image.uri,
-        type: "image/jpeg", // Adjust this if you need to support other image types
-        name: `image${index}.jpg`,
+    if (inventionData.images.length > 0) {
+      inventionData.images.forEach((image, index) => {
+        formData.append("images", {
+          uri: image.uri,
+          type: "image/jpeg", // Adjust this if you need to support other image types
+          name: `image${index}.jpg`,
+        });
       });
-    });
     }
-    const { data } = await instance.put(`/inventions/${inventionId}`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    // Check if there are images to determine the content type
+    const headers = inventionData.images?.length > 0 ? { "Content-Type": "multipart/form-data" } : {};
+   
+
+  
+    const { data } = await instance.put(`/inventions/${inventionId}`, formData, headers);
     return data;
   } catch (error) {
     throw error;
