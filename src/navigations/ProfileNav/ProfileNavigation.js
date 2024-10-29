@@ -4,10 +4,10 @@ import Profile from "../../screens/Profile/Profile";
 import EditProfile from "../../screens/Profile/EditProfile";
 import invention from "../../screens/Invention";
 import NAVIGATION from "../index";
+import UserProfile from "../../screens/Profile/UserProfile";
 
 import InventionDetails from "../../components/InventionDetails";
 import EditInvention from "../../screens/EditInvention";
-
 
 const Stack = createNativeStackNavigator();
 
@@ -18,6 +18,10 @@ const ProfileNavigation = () => {
       <Stack.Screen
         name={NAVIGATION.PROFILE.EDIT_PROFILE}
         component={EditProfile}
+      />
+      <Stack.Screen
+        name={NAVIGATION.PROFILE.USER_PROFILE}
+        component={UserProfile}
       />
       <Stack.Screen name="AddInvention" component={invention} />
       <Stack.Screen

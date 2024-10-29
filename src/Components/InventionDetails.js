@@ -136,17 +136,29 @@ const InventionDetails = ({ route }) => {
         </View>
 
         <View style={styles.inventorContainer}>
-          {invention?.inventors?.map((inventor) => (
-            <View key={inventor._id} style={styles.inventorRow}>
-              <Image
-                source={{ uri: BASE_URL + inventor.image }}
-                style={styles.inventorImage}
-              />
-              <Text style={styles.inventor}>
-                {inventor.firstName + " " + inventor.lastName}
-              </Text>
-            </View>
-          ))}
+          {invention?.inventors?.map((inventor) => {
+            console.log("Inventor ID:", inventor._id); // Debug log
+            return (
+              <TouchableOpacity
+                key={inventor._id}
+                style={styles.inventorRow}
+                onPress={() => {
+                  console.log("Navigating to profile with ID:", inventor._id); // Debug log
+                  navigation.navigate(NAVIGATION.PROFILE.USER_PROFILE, {
+                    userId: inventor._id,
+                  });
+                }}
+              >
+                <Image
+                  source={{ uri: BASE_URL + inventor.image }}
+                  style={styles.inventorImage}
+                />
+                <Text style={styles.inventor}>
+                  {inventor.firstName + " " + inventor.lastName}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
         <Text style={styles.description}>{invention?.description}</Text>
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>

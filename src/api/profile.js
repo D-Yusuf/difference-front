@@ -2,13 +2,25 @@ import instance from "./index";
 
 export const getProfile = async () => {
   try {
-    console.log("get profile",response)
+    console.log("get profile", response);
     const response = await instance.get(`/auth/profile`);
     return response.data;
   } catch (error) {
     return error;
   }
 };
+
+export const getProfileById = async (userId) => {
+  try {
+    const response = await instance.get(`/users/${userId}`);
+    console.log("Profile data received:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    throw error;
+  }
+};
+
 export const updateProfile = async (userInfo) => {
   try {
     const formData = new FormData();
