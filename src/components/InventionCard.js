@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { BASE_URL } from "../api/index";
 import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigations";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const InventionCard = ({ invention }) => {
   const navigation = useNavigation();
@@ -22,8 +23,6 @@ const InventionCard = ({ invention }) => {
             uri: `${BASE_URL}${invention.images[0]?.replace(/\\/g, "/")}`,
           }}
           style={styles.image}
-          width={100}
-          height={100}
           resizeMode="cover"
         />
         <View style={styles.content}>
@@ -32,6 +31,14 @@ const InventionCard = ({ invention }) => {
             {invention.description}
           </Text>
           <Text style={styles.cost}>Funding needed: ${invention.cost}</Text>
+          <View style={styles.icons}>
+            <TouchableOpacity style={styles.likeButton}>
+              <Icon name="heart" size={30} color="red" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.thumbsUpButton}>
+              <Icon name="thumbs-up" size={30} color="blue" />
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -48,6 +55,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     marginBottom: 16,
+    width: "100%",
   },
   image: {
     width: "100%",
@@ -73,9 +81,16 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: 4,
   },
-  shares: {
-    fontSize: 14,
-    color: "#444",
+  icons: {
+    flexDirection: "row",
+    marginTop: 10,
+    gap: 15,
+  },
+  likeButton: {
+    alignItems: "center",
+  },
+  thumbsUpButton: {
+    alignItems: "center",
   },
 });
 
