@@ -8,6 +8,8 @@ import { TouchableOpacity } from "react-native";
 import { getProfile } from "../api/profile"; // Import the getProfile function
 import UserContext from "../context/UserContext";
 import { BASE_URL } from "../api";
+import NAVIGATION from "../navigations";
+
 const InventionDetails = () => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
@@ -50,7 +52,9 @@ const InventionDetails = () => {
         {isOwner && (
           <TouchableOpacity
             style={styles.button}
-            onPress={() => navigation.navigate("EditInvention", { invention })}
+            onPress={() =>
+              navigation.navigate(NAVIGATION.INVENTION.EDIT_INVENTION)
+            }
           >
             <Text style={styles.buttonText}>Edit</Text>
           </TouchableOpacity>

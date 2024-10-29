@@ -17,7 +17,7 @@ const NAVIGATION = {
     INDEX: "InvestIndex",
     INVEST: "Invest",
     INVENTION_DETAILS: "InventionDetails",
-  },
+  }, // not needed
   INVENTION: {
     INDEX: "InventionIndex",
     INVENTION_DETAILS: "InventionDetails",
