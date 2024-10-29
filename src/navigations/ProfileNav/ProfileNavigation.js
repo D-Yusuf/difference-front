@@ -6,7 +6,7 @@ import invention from "../../screens/Invention";
 import NAVIGATION from "../index";
 import UserProfile from "../../screens/Profile/UserProfile";
 
-import InventionDetails from "../../Components/InventionDetails";
+import InventionDetails from "../../components/InventionDetails";
 import EditInvention from "../../screens/EditInvention";
 
 const Stack = createNativeStackNavigator();

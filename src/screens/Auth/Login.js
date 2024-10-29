@@ -33,7 +33,7 @@ const Login = () => {
 
   const handleLogin = () => {
     if (validateInputs()) {
-      console.log("first")
+      console.log("first");
       mutate();
     }
   };

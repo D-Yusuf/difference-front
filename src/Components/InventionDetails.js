@@ -35,7 +35,6 @@ const InventionDetails = ({ route }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [isInterested, setIsInterested] = useState(false);
 
-
   const { inventionId, image } = route.params;
   console.log("Received inventionId:", inventionId);
 
@@ -53,7 +52,6 @@ const InventionDetails = ({ route }) => {
         throw error;
       }
     },
-
   });
 
   console.log("Invention ID:", inventionId);
@@ -89,7 +87,6 @@ const InventionDetails = ({ route }) => {
     invention.inventors.find((inventor) => inventor._id === user._id) ||
     user.role === "admin";
   const canInvest = user.role === "investor" || user.role === "admin";
-
 
   // Update the phase display to look nicer (capitalize first letter)
   const formatPhase = (phase) => {

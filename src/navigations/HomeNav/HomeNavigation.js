@@ -5,7 +5,7 @@ import Home from "../../screens/Home/Home";
 import InventionNavigation from "../InventionNav/InventionNavigation";
 
 import NAVIGATION from "../index";
-import InventionDetails from "../../Components/InventionDetails";
+import InventionDetails from "../../components/InventionDetails";
 const Stack = createNativeStackNavigator();
 const HomeNavigation = () => {
   return (

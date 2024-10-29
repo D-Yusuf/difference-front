@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
 import { useQuery } from "@tanstack/react-query";
 import { getAllInventions } from "../../api/invention";
-import InventionList from "../../Components/InventionList";
+import InventionList from "../../components/InventionList";
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
