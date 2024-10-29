@@ -13,11 +13,12 @@ import NAVIGATION from "../navigations";
 const InventionDetails = ({route}) => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
-  
+    const [isLiked, setIsLiked] = useState(false);
+    const [isInterested, setIsInterested] = useState(false);
   const { inventionId, image } = route.params;
   console.log("Image URI:", image); // Add this to debug
   const { data: invention, isPending: inventionPending } = useQuery({
-    queryKey: ["invention"],
+    queryKey: ["invention", inventionId],
     queryFn: () => getInvention(inventionId),
   });
   if (inventionPending) {
@@ -30,9 +31,7 @@ const InventionDetails = ({route}) => {
     user.role === "admin";
   const canInvest = user.role === "investor" || user.role === "admin";
 
-  // Add these state variables after other useState declarations
-  const [isLiked, setIsLiked] = useState(false);
-  const [isInterested, setIsInterested] = useState(false);
+
 
   return (
     <ScrollView style={styles.container}>

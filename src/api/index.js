@@ -8,8 +8,9 @@ const instance = axios.create({
 });
 instance.interceptors.request.use(async (config) => {
   const token = await getToken();
-  config.headers.Authorization = `Bearer ${token}`;
+  config.headers.Authorization = `Bearer ${token?.token}`;
   return config;
 });
+
 export default instance;
 export { BASE_URL };

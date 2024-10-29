@@ -5,7 +5,7 @@ import UserContext from "./src/context/UserContext";
 import { getToken } from "./src/api/storage";
 import MainNavigation from "./src/navigations/MainNavigation";
 import { useState, useEffect } from "react";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, Text } from "react-native";
 import { logout } from "./src/api/auth";
 import { getProfile } from "./src/api/profile";
 export default function App() {
@@ -15,21 +15,23 @@ export default function App() {
     _id: null,
     role: null,
   });
-
+  const [loading, setLoading] = useState(false);
   const checkToken = async () => {
+    setLoading(true);
     const token = await getToken();
     if (token) {
-      const profile = await getProfile();
-      setUser({ loggedIn: true, _id: profile._id, role: profile.role });
+      setUser({ ...user, loggedIn: true, _id: token?._id, role: token?.role });
     }
-
-    
+    setLoading(false);
   };
 
   useEffect(() => {
     checkToken();
   }, []);
 
+  if (loading) {
+    return <Text>Loading...</Text>;
+  }
   return (
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
