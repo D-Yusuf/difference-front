@@ -11,26 +11,42 @@ import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateInvention } from "../api/invention";
 import * as ImagePicker from "expo-image-picker";
+import { BASE_URL } from "../api";
 
 const EditInvention = ({ route, navigation }) => {
   const queryClient = useQueryClient();
   const { invention } = route.params;
   const [inventionInfo, setInventionInfo] = useState({
-    name: invention?.name || "",
-    description: invention?.description || "",
-    cost: invention?.cost?.toString() || "",
-    images: invention?.images || [],
+    // name: invention.name,
+    // description: invention.description,
+    // cost: invention.cost.toString(),
+    // phase: invention.phase,
+    // inventors: invention.inventors,
+    // images: invention.images,
+    // category: invention.category,
   });
-
+  const [images, setImages] = useState(null);
   const { mutate: editInvention } = useMutation({
     mutationFn: () => updateInvention(invention._id, inventionInfo),
     onSuccess: () => {
       alert("Invention updated successfully");
-      queryClient.invalidateQueries({ queryKey: ["profile", "inventions"] });
+      queryClient.invalidateQueries(["profile"]);
+      queryClient.invalidateQueries(["inventions"]);
+      queryClient.invalidateQueries(["invention", invention._id]);
       navigation.goBack();
     },
+    onError: (error) => {
+      alert(error.response.data.message);
+    },
   });
+  const validateInputs = () => {
+    if (!userInfo.firstName || !userInfo.lastName) {
+      alert("Please fill in first name and last name");
+      return false;
+    }
 
+    return true;
+  };
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -39,10 +55,10 @@ const EditInvention = ({ route, navigation }) => {
     });
 
     if (!result.canceled) {
-      const newImages = result.assets.map((asset) => asset.uri);
+      setImages(result.assets);
       setInventionInfo({
         ...inventionInfo,
-        images: [...inventionInfo.images, ...newImages],
+        images: result.assets,
       });
     }
   };
@@ -52,7 +68,7 @@ const EditInvention = ({ route, navigation }) => {
       <View style={styles.form}>
         <TextInput
           style={styles.input}
-          value={inventionInfo.name}
+          value={inventionInfo.name || invention.name}
           onChangeText={(value) => setInventionInfo({
             ...inventionInfo,
             name: value
@@ -61,7 +77,7 @@ const EditInvention = ({ route, navigation }) => {
         />
         <TextInput
           style={styles.input}
-          value={inventionInfo.description}
+          value={inventionInfo.description || invention.description}
           onChangeText={(value) => setInventionInfo({
             ...inventionInfo,
             description: value
@@ -71,7 +87,7 @@ const EditInvention = ({ route, navigation }) => {
         />
         <TextInput
           style={styles.input}
-          value={inventionInfo.cost}
+          value={inventionInfo.cost || invention.cost.toString()}
           onChangeText={(value) => setInventionInfo({
             ...inventionInfo,
             cost: value
@@ -85,13 +101,21 @@ const EditInvention = ({ route, navigation }) => {
         </TouchableOpacity>
 
         <View style={styles.imageGrid}>
-          {inventionInfo.images.map((image, index) => (
-            <Image
-              key={index}
-              source={{ uri: image }}
+          {images
+            ? images.map((image, index) => (
+                <Image
+                  key={index}
+                  source={{ uri: image.uri }}
               style={styles.imagePreview}
-            />
-          ))}
+                />
+              ))
+              : invention.images.map((image, index) => (
+                <Image
+                  key={index}
+                  source={{ uri: `${BASE_URL}${image}` }}
+                  style={styles.imagePreview}
+                />
+              ))}
         </View>
 
         <TouchableOpacity style={styles.submitButton} onPress={editInvention}>

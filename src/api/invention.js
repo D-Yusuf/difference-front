@@ -69,12 +69,15 @@ export const getAllInventions = async () => {
 };
 export const updateInvention = async (inventionId, inventionData) => {
   try {
+    console.log(inventionData);
     const formData = new FormData();
     for (let key in inventionData) {
       if (key !== "images") formData.append(key, inventionData[key]);
     }
     // Append each image file individually
+
     if (inventionData.images) {
+
       inventionData.images.forEach((image, index) => {
         formData.append("images", {
           uri: image.uri,
@@ -83,6 +86,7 @@ export const updateInvention = async (inventionId, inventionData) => {
         });
       });
     }
+
     const { data } = await instance.put(
       `/inventions/${inventionId}`,
       formData,
@@ -92,6 +96,7 @@ export const updateInvention = async (inventionId, inventionData) => {
         },
       }
     );
+
     return data;
   } catch (error) {
     throw error;
