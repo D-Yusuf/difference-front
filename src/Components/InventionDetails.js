@@ -17,7 +17,7 @@ const InventionDetails = ({route}) => {
   const { inventionId, image } = route.params;
   console.log("Image URI:", image); // Add this to debug
   const { data: invention, isPending: inventionPending } = useQuery({
-    queryKey: ["invention"],
+    queryKey: ["invention", inventionId],
     queryFn: () => getInvention(inventionId),
   });
   if (inventionPending) {
