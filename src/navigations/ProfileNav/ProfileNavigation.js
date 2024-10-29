@@ -24,6 +24,10 @@ const ProfileNavigation = () => {
         name={NAVIGATION.INVENTION.INVENTION_DETAILS}
         component={InventionDetails}
       />
+      <Stack.Screen
+        name={NAVIGATION.INVENTION.EDIT_INVENTION}
+        component={EditInvention}
+      />
     </Stack.Navigator>
   );
 };
