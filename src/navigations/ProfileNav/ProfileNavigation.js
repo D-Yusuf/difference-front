@@ -8,12 +8,11 @@ import NAVIGATION from "../index";
 import InventionDetails from "../../components/InventionDetails";
 import EditInvention from "../../screens/EditInvention";
 
-
 const Stack = createNativeStackNavigator();
 
 const ProfileNavigation = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name={NAVIGATION.PROFILE.PROFILE} component={Profile} />
       <Stack.Screen
         name={NAVIGATION.PROFILE.EDIT_PROFILE}

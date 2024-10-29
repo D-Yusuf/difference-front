@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { logout } from "../../api/auth";
 import { useContext } from "react";
 import UserContext from "../../context/UserContext";
+import Icon from "react-native-vector-icons/FontAwesome";
 const Profile = () => {
   const navigation = useNavigation();
   const { data: profile, isLoading: profileLoading } = useQuery({
@@ -65,18 +66,23 @@ const Profile = () => {
         </Text>
         <Text style={styles.bio}>{profile?.bio}</Text>
 
-        <TouchableOpacity style={styles.cvButton}>
-          <Text style={styles.actionButtonText}>Go to CV</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.addInventionButton}
-          onPress={() => navigation.navigate("AddInvention")}
-        >
-          <Text style={styles.actionButtonText}>Add Invention +</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.logoutButton} onPress={() => signOut()}>
-          <Text style={styles.actionButtonText}>Logout</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.cvButton}>
+            <Text style={styles.actionButtonText}>Go to CV</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.addInventionButton}
+            onPress={() => navigation.navigate("AddInvention")}
+          >
+            <MaterialIcons name="add" size={20} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={() => signOut()}
+          >
+            <MaterialIcons name="exit-to-app" size={20} color="black" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.inventionsSection}>
@@ -100,13 +106,15 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 15,
     alignItems: "center",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
     elevation: 3,
     borderWidth: 2,
     borderColor: "gray",
     marginHorizontal: 20,
     position: "relative",
+    marginTop: 20,
+    shadowColor: "blue",
   },
   editButton: {
     position: "absolute", // Position the button absolutely
@@ -146,29 +154,27 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   cvButton: {
-    backgroundColor: "lightgray",
+    backgroundColor: "skyblue",
     padding: 8,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "black",
     marginTop: 10,
-    width: "100%",
     alignItems: "center",
   },
   addInventionButton: {
-    backgroundColor: "lightgreen", // i used this green for add invention button, we can change it to any color we want.
+    backgroundColor: "skyblue", // i used this green for add invention button, we can change it to any color we want.
     padding: 10,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "black",
-    width: "100%",
     alignItems: "center",
+    width: "28%",
     marginTop: 10,
   },
   actionButtonText: {
     color: "black",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 15,
   },
   scrollContent: {
     flexGrow: 1,
@@ -188,8 +194,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "black",
-    width: "100%",
     alignItems: "center",
+    width: "28%",
     marginTop: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    gap: 10,
   },
 });
