@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,16 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
+  StatusBar,
+  ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { login } from "../../api/auth";
 import UserContext from "../../context/UserContext";
 import { useMutation } from "@tanstack/react-query";
 import NAVIGATION from "../../navigations/index";
+import Icon from "react-native-vector-icons/Ionicons";
+import { ThemeContext } from "../../context/ThemeContext";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -30,6 +34,11 @@ const Login = () => {
       alert("Login Error", error);
     },
   });
+  const { setBackgroundColor } = useContext(ThemeContext);
+
+  useEffect(() => {
+    setBackgroundColor("#FF7F50"); // Keeping the coral base
+  }, []);
 
   const handleLogin = () => {
     if (validateInputs()) {
@@ -51,89 +60,219 @@ const Login = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.title}>Login</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Login</Text>
-        </TouchableOpacity>
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" />
 
-        <View style={styles.registerContainer}>
-          <Text style={styles.registerText}>Don't have an account?</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate(NAVIGATION.AUTH.REGISTER)}
-          >
-            <Text style={styles.registerLink}>Register</Text>
-          </TouchableOpacity>
+      {/* Decorative Background Elements */}
+      <View style={styles.bgCircle1} />
+      <View style={styles.bgCircle2} />
+      <View style={styles.bgCircle3} />
+
+      <SafeAreaView style={styles.content}>
+        <View style={styles.headerSection}>
+          <Text style={styles.welcomeText}>Welcome{"\n"}Back</Text>
         </View>
-      </View>
-    </SafeAreaView>
+
+        <View style={styles.formSection}>
+          <View style={styles.inputGroup}>
+            <View style={styles.inputContainer}>
+              <Icon name="mail-outline" size={24} color="#fff" />
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={email}
+                onChangeText={setEmail}
+                placeholderTextColor="rgba(255,255,255,0.7)"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Icon name="lock-closed-outline" size={24} color="#fff" />
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+                placeholderTextColor="rgba(255,255,255,0.7)"
+              />
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[
+              styles.loginButton,
+              isPending && styles.loginButtonDisabled,
+            ]}
+            onPress={handleLogin}
+            disabled={isPending}
+          >
+            {isPending ? (
+              <ActivityIndicator color="#003863" />
+            ) : (
+              <>
+                <Text style={styles.loginButtonText}>Sign In</Text>
+                <Icon name="arrow-forward" size={24} color="#003863" />
+              </>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.forgotPassword}>
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+          </TouchableOpacity>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Don't have an account?</Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate(NAVIGATION.AUTH.REGISTER)}
+              style={styles.registerButton}
+            >
+              <Text style={styles.registerButtonText}>Sign Up</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "lightgray",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#FF7F50", // Coral base
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
+  bgCircle1: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: "rgba(241, 245, 249, 0.15)", // Soft cool gray overlay
+    top: -50,
+    right: -50,
+  },
+  bgCircle2: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "rgba(255, 127, 80, 0.25)", // Matching coral
+    top: 100,
+    left: -100,
+  },
+  bgCircle3: {
+    position: "absolute",
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: "rgba(226, 232, 240, 0.2)", // Light slate gray
+    bottom: -50,
+    right: -50,
   },
   content: {
-    width: "80%",
-    alignItems: "center",
+    flex: 1,
+    padding: 24,
   },
-  input: {
-    width: "100%",
-    height: 40,
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    backgroundColor: "white",
+  headerSection: {
+    marginTop: 40,
+    marginBottom: 60,
   },
-  loginButton: {
-    width: "100%",
-    backgroundColor: "skyblue",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: "black",
+
+  welcomeText: {
+    fontSize: 48,
+    fontWeight: "800",
+    color: "#ffffff",
+    lineHeight: 56,
+    paddingHorizontal: 8,
   },
-  loginButtonText: {
-    color: "white",
-    fontWeight: "bold",
+  formSection: {
+    flex: 1,
   },
-  registerContainer: {
+  inputGroup: {
+    gap: 20,
+    marginBottom: 30,
+  },
+  inputContainer: {
     flexDirection: "row",
     alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(241, 245, 249, 0.3)",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
   },
-  registerText: {
-    marginRight: 5,
+  input: {
+    flex: 1,
+    marginLeft: 16,
+    fontSize: 16,
+    color: "#ffffff",
+    paddingVertical: 12,
+    paddingHorizontal: 8,
   },
-  registerLink: {
-    color: "skyblue",
-    fontWeight: "bold",
+  loginButton: {
+    flexDirection: "row",
+    backgroundColor: "#F8FAFC",
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    marginHorizontal: 4,
+    paddingHorizontal: 24,
+    shadowColor: "#475569",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    gap: 12,
+  },
+  loginButtonDisabled: {
+    backgroundColor: "rgba(255,255,255,0.7)",
+  },
+  loginButtonText: {
+    color: "#FF7F50",
+    fontSize: 18,
+    fontWeight: "700",
+    paddingHorizontal: 8,
+  },
+  forgotPassword: {
+    alignSelf: "center",
+    marginTop: 20,
+    padding: 16,
+  },
+  forgotPasswordText: {
+    color: "#F1F5F9",
+    fontSize: 14,
+    fontWeight: "600",
+    paddingHorizontal: 8,
+  },
+  footer: {
+    position: "absolute",
+    bottom: 40,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  footerText: {
+    color: "rgba(241, 245, 249, 0.7)",
+    fontSize: 14,
+    paddingHorizontal: 4,
+  },
+  registerButton: {
+    backgroundColor: "transparent",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  registerButtonText: {
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: "700",
+    paddingHorizontal: 4,
   },
 });
 

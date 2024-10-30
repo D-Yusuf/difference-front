@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { useQuery } from "@tanstack/react-query";
 import { getAllInventions } from "../../api/invention";
 import InventionList from "../../components/InventionList";
+import { ThemeContext } from "../../context/ThemeContext";
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [gridColumns, setGridColumns] = useState(2);
@@ -20,6 +21,11 @@ const Home = () => {
     queryKey: ["inventions"],
     queryFn: getAllInventions,
   });
+  const { setBackgroundColor } = useContext(ThemeContext);
+
+  useEffect(() => {
+    setBackgroundColor("#88B3D4"); // Set color when component mounts
+  }, []);
 
   // Filter inventions based on the search term
   const filteredInventions = inventions?.filter((invention) =>
@@ -31,28 +37,32 @@ const Home = () => {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <View style={styles.glassCard}>
-            <Text style={styles.headerTitle}>Discover</Text>
-            <View style={styles.searchContainer}>
-              <Icon
-                name="search-outline"
-                size={20}
-                color="#003863"
-                style={styles.searchIcon}
-              />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="What invention inspires you?"
-                value={searchTerm}
-                onChangeText={setSearchTerm}
-                placeholderTextColor="rgba(0, 56, 99, 0.5)"
-              />
-            </View>
+
+      {/* Background Elements */}
+      <View style={styles.bgCircle1} />
+      <View style={styles.bgCircle2} />
+      <View style={styles.bgCircle3} />
+
+      <View style={styles.innerContainer}>
+        <View style={styles.headerSection}>
+          <Text style={styles.headerTitle}>Discover</Text>
+          <Text style={styles.headerSubtitle}>Find your next inspiration</Text>
+        </View>
+
+        <View style={styles.searchSection}>
+          <View style={styles.searchContainer}>
+            <Icon name="search-outline" size={24} color="#fff" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="What invention inspires you?"
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+              placeholderTextColor="rgba(255,255,255,0.7)"
+            />
           </View>
+
           <View style={styles.gridControls}>
             <TouchableOpacity
               style={[
@@ -64,7 +74,7 @@ const Home = () => {
               <Icon
                 name="reorder-four"
                 size={24}
-                color={gridColumns === 1 ? "#ffffff" : "#003863"}
+                color={gridColumns === 1 ? "#88B3D4" : "#fff"}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -77,92 +87,117 @@ const Home = () => {
               <Icon
                 name="grid"
                 size={24}
-                color={gridColumns === 2 ? "#ffffff" : "#003863"}
+                color={gridColumns === 2 ? "#88B3D4" : "#fff"}
               />
             </TouchableOpacity>
           </View>
         </View>
-        <InventionList
-          inventions={filteredInventions}
-          numColumns={gridColumns}
-        />
+
+        <View style={styles.listContainer}>
+          <InventionList
+            inventions={filteredInventions}
+            numColumns={gridColumns}
+          />
+        </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#88B3D4",
-  },
   container: {
     flex: 1,
     backgroundColor: "#88B3D4",
   },
-  headerContainer: {
-    padding: 20,
-    paddingTop: 10,
-    backgroundColor: "transparent",
+  bgCircle1: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    top: -50,
+    right: -50,
   },
-  glassCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.85)",
-    borderRadius: 25,
-    padding: 20,
-    shadowColor: "#003863",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
-    elevation: 8,
-    backdropFilter: "blur(10px)",
+  bgCircle2: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: "rgba(255, 255, 255, 0.08)",
+    top: 100,
+    left: -100,
+  },
+  bgCircle3: {
+    position: "absolute",
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    bottom: -50,
+    right: -50,
+  },
+  innerContainer: {
+    flex: 1,
+    marginHorizontal: 20,
+  },
+  headerSection: {
+    marginTop: 40,
+    marginBottom: 30,
   },
   headerTitle: {
-    fontSize: 36,
+    fontSize: 48,
     fontWeight: "800",
-    color: "#003863",
-    marginBottom: 20,
+    color: "#ffffff",
     letterSpacing: 0.5,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: "rgba(255,255,255,0.7)",
+    marginTop: 8,
+  },
+  searchSection: {
+    marginBottom: 20,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#ffffff",
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    height: 50,
-  },
-  searchIcon: {
-    marginRight: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.3)",
+    paddingVertical: 12,
+    marginBottom: 20,
   },
   searchInput: {
     flex: 1,
+    marginLeft: 16,
     fontSize: 16,
-    color: "#003863",
+    color: "#ffffff",
+    paddingVertical: 8,
   },
   gridControls: {
     flexDirection: "row",
-    justifyContent: "center",
     gap: 15,
-    marginTop: 20,
-    paddingHorizontal: 40,
+    alignSelf: "flex-end",
   },
   gridButton: {
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
     padding: 12,
-    borderRadius: 50,
+    borderRadius: 15,
     width: 50,
     height: 50,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#003863",
+  },
+  activeGridButton: {
+    backgroundColor: "#ffffff",
+    transform: [{ scale: 1.1 }],
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
   },
-  activeGridButton: {
-    backgroundColor: "#003863",
-    transform: [{ scale: 1.1 }],
+  listContainer: {
+    flex: 1,
   },
 });
 
