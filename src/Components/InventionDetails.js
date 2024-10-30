@@ -83,7 +83,7 @@ const InventionDetails = ({ route }) => {
     user.role === "admin";
 
   // Update the phase display to look nicer (capitalize first letter)
-
+  const canInvest = user.role === "investor" || user.role === "admin";
 
   return (
     <ScrollView style={styles.container}>

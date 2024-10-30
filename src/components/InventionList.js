@@ -2,13 +2,9 @@ import React from "react";
 import { StyleSheet, FlatList, View, Text } from "react-native";
 import InventionCard from "./InventionCard";
 
-<<<<<<< HEAD
-const InventionList = ({ inventions, numColumns }) => {
-=======
-const InventionList = ({ inventions, numColumns, showInvestButton = true, showEditButton = true }) => {
->>>>>>> difference-front/dashboard
-  if (!inventions || !Array.isArray(inventions)) {
-    return <Text style={styles.noInventions}>No inventions found.</Text>;
+const InventionList = ({ inventions, numColumns = 3, showInvestButton = true, showEditButton = true }) => {
+  if (inventions?.length === 0 || !inventions) {
+    return <Text>No inventions found.</Text>;
   }
 
   const validInventions = inventions.filter((invention) => invention != null);
@@ -26,14 +22,7 @@ const InventionList = ({ inventions, numColumns, showInvestButton = true, showEd
       key={numColumns}
       contentContainerStyle={styles.container}
     />
-    
   );
-  // <View>
-  //   {inventions.map((invention) => (
-  //     <InventionCard key={invention._id} invention={invention} showInvestButton={showInvestButton} showEditButton={showEditButton} />
-  //     ))}
-  //   </View>
-  // );
 };
 
 const styles = StyleSheet.create({

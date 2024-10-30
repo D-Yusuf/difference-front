@@ -15,12 +15,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { createInvention } from "../api/invention";
 import { getCategories } from "../api/categories";
-<<<<<<< HEAD
 import { getInventors } from "../api/user";
 import { BASE_URL } from "../api";
-=======
-
->>>>>>> difference-front/dashboard
 const Invention = ({ navigation }) => {
   const phases = [
     { label: "Idea", value: "idea" },
