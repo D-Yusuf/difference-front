@@ -9,26 +9,79 @@ import { getProfile } from "../api/profile"; // Import the getProfile function
 import UserContext from "../context/UserContext";
 import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
+import { getCategory } from "../api/category"; // You'll need to create this API function
 
-const InventionDetails = ({route}) => {
+const PHASES = ["idea", "work-in-progress", "prototype", "market-ready"];
+
+const normalizePhase = (phase) => {
+  const phaseMap = {
+    testing: "prototype", // Map 'testing' to 'prototype' phase
+    // Add other mappings if needed
+  };
+  return phaseMap[phase] || phase;
+};
+
+const getPhaseProgress = (currentPhase) => {
+  const normalizedPhase = normalizePhase(currentPhase);
+  const index = PHASES.indexOf(normalizedPhase);
+  if (index === -1) return 0;
+  return ((index + 1) / PHASES.length) * 100;
+};
+
+const InventionDetails = ({ route }) => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isInterested, setIsInterested] = useState(false);
-  const { inventionId, image, showInvestButton = false, showEditButton = false } = route.params;
+  const { inventionId, image, showInvestButton , showEditButton  } = route.params;
+  
+    const [isLiked, setIsLiked] = useState(false);
   console.log("Image URI:", image); // Add this to debug
+
+  console.log("Received inventionId:", inventionId);
+
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention", inventionId],
+
     queryFn: () => getInvention(inventionId),
   });
-  if (inventionPending) {
+  const formatPhase = (phase) => {
+    return phase
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+  console.log("Invention ID:", inventionId);
+  console.log("Invention pending:", inventionPending);
+  console.log("Raw invention data:", invention);
+  console.log("Current phase:", invention?.phase);
+
+  const { data: category, isPending: categoryPending } = useQuery({
+    queryKey: ["category", invention?.category],
+    queryFn: () => getCategory(invention?.category),
+    enabled: !!invention?.category,
+  });
+
+  console.log("Category data:", category);
+
+  if (inventionPending || categoryPending) {
     return <Text>Loading...</Text>;
   }
+
+  if (!invention) {
+    console.log("No invention data available");
+    return <Text>No invention data available</Text>;
+  }
+
+  console.log("Rendering with invention:", {
+    id: invention._id,
+    name: invention.name,
+    phase: invention.phase,
+  });
 
   // We will check if the user is the inventor or admin appear the edit button for him.
   const isOwner =
     invention.inventors.find((inventor) => inventor._id === user._id) ||
     user.role === "admin";
+
   const canInvest = (user.role === "investor" || user.role === "admin") && !invention.inventors.find((inventor) => inventor._id === user._id);
 console.log("sasdasas",invention.orders)
 
@@ -38,9 +91,56 @@ console.log("sasdasas",invention.orders)
       <View style={styles.contentContainer}>
         <Image source={{ uri: image }} style={styles.image} />
         <Text style={styles.title}>{invention?.name}</Text>
+
+        <View style={styles.metaContainer}>
+          <View style={styles.metaItem}>
+            <Text style={styles.metaLabel}>Category</Text>
+            <Text style={styles.metaValue}>
+              {category?.name || "Loading..."}
+            </Text>
+          </View>
+          <View style={styles.metaItem}>
+            <Text style={styles.metaLabel}>Phase</Text>
+            <Text style={styles.metaValue}>
+              {formatPhase(invention?.phase)}
+            </Text>
+            <View style={styles.progressContainer}>
+              <View
+                style={[
+                  styles.progressBar,
+                  { width: `${getPhaseProgress(invention?.phase)}%` },
+                ]}
+              />
+              <View style={styles.phaseMarkers}>
+                {PHASES.map((phase, index) => (
+                  <View
+                    key={phase}
+                    style={[
+                      styles.phaseDot,
+                      PHASES.indexOf(normalizePhase(invention?.phase)) >=
+                        index && styles.phaseDotActive,
+                    ]}
+                  />
+                ))}
+              </View>
+            </View>
+          </View>
+        </View>
+
         <View style={styles.inventorContainer}>
-          {invention?.inventors?.map((inventor) => (
-            <View key={inventor._id} style={styles.inventorRow}>
+          {invention?.inventors?.map((inventor) => {
+            console.log("Inventor ID:", inventor._id); // Debug log
+            return (
+              <TouchableOpacity
+                key={inventor._id}
+                style={styles.inventorRow}
+                onPress={() => {
+                  console.log("Navigating to profile with ID:", inventor._id); // Debug log
+                  navigation.navigate(NAVIGATION.PROFILE.USER_PROFILE, {
+                    userId: inventor._id,
+                  });
+                }}
+              >
               <Image
                 source={{ uri: BASE_URL + inventor.image }}
                 style={styles.inventorImage}
@@ -48,8 +148,9 @@ console.log("sasdasas",invention.orders)
               <Text style={styles.inventor}>
                 {inventor.firstName + " " + inventor.lastName}
               </Text>
-            </View>
-          ))}
+            </TouchableOpacity>
+            );
+          })}
         </View>
         <Text style={styles.description}>{invention?.description}</Text>
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
@@ -76,7 +177,9 @@ console.log("sasdasas",invention.orders)
           <TouchableOpacity
             style={styles.button}
             onPress={() =>
-              navigation.navigate(NAVIGATION.INVENTION.EDIT_INVENTION, {invention})
+              navigation.navigate(NAVIGATION.INVENTION.EDIT_INVENTION, {
+                invention,
+              })
             }
           >
             <Text style={styles.buttonText}>Edit</Text>
@@ -220,5 +323,73 @@ const styles = StyleSheet.create({
   },
   actionButtonTextActive: {
     color: "#ffffff",
+  },
+  metaContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 20,
+    gap: 12,
+  },
+  metaItem: {
+    flex: 1,
+    backgroundColor: "#f8f9fa",
+    padding: 12,
+    borderRadius: 10,
+  },
+  metaLabel: {
+    fontSize: 14,
+    color: "#6b7280",
+    marginBottom: 4,
+  },
+  metaValue: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1a1a1a",
+  },
+  progressContainer: {
+    marginTop: 8,
+    height: 24,
+    position: "relative",
+    backgroundColor: "#f0f0f0",
+    borderRadius: 2,
+    width: "100%",
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: "#2563eb",
+    borderRadius: 2,
+    position: "absolute",
+    top: 10,
+    left: 0,
+    zIndex: 1,
+  },
+  phaseMarkers: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    paddingHorizontal: 4,
+    alignItems: "center",
+    zIndex: 2,
+  },
+  phaseDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#e5e7eb",
+    borderWidth: 2,
+    borderColor: "#fff",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+    elevation: 2,
+  },
+  phaseDotActive: {
+    backgroundColor: "#2563eb", // Make sure this color is visibly different
   },
 });

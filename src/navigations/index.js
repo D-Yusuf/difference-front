@@ -16,6 +16,7 @@ const NAVIGATION = {
     EDIT_PROFILE: "EditProfile",
     ORDERS: "Orders",
     INVEST_DETAILS: "InvestDetails-Profile",
+    USER_PROFILE: "UserProfile",
   },
   // INVEST: {
   //   INDEX: "InvestIndex",

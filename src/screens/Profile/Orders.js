@@ -11,9 +11,8 @@ const Orders = ({route}) => {
     })
     if(isPending) return <Text>Loading...</Text>
     const {inventions} = route.params; // these are the user's inventions
-    console.log("inventions",inventions)
-    const orders = allOrders.filter(order => inventions.includes(order.invention?._id));
-  console.log("orders", orders)
+    const orders = allOrders?.filter(order => inventions?.includes(order.invention?._id));
+  console.log("orders-iusihewbf", orders)
   return (
     <View style={styles.container}>
       <OrderList orders={orders} />
