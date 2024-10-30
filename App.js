@@ -22,6 +22,7 @@ export default function App() {
   const checkToken = async () => {
     setLoading(true);
     const token = await getToken();
+    // console.log(token)
     if (token) {
       setUser({ ...user, loggedIn: true, _id: token?._id, role: token?.role });
     }
@@ -39,11 +40,11 @@ export default function App() {
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <ThemeContext.Provider value={{ backgroundColor, setBackgroundColor }}>
-          <SafeAreaView style={{ flex: 1, backgroundColor }}>
+          
             <UserContext.Provider value={[user, setUser]}>
-              {user.loggedIn ? <MainNavigation /> : <AuthNavigation />}
+              {user.loggedIn ? <SafeAreaView style={{ flex: 1, backgroundColor }}><MainNavigation /></SafeAreaView>: <AuthNavigation />}
             </UserContext.Provider>
-          </SafeAreaView>
+          
         </ThemeContext.Provider>
       </QueryClientProvider>
     </NavigationContainer>

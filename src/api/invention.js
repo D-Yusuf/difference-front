@@ -2,6 +2,13 @@ import instance from "./index"; // Ensure this path is correct
 import { BASE_URL } from "../api"; // Adjust the path as needed
 
 export const createInvention = async (inventionData) => {
+<<<<<<< HEAD
+=======
+  inventionData.inventors = [
+    "67189c8629a471689f676f07",
+    "6718bc3311abf0128e187d16",
+  ];
+>>>>>>> difference-front/dashboard
   try {
     const formData = new FormData();
     for (let key in inventionData) {
@@ -75,6 +82,7 @@ export const updateInvention = async (inventionId, inventionData) => {
         formData.append("inventors[]", inventorId);
       });
     }
+<<<<<<< HEAD
 
     // Append other non-image data
     Object.keys(inventionData).forEach((key) => {
@@ -85,6 +93,12 @@ export const updateInvention = async (inventionId, inventionData) => {
 
     // Handle images if they exist
     if (inventionData.images && inventionData.images.length > 0) {
+=======
+    // Append each image file individually
+
+    if (inventionData.images) {
+
+>>>>>>> difference-front/dashboard
       inventionData.images.forEach((image, index) => {
         formData.append("images", {
           uri: image.uri,

@@ -8,6 +8,10 @@ import {
   StatusBar,
   SafeAreaView,
   Animated,
+<<<<<<< HEAD
+=======
+  ScrollView,
+>>>>>>> difference-front/dashboard
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useQuery } from "@tanstack/react-query";

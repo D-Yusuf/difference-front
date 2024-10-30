@@ -31,29 +31,24 @@ const getPhaseProgress = (currentPhase) => {
 const InventionDetails = ({ route }) => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
+  const { inventionId, image, showInvestButton , showEditButton  } = route.params;
+  
+    const [isLiked, setIsLiked] = useState(false);
+  console.log("Image URI:", image); // Add this to debug
 
-  const [isLiked, setIsLiked] = useState(false);
-  const [isInterested, setIsInterested] = useState(false);
-
-  const { inventionId, image } = route.params;
   console.log("Received inventionId:", inventionId);
 
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention", inventionId],
 
-    queryFn: async () => {
-      try {
-        console.log("Fetching invention with ID:", inventionId);
-        const response = await getInvention(inventionId);
-        console.log("Invention API response:", response);
-        return response;
-      } catch (error) {
-        console.error("Error fetching invention:", error);
-        throw error;
-      }
-    },
+    queryFn: () => getInvention(inventionId),
   });
-
+  const formatPhase = (phase) => {
+    return phase
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
   console.log("Invention ID:", inventionId);
   console.log("Invention pending:", inventionPending);
   console.log("Raw invention data:", invention);
@@ -86,15 +81,9 @@ const InventionDetails = ({ route }) => {
   const isOwner =
     invention.inventors.find((inventor) => inventor._id === user._id) ||
     user.role === "admin";
-  const canInvest = user.role === "investor" || user.role === "admin";
 
   // Update the phase display to look nicer (capitalize first letter)
-  const formatPhase = (phase) => {
-    return phase
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
+
 
   return (
     <ScrollView style={styles.container}>
@@ -180,25 +169,10 @@ const InventionDetails = ({ route }) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.actionButton,
-              isInterested && styles.actionButtonActive,
-            ]}
-            onPress={() => setIsInterested(!isInterested)}
-          >
-            <Text
-              style={[
-                styles.actionButtonText,
-                isInterested && styles.actionButtonTextActive,
-              ]}
-            >
-              {isInterested ? "Interested" : "Interest"}
-            </Text>
-          </TouchableOpacity>
+          
         </View>
 
-        {isOwner && (
+        {showEditButton && isOwner && (
           <TouchableOpacity
             style={styles.button}
             onPress={() =>
@@ -211,10 +185,10 @@ const InventionDetails = ({ route }) => {
           </TouchableOpacity>
         )}
 
-        {canInvest && (
+        {showInvestButton && canInvest && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
-            onPress={() => navigation.navigate("Invest")}
+            onPress={() => navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {invention})}
           >
             <Text style={styles.buttonText}>Invest</Text>
           </TouchableOpacity>

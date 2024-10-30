@@ -17,6 +17,9 @@ import InventionList from "../../components/InventionList";
 import UserContext from "../../context/UserContext";
 import { logout } from "../../api/auth";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { getOrders } from "../../api/orders";
+import NAVIGATION from "../../navigations";
+import OrderList from "../../components/OrderList";
 
 const Profile = ({ navigation }) => {
   const [user, setUser] = useContext(UserContext);
@@ -24,6 +27,11 @@ const Profile = ({ navigation }) => {
     queryKey: ["profile"],
     queryFn: getProfile,
   });
+  const { data: allOrders, isLoading: allOrdersLoading } = useQuery({
+    queryKey: ["allOrders"],
+    queryFn: getOrders,
+  });
+
 
   const signOut = () => {
     logout();
@@ -37,7 +45,6 @@ const Profile = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
-        <View style={styles.headerContainer}>
           <View style={styles.glassCard}>
             <TouchableOpacity
               style={styles.editButton}
@@ -60,6 +67,20 @@ const Profile = ({ navigation }) => {
 
             <View style={styles.buttonContainer}>
 
+            {user.role === "inventor" && (
+              <TouchableOpacity
+              style={[styles.actionButton, styles.ordersButton]}
+              onPress={() => navigation.navigate(NAVIGATION.PROFILE.ORDERS, {inventions: profile?.inventions.map(invention => invention._id)})}
+            >
+              <Icon
+                name="document-text-outline"
+                size={20}
+                color="#003863"
+              />
+              <Text style={styles.buttonText}>Orders</Text>
+            </TouchableOpacity>
+            )}
+              <View style={styles.buttonContainer}>
               {profile?.cv && (
                 <TouchableOpacity
                   style={[styles.actionButton, styles.cvButton]}
@@ -74,7 +95,6 @@ const Profile = ({ navigation }) => {
                 </TouchableOpacity>
               )}
 
-
               <TouchableOpacity
                 style={[styles.actionButton, styles.addButton]}
                 onPress={() => navigation.navigate("AddInvention")}
@@ -86,18 +106,30 @@ const Profile = ({ navigation }) => {
           </View>
         </View>
 
-        <View style={styles.inventionsContainer}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>My Inventions</Text>
-            <TouchableOpacity
-              style={styles.logoutButton}
-              onPress={() => signOut()}
-            >
-              <MaterialIcons name="exit-to-app" size={24} color="red" />
-            </TouchableOpacity>
+        {user.role === "inventor" && (
+          <View style={styles.inventionsContainer}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>My Inventions</Text>
+              <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+                <Icon name="log-out-outline" size={24} color="#FF4444" />
+              </TouchableOpacity>
+            </View>
+            <InventionList inventions={profile?.inventions} numColumns={2} />
           </View>
-          <InventionList inventions={profile?.inventions} numColumns={2} />
-        </View>
+        )}
+
+        {user.role === "investor" && (
+          <View style={styles.inventionsSection}>
+            <Text style={styles.sectionTitle}>My Orders</Text>
+            <Text style={styles.sectionTitle}>
+              {allOrders?.filter(order => order?.investor?._id === profile?._id).length} orders
+            </Text>
+            <OrderList
+              orders={allOrders?.filter(order => order?.investor?._id === profile?._id)} 
+              own={true} 
+            />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
