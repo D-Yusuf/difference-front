@@ -14,7 +14,6 @@ import { useQuery } from "@tanstack/react-query";
 import { getAllInventions } from "../../api/invention";
 import InventionList from "../../components/InventionList";
 import { ThemeContext } from "../../context/ThemeContext";
-
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [gridColumns, setGridColumns] = useState(2);
