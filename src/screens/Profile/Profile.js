@@ -17,6 +17,7 @@ import InventionList from "../../components/InventionList";
 import UserContext from "../../context/UserContext";
 import { logout } from "../../api/auth";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { colors } from "../../../Colors";
 import { getOrders } from "../../api/orders";
 import NAVIGATION from "../../navigations";
 import OrderList from "../../components/OrderList";
@@ -32,8 +33,7 @@ const Profile = ({ navigation }) => {
     queryFn: getOrders,
   });
 
-
-  console.log("PROFILE", profile)
+  console.log("PROFILE", profile);
 
   const signOut = () => {
     logout();
@@ -47,42 +47,43 @@ const Profile = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
-          <View style={styles.glassCard}>
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => navigation.navigate("EditProfile", { profile })}
-            >
-              <Icon name="create-outline" size={24} color="#003863" />
-            </TouchableOpacity>
+        <View style={styles.glassCard}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate("EditProfile", { profile })}
+          >
+            <Icon name="create-outline" size={24} color="#003863" />
+          </TouchableOpacity>
 
-            <Image
-              source={profile?.image && { uri: BASE_URL + profile.image }}
-              style={styles.profileImage}
-            />
+          <Image
+            source={profile?.image && { uri: BASE_URL + profile.image }}
+            style={styles.profileImage}
+          />
 
-            <Text style={styles.name}>
-              {profile?.firstName} {profile?.lastName}
-            </Text>
-            <Text style={styles.email}>{profile?.email}</Text>
-            <Text style={styles.roleText}>{profile?.role}</Text>
-            <Text style={styles.bio}>{profile?.bio}</Text>
+          <Text style={styles.name}>
+            {profile?.firstName} {profile?.lastName}
+          </Text>
+          <Text style={styles.email}>{profile?.email}</Text>
+          <Text style={styles.roleText}>{profile?.role}</Text>
+          <Text style={styles.bio}>{profile?.bio}</Text>
 
-            <View style={styles.buttonContainer}>
-
+          <View style={styles.buttonContainer}>
             {user.role === "inventor" && (
               <TouchableOpacity
-              style={[styles.actionButton, styles.ordersButton]}
-              onPress={() => navigation.navigate(NAVIGATION.PROFILE.ORDERS, {inventions: profile?.inventions.map(invention => invention._id)})}
-            >
-              <Icon
-                name="document-text-outline"
-                size={20}
-                color="#003863"
-              />
-              <Text style={styles.buttonText}>Orders</Text>
-            </TouchableOpacity>
+                style={[styles.actionButton, styles.ordersButton]}
+                onPress={() =>
+                  navigation.navigate(NAVIGATION.PROFILE.ORDERS, {
+                    inventions: profile?.inventions.map(
+                      (invention) => invention._id
+                    ),
+                  })
+                }
+              >
+                <Icon name="document-text-outline" size={20} color="#003863" />
+                <Text style={styles.buttonText}>Orders</Text>
+              </TouchableOpacity>
             )}
-              <View style={styles.buttonContainer}>
+            <View style={styles.buttonContainer}>
               {profile?.cv && (
                 <TouchableOpacity
                   style={[styles.actionButton, styles.cvButton]}
@@ -108,27 +109,32 @@ const Profile = ({ navigation }) => {
           </View>
         </View>
 
-        
-          <View style={styles.inventionsContainer}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>My Inventions</Text>
-              <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
-                <Icon name="log-out-outline" size={24} color="#FF4444" />
-              </TouchableOpacity>
-            </View>
-            <InventionList inventions={profile?.inventions} numColumns={2} />
+        <View style={styles.inventionsContainer}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>My Inventions</Text>
+            <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+              <Icon name="log-out-outline" size={24} color="#FF4444" />
+            </TouchableOpacity>
           </View>
-        
+          <InventionList inventions={profile?.inventions} numColumns={2} />
+        </View>
 
         {user.role === "investor" && (
           <View style={styles.inventionsSection}>
             <Text style={styles.sectionTitle}>My Orders</Text>
             <Text style={styles.sectionTitle}>
-              {allOrders?.filter(order => order?.investor?._id === profile?._id).length} orders
+              {
+                allOrders?.filter(
+                  (order) => order?.investor?._id === profile?._id
+                ).length
+              }{" "}
+              orders
             </Text>
             <OrderList
-              orders={allOrders?.filter(order => order?.investor?._id === profile?._id)} 
-              own={true} 
+              orders={allOrders?.filter(
+                (order) => order?.investor?._id === profile?._id
+              )}
+              own={true}
             />
           </View>
         )}
@@ -185,12 +191,12 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#003863",
+    color: colors.primary,
     marginBottom: 5,
   },
   email: {
     fontSize: 16,
-    color: "#666",
+    color: colors.primary,
     marginBottom: 5,
   },
   roleText: {
@@ -201,7 +207,7 @@ const styles = StyleSheet.create({
   },
   bio: {
     fontSize: 16,
-    color: "#444",
+    color: colors.primary,
     textAlign: "center",
     marginBottom: 20,
     paddingHorizontal: 10,
