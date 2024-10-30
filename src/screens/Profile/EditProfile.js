@@ -12,6 +12,7 @@ import { TouchableOpacity } from "react-native";
 import { getProfile, updateProfile } from "../../api/profile";
 import { BASE_URL } from "../../api";
 import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 const EditProfile = ({ route, navigation }) => {
   const queryClient = useQueryClient();
   const { profile } = route.params;
@@ -20,6 +21,18 @@ const EditProfile = ({ route, navigation }) => {
     lastName: profile.lastName,
     bio: profile.bio,
   });
+  const pickDocument = async () => {
+    try {
+      let result = await DocumentPicker.pick({
+        type: DocumentPicker.types.pdf,
+      });
+      if (!result.canceled) {
+        setUserInfo({ ...userInfo, cv: result.assets[0].uri });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const [image, setImage] = useState(null);
   // const { data: profile } = useQuery({
   //   queryKey: ["profile-image"],
@@ -100,6 +113,9 @@ const EditProfile = ({ route, navigation }) => {
           onChangeText={(text) => setUserInfo({ ...userInfo, bio: text })}
         />
       </View>
+      <TouchableOpacity style={styles.button} onPress={pickDocument}>
+        <Text style={styles.buttonText}>Upload CV</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
         <Text style={styles.buttonText}>Update Profile</Text>
       </TouchableOpacity>

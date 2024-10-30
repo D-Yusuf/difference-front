@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  Linking,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useQuery } from "@tanstack/react-query";
@@ -57,15 +58,19 @@ const Profile = ({ navigation }) => {
             <Text style={styles.bio}>{profile?.bio}</Text>
 
             <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.cvButton]}
-                onPress={() => {
-                  /* CV handler */
-                }}
-              >
-                <Icon name="document-text-outline" size={20} color="#003863" />
-                <Text style={styles.buttonText}>View CV</Text>
-              </TouchableOpacity>
+              {profile?.cv && (
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.cvButton]}
+                  onPress={() => Linking.openURL(`${BASE_URL}${profile.cv}`)}
+                >
+                  <Icon
+                    name="document-text-outline"
+                    size={20}
+                    color="#003863"
+                  />
+                  <Text style={styles.buttonText}>View CV</Text>
+                </TouchableOpacity>
+              )}
 
               <TouchableOpacity
                 style={[styles.actionButton, styles.addButton]}

@@ -2,10 +2,6 @@ import instance from "./index"; // Ensure this path is correct
 import { BASE_URL } from "../api"; // Adjust the path as needed
 
 export const createInvention = async (inventionData) => {
-  inventionData.inventors = [
-    "67189c8629a471689f676f07",
-    "6718bc3311abf0128e187d16",
-  ];
   try {
     const formData = new FormData();
     for (let key in inventionData) {
@@ -77,7 +73,6 @@ export const updateInvention = async (inventionId, inventionData) => {
     // Append each image file individually
 
     if (inventionData.images) {
-
       inventionData.images.forEach((image, index) => {
         formData.append("images", {
           uri: image.uri,
