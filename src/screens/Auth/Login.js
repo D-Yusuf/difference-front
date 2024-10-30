@@ -17,6 +17,7 @@ import { useMutation } from "@tanstack/react-query";
 import NAVIGATION from "../../navigations/index";
 import Icon from "react-native-vector-icons/Ionicons";
 import { ThemeContext } from "../../context/ThemeContext";
+import { colors } from "../../../Colors";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -35,10 +36,6 @@ const Login = () => {
     },
   });
   const { setBackgroundColor } = useContext(ThemeContext);
-
-  useEffect(() => {
-    setBackgroundColor("#FF7F50"); // Keeping the coral base
-  }, []);
 
   const handleLogin = () => {
     if (validateInputs()) {
@@ -141,34 +138,39 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FF7F50", // Coral base
+    backgroundColor: colors.primary, // Coral base
+    padding: 10,
   },
   bgCircle1: {
     position: "absolute",
     width: 300,
     height: 300,
     borderRadius: 150,
-    backgroundColor: "rgba(241, 245, 249, 0.15)", // Soft cool gray overlay
+    backgroundColor: colors.secondary, // Soft cool gray overlay
     top: -50,
     right: -50,
+    opacity: 0.2,
   },
+
   bgCircle2: {
     position: "absolute",
     width: 200,
     height: 200,
     borderRadius: 100,
-    backgroundColor: "rgba(255, 127, 80, 0.25)", // Matching coral
+    backgroundColor: colors.secondary, // Matching coral
     top: 100,
     left: -100,
+    opacity: 0.2,
   },
   bgCircle3: {
     position: "absolute",
     width: 250,
     height: 250,
     borderRadius: 125,
-    backgroundColor: "rgba(226, 232, 240, 0.2)", // Light slate gray
+    backgroundColor: colors.secondary, // Light slate gray
     bottom: -50,
     right: -50,
+    opacity: 0.2,
   },
   content: {
     flex: 1,
@@ -230,7 +232,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.7)",
   },
   loginButtonText: {
-    color: "#FF7F50",
+    color: colors.primary,
     fontSize: 18,
     fontWeight: "700",
     paddingHorizontal: 8,

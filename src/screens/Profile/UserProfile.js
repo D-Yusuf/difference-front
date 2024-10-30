@@ -95,27 +95,39 @@ const UserProfile = ({ route }) => {
       {/* Bio Section */}
       {userInfo?.bio && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
-          <Text style={styles.bio}>{userInfo.bio}</Text>
+          <View style={styles.backColor}>
+            <Text style={styles.sectionTitle}>About</Text>
+            <Text style={styles.bio}>{userInfo.bio}</Text>
+          </View>
         </View>
       )}
 
       {/* Contact Information */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Contact Information</Text>
-        <View style={styles.infoContainer}>
-          {userInfo?.email && <InfoItem label="Email" value={userInfo.email} />}
-          {userInfo?.phone && <InfoItem label="Phone" value={userInfo.phone} />}
-          {userInfo?.location && (
-            <InfoItem label="Location" value={userInfo.location} />
-          )}
+        <View style={styles.backColor}>
+          <Text style={styles.sectionTitle}>Contact Information</Text>
+          <View style={styles.infoContainer}>
+            {userInfo?.email && (
+              <InfoItem label="Email" value={userInfo.email} />
+            )}
+            {userInfo?.phone && (
+              <InfoItem label="Phone" value={userInfo.phone} />
+            )}
+            {userInfo?.location && (
+              <InfoItem label="Location" value={userInfo.location} />
+            )}
+          </View>
         </View>
       </View>
 
       {/* Inventions Section */}
       {inventionsData.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Inventions</Text>
+          <View>
+            <Text style={styles.sectionTitle}>
+              {userInfo?.firstName}'s Inventions
+            </Text>
+          </View>
           <View style={styles.inventionsContainer}>
             <InventionList inventions={inventionsData} />
           </View>
@@ -135,7 +147,7 @@ const InfoItem = ({ label, value }) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#88B3D4",
   },
   centerContainer: {
     flex: 1,
@@ -160,6 +172,13 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     backgroundColor: "#f0f0f0",
   },
+  backColor: {
+    backgroundColor: "white",
+    flex: 1,
+    borderRadius: 20,
+    padding: 10,
+    display: "flex",
+  },
   name: {
     fontSize: 24,
     fontWeight: "bold",
@@ -173,6 +192,7 @@ const styles = StyleSheet.create({
     padding: 20,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
+    backgroundColor: "#88B3D4",
   },
   sectionTitle: {
     fontSize: 18,
@@ -185,9 +205,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: "#444",
   },
-  infoContainer: {
-    backgroundColor: "#fff",
-  },
+
   infoItem: {
     flexDirection: "row",
     paddingVertical: 8,

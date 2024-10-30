@@ -16,6 +16,7 @@ import InventionList from "../../components/InventionList";
 import UserContext from "../../context/UserContext";
 import { logout } from "../../api/auth";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { colors } from "../../../Colors";
 
 const Profile = ({ navigation }) => {
   const [user, setUser] = useContext(UserContext);
@@ -139,12 +140,12 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#003863",
+    color: colors.primary,
     marginBottom: 5,
   },
   email: {
     fontSize: 16,
-    color: "#666",
+    color: colors.primary,
     marginBottom: 5,
   },
   roleText: {
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
   },
   bio: {
     fontSize: 16,
-    color: "#444",
+    color: colors.primary,
     textAlign: "center",
     marginBottom: 20,
     paddingHorizontal: 10,

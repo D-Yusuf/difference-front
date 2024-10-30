@@ -39,11 +39,15 @@ export default function App() {
     <NavigationContainer>
       <QueryClientProvider client={queryClient}>
         <ThemeContext.Provider value={{ backgroundColor, setBackgroundColor }}>
-          <SafeAreaView style={{ flex: 1, backgroundColor }}>
-            <UserContext.Provider value={[user, setUser]}>
-              {user.loggedIn ? <MainNavigation /> : <AuthNavigation />}
-            </UserContext.Provider>
-          </SafeAreaView>
+          <UserContext.Provider value={[user, setUser]}>
+            {user.loggedIn ? (
+              <SafeAreaView style={{ flex: 1, backgroundColor }}>
+                <MainNavigation />
+              </SafeAreaView>
+            ) : (
+              <AuthNavigation />
+            )}
+          </UserContext.Provider>
         </ThemeContext.Provider>
       </QueryClientProvider>
     </NavigationContainer>

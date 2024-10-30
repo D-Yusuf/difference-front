@@ -19,6 +19,7 @@ import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { validateEmail, validatePassword } from "../../utils/validation";
 import Icon from "react-native-vector-icons/Ionicons";
+import { colors } from "../../../Colors";
 
 const Register = () => {
   const roles = [
@@ -111,6 +112,9 @@ const Register = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.bgCircle1} />
+      <View style={styles.bgCircle2} />
+      <View style={styles.bgCircle3} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingView}
@@ -222,7 +226,38 @@ const Register = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FF7F50",
+    backgroundColor: colors.primary,
+  },
+  bgCircle1: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: colors.secondary, // Soft cool gray overlay
+    top: -50,
+    right: -50,
+    opacity: 0.2,
+  },
+
+  bgCircle2: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: colors.secondary, // Matching coral
+    top: 100,
+    left: -100,
+    opacity: 0.2,
+  },
+  bgCircle3: {
+    position: "absolute",
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: colors.secondary, // Light slate gray
+    bottom: -50,
+    right: -50,
+    opacity: 0.2,
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -268,7 +303,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   buttonText: {
-    color: "#FF7F50",
+    color: colors.primary,
     fontSize: 18,
     fontWeight: "700",
   },
@@ -282,7 +317,7 @@ const styles = StyleSheet.create({
   },
   dropdownButtonText: {
     fontSize: 16,
-    color: "#333",
+    color: colors.primary,
   },
   modalView: {
     margin: 20,
@@ -335,7 +370,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   imagePickerText: {
-    color: "#007AFF",
+    color: colors.primary,
     textAlign: "center",
   },
   nameContainer: {

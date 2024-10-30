@@ -69,29 +69,35 @@ const EditInvention = ({ route, navigation }) => {
         <TextInput
           style={styles.input}
           value={inventionInfo.name || invention.name}
-          onChangeText={(value) => setInventionInfo({
-            ...inventionInfo,
-            name: value
-          })}
+          onChangeText={(value) =>
+            setInventionInfo({
+              ...inventionInfo,
+              name: value,
+            })
+          }
           placeholder="Invention Name"
         />
         <TextInput
           style={styles.input}
           value={inventionInfo.description || invention.description}
-          onChangeText={(value) => setInventionInfo({
-            ...inventionInfo,
-            description: value
-          })}
+          onChangeText={(value) =>
+            setInventionInfo({
+              ...inventionInfo,
+              description: value,
+            })
+          }
           placeholder="Description"
           multiline
         />
         <TextInput
           style={styles.input}
           value={inventionInfo.cost || invention.cost.toString()}
-          onChangeText={(value) => setInventionInfo({
-            ...inventionInfo,
-            cost: value
-          })}
+          onChangeText={(value) =>
+            setInventionInfo({
+              ...inventionInfo,
+              cost: value,
+            })
+          }
           placeholder="Cost"
           keyboardType="numeric"
         />
@@ -106,10 +112,10 @@ const EditInvention = ({ route, navigation }) => {
                 <Image
                   key={index}
                   source={{ uri: image.uri }}
-              style={styles.imagePreview}
+                  style={styles.imagePreview}
                 />
               ))
-              : invention.images.map((image, index) => (
+            : invention.images.map((image, index) => (
                 <Image
                   key={index}
                   source={{ uri: `${BASE_URL}${image}` }}
@@ -131,17 +137,19 @@ export default EditInvention;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#88B3D4",
   },
   form: {
     padding: 20,
   },
   input: {
+    height: 50,
+    borderColor: "#003863",
     borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 10,
+    borderRadius: 10,
+    paddingHorizontal: 15,
     marginBottom: 15,
-    borderRadius: 5,
+    backgroundColor: "#f9f9f9",
   },
   imageButton: {
     backgroundColor: "#f0f0f0",
@@ -162,13 +170,24 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   submitButton: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 5,
+    flexDirection: "row",
+    backgroundColor: "#F8FAFC",
+    height: 60,
+    borderRadius: 30,
     alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    marginHorizontal: 4,
+    paddingHorizontal: 24,
+    shadowColor: "#475569",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    gap: 12,
   },
   submitButtonText: {
-    color: "#fff",
+    color: "#88B3D4",
     fontWeight: "bold",
   },
 });
