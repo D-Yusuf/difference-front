@@ -33,6 +33,8 @@ const Profile = ({ navigation }) => {
   });
 
 
+  console.log("PROFILE", profile)
+
   const signOut = () => {
     logout();
     setUser(false);
@@ -106,7 +108,7 @@ const Profile = ({ navigation }) => {
           </View>
         </View>
 
-        {user.role === "inventor" && (
+        
           <View style={styles.inventionsContainer}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>My Inventions</Text>
@@ -116,7 +118,7 @@ const Profile = ({ navigation }) => {
             </View>
             <InventionList inventions={profile?.inventions} numColumns={2} />
           </View>
-        )}
+        
 
         {user.role === "investor" && (
           <View style={styles.inventionsSection}>

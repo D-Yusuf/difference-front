@@ -135,8 +135,11 @@ const InventionDetails = ({ route }) => {
                 style={styles.inventorRow}
                 onPress={() => {
                   console.log("Navigating to profile with ID:", inventor._id); // Debug log
-                  navigation.navigate(NAVIGATION.PROFILE.USER_PROFILE, {
-                    userId: inventor._id,
+                  navigation.navigate(NAVIGATION.PROFILE.INDEX, {
+                    screen: NAVIGATION.PROFILE.USER_PROFILE,
+                    params: {
+                      userId: inventor._id,
+                    },
                   });
                 }}
               >

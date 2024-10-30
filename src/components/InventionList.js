@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, FlatList, View, Text } from "react-native";
 import InventionCard from "./InventionCard";
 
-const InventionList = ({ inventions, numColumns = 3, showInvestButton = true, showEditButton = true }) => {
+const InventionList = ({ inventions, numColumns = 1, showInvestButton = true, showEditButton = true }) => {
   if (inventions?.length === 0 || !inventions) {
     return <Text>No inventions found.</Text>;
   }
