@@ -27,9 +27,9 @@ export const getOrder = async (id) => {
     }
 }
 
-export const updateOrder = async (id, order) => {
+export const updateOrder = async (id, {status, ...order}) => {
     try{
-        const { data } = await instance.put(`/orders/${id}`, order);
+        const { data } = await instance.put(`/orders/${id}`, {status});
         return data;
     }catch(error){
         return error;

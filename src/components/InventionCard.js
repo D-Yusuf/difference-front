@@ -6,7 +6,7 @@ import NAVIGATION from "../navigations";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { colors } from "../../Colors";
 
-const InventionCard = ({ invention, compact }) => {
+const InventionCard = ({ invention, compact, showInvestButton = true, showEditButton = true }) => {
   const navigation = useNavigation();
 
   if (!invention || !invention._id) {
@@ -23,6 +23,8 @@ const InventionCard = ({ invention, compact }) => {
         navigation.navigate(NAVIGATION.INVENTION.INVENTION_DETAILS, {
           inventionId: invention._id,
           image: imageUrl,
+          showInvestButton: showInvestButton,
+          showEditButton: showEditButton,
         })
       }
     >

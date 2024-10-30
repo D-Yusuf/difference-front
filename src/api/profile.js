@@ -31,6 +31,12 @@ export const updateProfile = async (userInfo) => {
           type: "image/jpeg",
           uri: userInfo.image,
         });
+      } else if (key === "cv") {
+        formData.append("cv", {
+          name: "cv.pdf",
+          type: "application/pdf",
+          uri: userInfo.cv,
+        });
       } else {
         formData.append(key, userInfo[key]);
       }
@@ -40,7 +46,7 @@ export const updateProfile = async (userInfo) => {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-    }); // Use userId in the URL
+    });
 
     return response.data;
   } catch (error) {

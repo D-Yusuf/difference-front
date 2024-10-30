@@ -20,6 +20,8 @@ import { colors } from "../../Colors";
 import Icon from "react-native-vector-icons/Ionicons";
 import { ThemeContext } from "../context/ThemeContext";
 
+import { getInventors } from "../api/user";
+import { BASE_URL } from "../api";
 const Invention = ({ navigation }) => {
   const phases = [
     { label: "Idea", value: "idea" },
@@ -34,6 +36,8 @@ const Invention = ({ navigation }) => {
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [phaseModalVisible, setPhaseModalVisible] = useState(false);
+  const [selectedInventors, setSelectedInventors] = useState([]);
+  const [inventorModalVisible, setInventorModalVisible] = useState(false);
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -49,6 +53,15 @@ const Invention = ({ navigation }) => {
     },
     onError: (error) => {
       console.log(error);
+    },
+  });
+
+  const { data: inventors } = useQuery({
+    queryKey: ["inventors"],
+    queryFn: getInventors,
+    onError: (error) => {
+      console.log("Error fetching inventors:", error);
+      alert("Failed to load inventors");
     },
   });
 
@@ -87,6 +100,10 @@ const Invention = ({ navigation }) => {
       alert("Please select a phase for your invention");
       return;
     }
+    if (selectedInventors.length === 0) {
+      alert("Please select at least one inventor");
+      return;
+    }
     mutate();
   };
   const { setBackgroundColor } = useContext(ThemeContext);
@@ -118,6 +135,41 @@ const Invention = ({ navigation }) => {
       }}
     >
       <Text style={styles.roleItemText}>{item.name}</Text>
+    </TouchableOpacity>
+  );
+
+  const renderInventorItem = ({ item }) => (
+    <TouchableOpacity
+      style={[
+        styles.roleItem,
+        selectedInventors.includes(item._id) && styles.selectedItem,
+      ]}
+      onPress={() => {
+        const updatedInventors = selectedInventors.includes(item._id)
+          ? selectedInventors.filter((id) => id !== item._id)
+          : [...selectedInventors, item._id];
+
+        setSelectedInventors(updatedInventors);
+        setInvention({ ...invention, inventors: updatedInventors });
+      }}
+    >
+      <View style={styles.inventorItemContainer}>
+        {item.image && (
+          <Image
+            source={{ uri: `${BASE_URL}${item.image}` }}
+            style={styles.inventorImage}
+          />
+        )}
+        <View style={styles.inventorInfo}>
+          <Text style={styles.roleItemText}>
+            {item.firstName} {item.lastName}
+          </Text>
+          {item.bio && <Text style={styles.inventorBio}>{item.bio}</Text>}
+        </View>
+        {selectedInventors.includes(item._id) && (
+          <Text style={styles.checkmark}>✓</Text>
+        )}
+      </View>
     </TouchableOpacity>
   );
 
@@ -169,6 +221,18 @@ const Invention = ({ navigation }) => {
 
         <TouchableOpacity
           style={styles.dropdownButton}
+          onPress={() => setInventorModalVisible(true)}
+        >
+          <Text style={styles.dropdownButtonText}>
+            {selectedInventors.length > 0
+              ? `${selectedInventors.length} Inventor${
+                  selectedInventors.length > 1 ? "s" : ""
+                } Selected`
+              : "Select Inventors"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.dropdownButton}
           onPress={() => setCategoryModalVisible(true)}
         >
           <Text style={styles.dropdownButtonText}>
@@ -214,6 +278,32 @@ const Invention = ({ navigation }) => {
         </TouchableOpacity>
       </ScrollView>
 
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={inventorModalVisible}
+        onRequestClose={() => setInventorModalVisible(false)}
+      >
+        <View style={styles.modalView}>
+          <Text style={styles.modalTitle}>Select Inventors</Text>
+          {inventors && inventors?.length > 0 ? (
+            <FlatList
+              data={inventors}
+              renderItem={renderInventorItem}
+              keyExtractor={(item) => item._id}
+              style={styles.inventorsList}
+            />
+          ) : (
+            <Text style={styles.noDataText}>No inventors available</Text>
+          )}
+          <TouchableOpacity
+            style={styles.doneButton}
+            onPress={() => setInventorModalVisible(false)}
+          >
+            <Text style={styles.buttonText}>Done</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
       <Modal
         animationType="slide"
         transparent={true}
@@ -322,6 +412,9 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     height: 50,
   },
+  inventorsContainer: {
+    marginBottom: 20,
+  },
   descriptionInput: {
     backgroundColor: "transparent",
     borderBottomWidth: 1,
@@ -409,7 +502,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   roleItem: {
-    padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     width: "100%",
@@ -417,6 +509,60 @@ const styles = StyleSheet.create({
   roleItemText: {
     fontSize: 16,
     color: "#333",
+    fontWeight: "500",
+  },
+  selectedItem: {
+    backgroundColor: "#f0f0f0",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  checkmark: {
+    color: "#34A853",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 15,
+    color: "#333",
+  },
+  doneButton: {
+    backgroundColor: "#34A853",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 15,
+    width: "100%",
+  },
+  noDataText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginVertical: 20,
+  },
+  inventorItemContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+  },
+  inventorImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 10,
+  },
+  inventorInfo: {
+    flex: 1,
+  },
+  inventorBio: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 4,
+  },
+  inventorsList: {
+    width: "100%",
+    maxHeight: "80%",
   },
 });
 

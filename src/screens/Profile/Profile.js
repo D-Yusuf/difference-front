@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   ScrollView,
+  Linking,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useQuery } from "@tanstack/react-query";
@@ -17,6 +18,9 @@ import UserContext from "../../context/UserContext";
 import { logout } from "../../api/auth";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { colors } from "../../../Colors";
+import { getOrders } from "../../api/orders";
+import NAVIGATION from "../../navigations";
+import OrderList from "../../components/OrderList";
 
 const Profile = ({ navigation }) => {
   const [user, setUser] = useContext(UserContext);
@@ -24,6 +28,12 @@ const Profile = ({ navigation }) => {
     queryKey: ["profile"],
     queryFn: getProfile,
   });
+  const { data: allOrders, isLoading: allOrdersLoading } = useQuery({
+    queryKey: ["allOrders"],
+    queryFn: getOrders,
+  });
+
+  console.log("PROFILE", profile);
 
   const signOut = () => {
     logout();
@@ -37,32 +47,56 @@ const Profile = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
-        <View style={styles.headerContainer}>
-          <View style={styles.glassCard}>
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => navigation.navigate("EditProfile", { profile })}
-            >
-              <Icon name="create-outline" size={24} color="#003863" />
-            </TouchableOpacity>
+        <View style={styles.glassCard}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate("EditProfile", { profile })}
+          >
+            <Icon name="create-outline" size={24} color="#003863" />
+          </TouchableOpacity>
 
-            <Image
-              source={profile?.image && { uri: BASE_URL + profile.image }}
-              style={styles.profileImage}
-            />
+          <Image
+            source={profile?.image && { uri: BASE_URL + profile.image }}
+            style={styles.profileImage}
+          />
 
-            <Text style={styles.name}>
-              {profile?.firstName} {profile?.lastName}
-            </Text>
-            <Text style={styles.email}>{profile?.email}</Text>
-            <Text style={styles.roleText}>{profile?.role}</Text>
-            <Text style={styles.bio}>{profile?.bio}</Text>
+          <Text style={styles.name}>
+            {profile?.firstName} {profile?.lastName}
+          </Text>
+          <Text style={styles.email}>{profile?.email}</Text>
+          <Text style={styles.roleText}>{profile?.role}</Text>
+          <Text style={styles.bio}>{profile?.bio}</Text>
 
-            <View style={styles.buttonContainer}>
-              <TouchableOpacity style={[styles.actionButton, styles.cvButton]}>
+          <View style={styles.buttonContainer}>
+            {user.role === "inventor" && (
+              <TouchableOpacity
+                style={[styles.actionButton, styles.ordersButton]}
+                onPress={() =>
+                  navigation.navigate(NAVIGATION.PROFILE.ORDERS, {
+                    inventions: profile?.inventions.map(
+                      (invention) => invention._id
+                    ),
+                  })
+                }
+              >
                 <Icon name="document-text-outline" size={20} color="#003863" />
-                <Text style={styles.buttonText}>View CV</Text>
+                <Text style={styles.buttonText}>Orders</Text>
               </TouchableOpacity>
+            )}
+            <View style={styles.buttonContainer}>
+              {profile?.cv && (
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.cvButton]}
+                  onPress={() => Linking.openURL(`${BASE_URL}${profile.cv}`)}
+                >
+                  <Icon
+                    name="document-text-outline"
+                    size={20}
+                    color="#003863"
+                  />
+                  <Text style={styles.buttonText}>View CV</Text>
+                </TouchableOpacity>
+              )}
 
               <TouchableOpacity
                 style={[styles.actionButton, styles.addButton]}
@@ -78,15 +112,32 @@ const Profile = ({ navigation }) => {
         <View style={styles.inventionsContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Inventions</Text>
-            <TouchableOpacity
-              style={styles.logoutButton}
-              onPress={() => signOut()}
-            >
-              <MaterialIcons name="exit-to-app" size={24} color="red" />
+            <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+              <Icon name="log-out-outline" size={24} color="#FF4444" />
             </TouchableOpacity>
           </View>
           <InventionList inventions={profile?.inventions} numColumns={2} />
         </View>
+
+        {user.role === "investor" && (
+          <View style={styles.inventionsSection}>
+            <Text style={styles.sectionTitle}>My Orders</Text>
+            <Text style={styles.sectionTitle}>
+              {
+                allOrders?.filter(
+                  (order) => order?.investor?._id === profile?._id
+                ).length
+              }{" "}
+              orders
+            </Text>
+            <OrderList
+              orders={allOrders?.filter(
+                (order) => order?.investor?._id === profile?._id
+              )}
+              own={true}
+            />
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );

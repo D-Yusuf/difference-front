@@ -22,6 +22,7 @@ export default function App() {
   const checkToken = async () => {
     setLoading(true);
     const token = await getToken();
+    // console.log(token)
     if (token) {
       setUser({ ...user, loggedIn: true, _id: token?._id, role: token?.role });
     }

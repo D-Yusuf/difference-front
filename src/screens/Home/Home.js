@@ -8,6 +8,7 @@ import {
   StatusBar,
   SafeAreaView,
   Animated,
+  ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useQuery } from "@tanstack/react-query";
