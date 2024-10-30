@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
@@ -14,12 +14,11 @@ import {
   FlatList,
 } from "react-native";
 import { register } from "../../api/auth";
-import { useContext } from "react";
 import UserContext from "../../context/UserContext";
-import { useNavigation } from "@react-navigation/native";
 import { useMutation } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { validateEmail, validatePassword } from "../../utils/validation";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const Register = () => {
   const roles = [
@@ -36,7 +35,6 @@ const Register = () => {
   const [errors, setErrors] = useState({});
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -140,39 +138,40 @@ const Register = () => {
           />
           {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
-          <TextInput
-            style={[styles.input, errors.firstName && styles.inputError]}
-            placeholder="First Name"
-            placeholderTextColor="#888"
-            onChangeText={(text) =>
-              setUserInfo({ ...userInfo, firstName: text })
-            }
-          />
-          {errors.firstName && (
-            <Text style={styles.errorText}>{errors.firstName}</Text>
-          )}
-
-          <TextInput
-            style={[styles.input, errors.lastName && styles.inputError]}
-            placeholder="Last Name"
-            placeholderTextColor="#888"
-            onChangeText={(text) =>
-              setUserInfo({ ...userInfo, lastName: text })
-            }
-          />
-          {errors.lastName && (
-            <Text style={styles.errorText}>{errors.lastName}</Text>
-          )}
-
-          <TouchableOpacity onPress={pickImage}>
-            <Text>Pick Image</Text>
-          </TouchableOpacity>
-          {image && (
-            <Image
-              source={{ uri: image }}
-              style={{ width: 100, height: 100 }}
+          <View style={styles.nameContainer}>
+            <TextInput
+              style={[styles.nameInput, errors.firstName && styles.inputError]}
+              placeholder="First Name"
+              placeholderTextColor="#888"
+              onChangeText={(text) =>
+                setUserInfo({ ...userInfo, firstName: text })
+              }
             />
-          )}
+            {errors.firstName && (
+              <Text style={styles.errorText}>{errors.firstName}</Text>
+            )}
+
+            <TextInput
+              style={[styles.nameInput, errors.lastName && styles.inputError]}
+              placeholder="Last Name"
+              placeholderTextColor="#888"
+              onChangeText={(text) =>
+                setUserInfo({ ...userInfo, lastName: text })
+              }
+            />
+            {errors.lastName && (
+              <Text style={styles.errorText}>{errors.lastName}</Text>
+            )}
+          </View>
+
+          <TouchableOpacity style={styles.imagePicker} onPress={pickImage}>
+            {image ? (
+              <Image source={{ uri: image }} style={styles.image} />
+            ) : (
+              <Text style={styles.imagePickerText}>Pick Profile Image</Text>
+            )}
+          </TouchableOpacity>
+
           <TextInput
             style={[styles.input, errors.password && styles.inputError]}
             placeholder="Password"
@@ -181,7 +180,6 @@ const Register = () => {
             onChangeText={(text) =>
               setUserInfo({ ...userInfo, password: text })
             }
-            // Add autoCapitalize prop for better UX
             autoCapitalize="none"
           />
           {errors.password && (
@@ -189,8 +187,7 @@ const Register = () => {
           )}
 
           <TouchableOpacity
-            style={[styles.button, !userInfo.role && styles.buttonDisabled]}
-            disabled={!userInfo.role}
+            style={styles.registerButton}
             onPress={handleRegister}
           >
             <Text style={styles.buttonText}>Register</Text>
@@ -205,6 +202,12 @@ const Register = () => {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalView}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setModalVisible(false)}
+          >
+            <Icon name="close" size={24} color="#FF7F50" />
+          </TouchableOpacity>
           <FlatList
             data={roles}
             renderItem={renderRoleItem}
@@ -219,7 +222,7 @@ const Register = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#FF7F50",
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -234,25 +237,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 30,
     textAlign: "center",
-    color: "#333",
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-    color: "#333",
-  },
-  pickerContainer: {
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    marginBottom: 20,
-    overflow: "hidden",
-  },
-  picker: {
-    height: 50,
-    width: "100%",
+    color: "#ffffff",
   },
   input: {
     backgroundColor: "#fff",
@@ -265,20 +250,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
+  registerButton: {
+    flexDirection: "row",
+    backgroundColor: "#F8FAFC",
+    height: 60,
+    borderRadius: 30,
     alignItems: "center",
-    marginTop: 10,
-  },
-  buttonDisabled: {
-    backgroundColor: "#A0CFFF",
+    justifyContent: "center",
+    marginTop: 20,
+    marginHorizontal: 4,
+    paddingHorizontal: 24,
+    shadowColor: "#475569",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    gap: 12,
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: "#FF7F50",
     fontSize: 18,
+    fontWeight: "700",
   },
   dropdownButton: {
     backgroundColor: "white",
@@ -312,6 +304,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
     width: "100%",
+    backgroundColor: "white",
   },
   roleItemText: {
     fontSize: 16,
@@ -324,6 +317,52 @@ const styles = StyleSheet.create({
     color: "red",
     fontSize: 14,
     marginBottom: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginTop: 10,
+  },
+  imagePicker: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 15,
+    marginBottom: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  imagePickerText: {
+    color: "#007AFF",
+    textAlign: "center",
+  },
+  nameContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
+  nameInput: {
+    backgroundColor: "#fff",
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: "#333",
+    width: "48%",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 18,
+    color: "#FF7F50",
   },
 });
 
