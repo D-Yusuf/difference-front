@@ -65,18 +65,30 @@ export const getAllInventions = async () => {
 };
 export const updateInvention = async (inventionId, inventionData) => {
   try {
-    console.log(inventionData);
-    const formData = new FormData();
-    for (let key in inventionData) {
-      if (key !== "images") formData.append(key, inventionData[key]);
-    }
-    // Append each image file individually
+    console.log("Updating invention with data:", inventionData);
 
-    if (inventionData.images) {
+    const formData = new FormData();
+
+    // Handle inventors array separately
+    if (inventionData.inventors) {
+      inventionData.inventors.forEach((inventorId) => {
+        formData.append("inventors[]", inventorId);
+      });
+    }
+
+    // Append other non-image data
+    Object.keys(inventionData).forEach((key) => {
+      if (key !== "images" && key !== "inventors") {
+        formData.append(key, inventionData[key]);
+      }
+    });
+
+    // Handle images if they exist
+    if (inventionData.images && inventionData.images.length > 0) {
       inventionData.images.forEach((image, index) => {
         formData.append("images", {
           uri: image.uri,
-          type: "image/jpeg", // Adjust this if you need to support other image types
+          type: "image/jpeg",
           name: `image${index}.jpg`,
         });
       });
@@ -94,6 +106,7 @@ export const updateInvention = async (inventionId, inventionData) => {
 
     return data;
   } catch (error) {
+    console.error("Error in updateInvention:", error.response?.data || error);
     throw error;
   }
 };
