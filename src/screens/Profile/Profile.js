@@ -16,6 +16,7 @@ import { BASE_URL } from "../../api";
 import InventionList from "../../components/InventionList";
 import UserContext from "../../context/UserContext";
 import { logout } from "../../api/auth";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 const Profile = ({ navigation }) => {
   const [user, setUser] = useContext(UserContext);
@@ -58,6 +59,7 @@ const Profile = ({ navigation }) => {
             <Text style={styles.bio}>{profile?.bio}</Text>
 
             <View style={styles.buttonContainer}>
+
               {profile?.cv && (
                 <TouchableOpacity
                   style={[styles.actionButton, styles.cvButton]}
@@ -71,6 +73,7 @@ const Profile = ({ navigation }) => {
                   <Text style={styles.buttonText}>View CV</Text>
                 </TouchableOpacity>
               )}
+
 
               <TouchableOpacity
                 style={[styles.actionButton, styles.addButton]}
@@ -86,8 +89,11 @@ const Profile = ({ navigation }) => {
         <View style={styles.inventionsContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Inventions</Text>
-            <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
-              <Icon name="log-out-outline" size={24} color="#FF4444" />
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={() => signOut()}
+            >
+              <MaterialIcons name="exit-to-app" size={24} color="red" />
             </TouchableOpacity>
           </View>
           <InventionList inventions={profile?.inventions} numColumns={2} />
@@ -111,7 +117,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   glassCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    backgroundColor: "#ffffff",
     borderRadius: 25,
     padding: 20,
     alignItems: "center",
@@ -139,8 +145,8 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     marginBottom: 15,
-    borderWidth: 4,
-    borderColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#88B3D4",
   },
   name: {
     fontSize: 24,

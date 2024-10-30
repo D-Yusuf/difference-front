@@ -5,10 +5,10 @@ import {
   SafeAreaView,
   TextInput,
   Image,
+  TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { TouchableOpacity } from "react-native";
 import { getProfile, updateProfile } from "../../api/profile";
 import { BASE_URL } from "../../api";
 import * as ImagePicker from "expo-image-picker";
@@ -80,38 +80,35 @@ const EditProfile = ({ route, navigation }) => {
   };
   return (
     <View style={styles.container}>
-      <View style={styles.inputContainer}>
+      <View style={styles.profileContainer}>
         <TouchableOpacity onPress={pickImage}>
           <Image
-            source={
-              image
-                ? { uri: image }
-                : profile?.image && { uri: BASE_URL + profile.image }
-            }
+            source={image ? { uri: image } : { uri: BASE_URL + profile.image }}
             style={styles.image}
           />
+          <Text style={styles.imageText}>Change Image</Text>
         </TouchableOpacity>
         <TextInput
           style={styles.input}
-          placeholder="Update First Name"
+          placeholder="First Name"
           value={userInfo.firstName}
-          maxLength={20}
           onChangeText={(text) => setUserInfo({ ...userInfo, firstName: text })}
         />
         <TextInput
           style={styles.input}
-          placeholder="Update Last Name"
+          placeholder="Last Name"
           value={userInfo.lastName}
-          maxLength={20}
           onChangeText={(text) => setUserInfo({ ...userInfo, lastName: text })}
         />
         <TextInput
           style={styles.input}
-          placeholder="Add or Update Bio"
+          placeholder="Bio"
           value={userInfo.bio}
-          maxLength={50}
           onChangeText={(text) => setUserInfo({ ...userInfo, bio: text })}
         />
+        <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
+          <Text style={styles.buttonText}>Update Profile</Text>
+        </TouchableOpacity>
       </View>
       <TouchableOpacity style={styles.button} onPress={pickDocument}>
         <Text style={styles.buttonText}>Upload CV</Text>
@@ -119,6 +116,7 @@ const EditProfile = ({ route, navigation }) => {
       <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
         <Text style={styles.buttonText}>Update Profile</Text>
       </TouchableOpacity>
+
     </View>
   );
 };
@@ -128,43 +126,49 @@ export default EditProfile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "lightgray", // Light background color
-    paddingHorizontal: 20, // Add horizontal padding for white space
-    paddingTop: 20, // Optional: Add some top padding
+    backgroundColor: "#88B3D4",
+  },
+  profileContainer: {
+    marginTop: 10,
+    flex: 1,
+    backgroundColor: "#88B3D4",
+    padding: 20,
+    borderRadius: 10,
+    width: "100%",
   },
   image: {
     width: 100,
     height: 100,
-    borderRadius: 20,
-    marginBottom: 10,
+    borderRadius: 50,
+    borderWidth: 1,
+    borderColor: "#003863",
     alignSelf: "center",
-    borderWidth: 2,
-    borderColor: "black",
   },
-  inputContainer: {
-    marginBottom: 20,
-    marginTop: 20,
+  imageText: {
+    color: "#003863",
+    fontWeight: "bold",
+    textAlign: "center",
+    marginTop: 5,
+    marginBottom: 10,
   },
   input: {
     height: 50,
-    borderColor: "black", // Light border color
+    borderColor: "#003863",
     borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 15,
-    backgroundColor: "white",
+    backgroundColor: "#f9f9f9",
   },
   button: {
-    backgroundColor: "#007BFF", // Blue update button
-    padding: 15,
+    backgroundColor: "#003863",
+    padding: 12,
     borderRadius: 10,
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "black",
   },
   buttonText: {
     color: "white",
-    fontSize: 16,
     fontWeight: "bold",
+    fontSize: 16,
   },
 });
