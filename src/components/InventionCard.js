@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigations";
 import Icon from "react-native-vector-icons/FontAwesome";
 
-const InventionCard = ({ invention }) => {
+const InventionCard = ({ invention, showInvestButton = true, showEditButton = true }) => {
   const navigation = useNavigation();
   return (
     <TouchableOpacity
@@ -13,6 +13,8 @@ const InventionCard = ({ invention }) => {
         navigation.navigate(NAVIGATION.INVENTION.INVENTION_DETAILS, {
           inventionId: invention._id,
           image: `${BASE_URL}${invention.images[0]?.replace(/\\/g, "/")}`,
+          showInvestButton: showInvestButton,
+          showEditButton: showEditButton,
         })
       }
       key={invention._id}

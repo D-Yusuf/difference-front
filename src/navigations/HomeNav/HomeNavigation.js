@@ -5,15 +5,20 @@ import Home from "../../screens/Home/Home";
 import InventionNavigation from "../InventionNav/InventionNavigation";
 
 import NAVIGATION from "../index";
-import InventionDetails from "../../Components/InventionDetails";
+import InventionDetails from "../../components/InventionDetails";
+import InvestDetails from "../../screens/Invest/InvestDetails";
 const Stack = createNativeStackNavigator();
 const HomeNavigation = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen name={NAVIGATION.HOME.HOME} component={Home} />
-      <Stack.Screen
-        name={NAVIGATION.INVENTION.INVENTION_DETAILS}
-        component={InventionDetails}
+        <Stack.Screen
+          name={NAVIGATION.INVENTION.INVENTION_DETAILS}
+          component={InventionDetails}
+        />
+        <Stack.Screen
+        name={NAVIGATION.HOME.INVEST_DETAILS}
+        component={InvestDetails}
       />
     </Stack.Navigator>
   );

@@ -13,9 +13,9 @@ import NAVIGATION from "../navigations";
 const InventionDetails = ({route}) => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
-    const [isLiked, setIsLiked] = useState(false);
-    const [isInterested, setIsInterested] = useState(false);
-  const { inventionId, image } = route.params;
+  const [isLiked, setIsLiked] = useState(false);
+  const [isInterested, setIsInterested] = useState(false);
+  const { inventionId, image, showInvestButton = false, showEditButton = false } = route.params;
   console.log("Image URI:", image); // Add this to debug
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention", inventionId],
@@ -29,8 +29,8 @@ const InventionDetails = ({route}) => {
   const isOwner =
     invention.inventors.find((inventor) => inventor._id === user._id) ||
     user.role === "admin";
-  const canInvest = user.role === "investor" || user.role === "admin";
-
+  const canInvest = (user.role === "investor" || user.role === "admin") && !invention.inventors.find((inventor) => inventor._id === user._id);
+console.log("sasdasas",invention.orders)
 
 
   return (
@@ -69,25 +69,10 @@ const InventionDetails = ({route}) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.actionButton,
-              isInterested && styles.actionButtonActive,
-            ]}
-            onPress={() => setIsInterested(!isInterested)}
-          >
-            <Text
-              style={[
-                styles.actionButtonText,
-                isInterested && styles.actionButtonTextActive,
-              ]}
-            >
-              {isInterested ? "Interested" : "Interest"}
-            </Text>
-          </TouchableOpacity>
+          
         </View>
 
-        {isOwner && (
+        {showEditButton && isOwner && (
           <TouchableOpacity
             style={styles.button}
             onPress={() =>
@@ -98,10 +83,10 @@ const InventionDetails = ({route}) => {
           </TouchableOpacity>
         )}
 
-        {canInvest && (
+        {showInvestButton && canInvest && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
-            onPress={() => navigation.navigate("Invest")}
+            onPress={() => navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {invention})}
           >
             <Text style={styles.buttonText}>Invest</Text>
           </TouchableOpacity>

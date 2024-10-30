@@ -13,13 +13,17 @@ import { getProfile } from "../../api/profile";
 import { getInventions } from "../../api/invention";
 import { useQuery } from "@tanstack/react-query";
 import { BASE_URL } from "../../api";
-import InventionList from "../../Components/InventionList";
+import InventionList from "../../components/InventionList";
 import { useNavigation } from "@react-navigation/native";
 import { logout } from "../../api/auth";
 import { useContext } from "react";
 import UserContext from "../../context/UserContext";
+import NAVIGATION from "../../navigations";
+import OrderList from "../../components/OrderList";
+import { getOrders } from "../../api/orders";
 const Profile = () => {
   const navigation = useNavigation();
+  const [user, setUser] = useContext(UserContext);
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: getProfile,
@@ -27,14 +31,15 @@ const Profile = () => {
       console.log("found");
     },
   });
-  const [user, setUser] = useContext(UserContext);
+ const {data: allOrders, isPending: ordersLoading} = useQuery({
+        queryKey: ["orders-profile"],
+        queryFn: getOrders
+    })
 
-  console.log("Profile:", profile);
-  // console.log("Inventions:", inventions);
-
-  if (profileLoading) {
+  if (profileLoading || ordersLoading) {
     return <Text>Loading...</Text>;
   }
+  console.log(profile?.investments)
   const signOut = () => {
     logout();
     setUser(false);
@@ -74,15 +79,29 @@ const Profile = () => {
         >
           <Text style={styles.actionButtonText}>Add Invention +</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.addInventionButton}
+          onPress={() => navigation.navigate(NAVIGATION.PROFILE.ORDERS, {inventions: profile?.inventions.map(invention => invention._id)})}
+        >
+          <Text style={styles.actionButtonText}>Orders</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.logoutButton} onPress={() => signOut()}>
           <Text style={styles.actionButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
-
-      <View style={styles.inventionsSection}>
-        <Text style={styles.sectionTitle}>My Inventions</Text>
-        <InventionList inventions={profile?.inventions} />
-      </View>
+      {user.role === "inventor" && (
+        <View style={styles.inventionsSection}>
+          <Text style={styles.sectionTitle}>All Inventions</Text>
+          <InventionList showEditButton showInvestButton={false} inventions={profile?.inventions} />
+        </View>
+      )}
+      {user.role === "investor" && (
+        <View style={styles.inventionsSection}>
+          <Text style={styles.sectionTitle}>My Orders</Text>
+          <Text style={styles.sectionTitle}>{allOrders?.filter(order => order?.investor?._id === profile?._id).length} orders</Text>
+          <OrderList orders={allOrders?.filter(order => order?.investor?._id === profile?._id)} own={true} />
+        </View>
+      )}
     </ScrollView>
   );
 };

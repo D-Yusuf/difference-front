@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import {createOrder} from '../../api/orders';
 import { useMutation } from '@tanstack/react-query';
 const InvestDetails = ({ route, navigation }) => {
@@ -45,9 +45,11 @@ const InvestDetails = ({ route, navigation }) => {
   };
 
   return (
+    <ScrollView style={{ flex: 1 }}>
+
     <View style={styles.container}>
       <Text style={styles.title}>{invention.name}</Text>
-      <Text style={styles.description}>{invention.description}</Text>
+      {/* <Text style={styles.description}>{invention.description}</Text> */}
       <Text style={styles.cost}>Cost: ${invention.cost}</Text>
 
       <View style={styles.inputContainer}>
@@ -58,7 +60,7 @@ const InvestDetails = ({ route, navigation }) => {
           onChangeText={handlePercentageChange}
           keyboardType="numeric"
           placeholder="Enter percentage (e.g., 1.5)"
-        />
+          />
       </View>
 
       <Text style={styles.amountText}>
@@ -69,10 +71,11 @@ const InvestDetails = ({ route, navigation }) => {
         style={styles.confirmButton}
         onPress={handleConfirm}
         disabled={!percentage || parseFloat(percentage) <= 0}
-      >
+        >
         <Text style={styles.confirmButtonText}>Confirm Investment</Text>
       </TouchableOpacity>
     </View>
+    </ScrollView>
   );
 };
 
