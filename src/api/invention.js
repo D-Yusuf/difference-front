@@ -2,10 +2,6 @@ import instance from "./index"; // Ensure this path is correct
 import { BASE_URL } from "../api"; // Adjust the path as needed
 
 export const createInvention = async (inventionData) => {
-  inventionData.inventors = [
-    "67189c8629a471689f676f07",
-    "6718bc3311abf0128e187d16",
-  ];
   try {
     const formData = new FormData();
     for (let key in inventionData) {
@@ -69,19 +65,30 @@ export const getAllInventions = async () => {
 };
 export const updateInvention = async (inventionId, inventionData) => {
   try {
-    console.log(inventionData);
+    console.log("Updating invention with data:", inventionData);
+
     const formData = new FormData();
-    for (let key in inventionData) {
-      if (key !== "images") formData.append(key, inventionData[key]);
+
+    // Handle inventors array separately
+    if (inventionData.inventors) {
+      inventionData.inventors.forEach((inventorId) => {
+        formData.append("inventors[]", inventorId);
+      });
     }
-    // Append each image file individually
 
-    if (inventionData.images) {
+    // Append other non-image data
+    Object.keys(inventionData).forEach((key) => {
+      if (key !== "images" && key !== "inventors") {
+        formData.append(key, inventionData[key]);
+      }
+    });
 
+    // Handle images if they exist
+    if (inventionData.images && inventionData.images.length > 0) {
       inventionData.images.forEach((image, index) => {
         formData.append("images", {
           uri: image.uri,
-          type: "image/jpeg", // Adjust this if you need to support other image types
+          type: "image/jpeg",
           name: `image${index}.jpg`,
         });
       });
@@ -99,6 +106,7 @@ export const updateInvention = async (inventionId, inventionData) => {
 
     return data;
   } catch (error) {
+    console.error("Error in updateInvention:", error.response?.data || error);
     throw error;
   }
 };
