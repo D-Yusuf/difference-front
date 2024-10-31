@@ -332,7 +332,11 @@ const Invention = ({ navigation }) => {
             <Text style={styles.modalTitle}>Select Inventors</Text>
             {inventors && inventors?.length > 0 ? (
               <FlatList
-                data={inventors}
+                data={inventors?.sort((a, b) =>
+                  `${a.firstName} ${a.lastName}`.localeCompare(
+                    `${b.firstName} ${b.lastName}`
+                  )
+                )}
                 renderItem={renderInventorItem}
                 keyExtractor={(item) => item._id}
                 style={styles.inventorsList}
@@ -365,7 +369,7 @@ const Invention = ({ navigation }) => {
               <Icon name="close" size={24} color="red" />
             </TouchableOpacity>
             <FlatList
-              data={categories}
+              data={categories?.sort((a, b) => a.name.localeCompare(b.name))}
               renderItem={renderCategoryItem}
               keyExtractor={(item) => item._id}
             />
@@ -643,12 +647,3 @@ const styles = StyleSheet.create({
 });
 
 export default Invention;
-// //.sort((a, b) =>
-//   `${a.firstName} ${a.lastName}`.localeCompare(
-//     `${b.firstName} ${b.lastName}`
-//   )
-// )
-
-//----------------
-
-//.sort((a, b) => a.name.localeCompare(b.name))
