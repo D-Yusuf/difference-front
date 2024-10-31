@@ -158,6 +158,18 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 8,
   },
+  navButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 20,
+  },
+  logoutButton: {
+    padding: 8,
+  },
+  editButton: {
+    padding: 8,
+  },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -177,19 +189,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 14,
     fontWeight: "600",
-  },
-  editButton: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    padding: 8,
-    borderRadius: 20,
-    shadowColor: "#003863",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   profileImage: {
     width: 120,
@@ -252,14 +251,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 20,
-  },
-  logoutButton: {
-    padding: 8,
-  },
-  navButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
   },
 });
 
