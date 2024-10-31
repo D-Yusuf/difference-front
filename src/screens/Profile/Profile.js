@@ -116,7 +116,7 @@ const Profile = ({ navigation }) => {
             </View>
           </View>
         </View>
-        {user.role === "inventor" && (
+        {(user.role === "inventor" || user.role === "admin") && (
           <View style={styles.inventionsContainer}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>My Inventions</Text>
