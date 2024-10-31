@@ -26,7 +26,7 @@ const MainNavigation = () => {
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
-          marginBottom: 30,
+          marginBottom: 20,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.secondary,

@@ -16,7 +16,6 @@ import { BASE_URL } from "../../api";
 import InventionList from "../../components/InventionList";
 import UserContext from "../../context/UserContext";
 import { logout } from "../../api/auth";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { colors } from "../../../Colors";
 import { getOrders } from "../../api/orders";
 import NAVIGATION from "../../navigations";
@@ -32,8 +31,6 @@ const Profile = ({ navigation }) => {
     queryKey: ["allOrders"],
     queryFn: getOrders,
   });
-
-  console.log("PROFILE", profile);
 
   const signOut = () => {
     logout();
@@ -74,7 +71,7 @@ const Profile = ({ navigation }) => {
           <View style={styles.buttonContainer}>
             {user.role === "inventor" && (
               <TouchableOpacity
-                style={[styles.actionButton, styles.ordersButton]}
+                style={styles.actionButton}
                 onPress={() =>
                   navigation.navigate(NAVIGATION.PROFILE.ORDERS, {
                     inventions: profile?.inventions.map(
@@ -83,6 +80,7 @@ const Profile = ({ navigation }) => {
                   })
                 }
               >
+
                 <Icon name="document-text-outline" size={20} color="#003863" />
                 <Text style={styles.buttonText}>Orders</Text>
               </TouchableOpacity>
@@ -106,16 +104,29 @@ const Profile = ({ navigation }) => {
                 style={[styles.actionButton, styles.addButton]}
                 onPress={() => navigation.navigate("AddInvention")}
               >
+
                 <Icon
-                  name="add-circle-outline"
+                  name="document-text-outline"
                   size={20}
                   color={colors.primary}
                 />
-                <Text style={styles.buttonText}>Add Invention</Text>
+                <Text style={styles.buttonText}>Orders</Text>
               </TouchableOpacity>
-            </View>
+            )}
+            <TouchableOpacity
+              style={styles.actionButton}
+              onPress={() => navigation.navigate("AddInvention")}
+            >
+              <Icon
+                name="add-circle-outline"
+                size={20}
+                color={colors.primary}
+              />
+              <Text style={styles.buttonText}>Add Invention</Text>
+            </TouchableOpacity>
           </View>
         </View>
+
         {(user.role === "inventor" || user.role === "admin") && (
           <View style={styles.inventionsContainer}>
             <View style={styles.sectionHeader}>
@@ -161,10 +172,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.page,
     padding: 10,
   },
-  headerContainer: {
-    padding: 20,
-    paddingTop: 10,
-  },
   glassCard: {
     backgroundColor: "white",
     borderRadius: 25,
@@ -176,18 +183,37 @@ const styles = StyleSheet.create({
     shadowRadius: 15,
     elevation: 8,
   },
-  editButton: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+  navButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 20,
+  },
+  logoutButton: {
     padding: 8,
-    borderRadius: 20,
-    shadowColor: "#003863",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+  },
+  editButton: {
+    padding: 8,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 10,
+  },
+  actionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: "rgba(136, 179, 212, 0.1)",
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  buttonText: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: "600",
   },
   profileImage: {
     width: 120,
@@ -221,25 +247,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingHorizontal: 10,
   },
-  buttonContainer: {
-    flexDirection: "row",
-    gap: 15,
-    marginTop: 10,
-  },
-  actionButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 12,
-    borderRadius: 12,
-    gap: 8,
-
-    backgroundColor: "rgba(136, 179, 212, 0.1)",
-  },
-  buttonText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: "600",
-  },
   inventionsContainer: {
     flex: 1,
     backgroundColor: "#ffffff",
@@ -269,17 +276,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 20,
-  },
-  logoutButton: {
-    padding: 8,
-  },
-  navButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  editButton: {
-    padding: 8,
   },
 });
 

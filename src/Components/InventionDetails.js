@@ -4,7 +4,9 @@ import {
   View,
   Image,
   ScrollView,
+
   Linking,
+
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 
@@ -17,6 +19,7 @@ import UserContext from "../context/UserContext";
 import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
 import { getCategory } from "../api/category"; // You'll need to create this API function
+import { colors } from "../../Colors";
 
 import Icon from "react-native-vector-icons/FontAwesome";
 
@@ -40,6 +43,12 @@ const getPhaseProgress = (currentPhase) => {
 const InventionDetails = ({ route }) => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
+
+  const { inventionId, image, showInvestButton, showEditButton } = route.params;
+
+  const [isLiked, setIsLiked] = useState(false);
+  console.log("Image URI:", image); // Add this to debug
+
 
   const [isLiked, setIsLiked] = useState(false);
   const [isInterested, setIsInterested] = useState(false);
@@ -113,8 +122,8 @@ const InventionDetails = ({ route }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.contentContainer}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.contentContainer}>
         <Image source={{ uri: image }} style={styles.image} />
         <Text style={styles.title}>{invention?.name}</Text>
 
@@ -212,6 +221,7 @@ const InventionDetails = ({ route }) => {
             </Text>
           </TouchableOpacity>
 
+
           <TouchableOpacity
             style={[
               styles.actionButton,
@@ -228,6 +238,7 @@ const InventionDetails = ({ route }) => {
               {isInterested ? "Interested" : "Interest"}
             </Text>
           </TouchableOpacity>
+
         </View>
 
         {isOwner && (
@@ -246,13 +257,15 @@ const InventionDetails = ({ route }) => {
         {canInvest && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
+
             onPress={() => navigation.navigate("Invest")}
+
           >
             <Text style={styles.buttonText}>Invest</Text>
           </TouchableOpacity>
         )}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -261,7 +274,7 @@ export default InventionDetails;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffffff", // Changed to pure white for cleaner look
+    backgroundColor: colors.page,
   },
   contentContainer: {
     padding: 16,
@@ -285,7 +298,7 @@ const styles = StyleSheet.create({
     fontSize: 28, // Increased size
     fontWeight: "800", // Made font bolder
     marginBottom: 16,
-    color: "#1a1a1a",
+    color: colors.primary,
     letterSpacing: 0.5, // Added letter spacing for better readability
   },
   inventorContainer: {
@@ -315,17 +328,15 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 16,
     marginBottom: 20,
-    color: "#4a4a4a", // Softer color for better readability
-    lineHeight: 24, // Added line height for better readability
+    color: colors.primary,
+    lineHeight: 24,
     letterSpacing: 0.3,
   },
   cost: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#2563eb", // Changed to a more modern blue
-    backgroundColor: "#eff6ff", // Light blue background
+    color: colors.primary, // Changed to a more modern blue
     padding: 12,
-    borderRadius: 10,
     alignSelf: "flex-start", // Makes the container fit the content
   },
   button: {
@@ -335,6 +346,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginTop: 24,
+    marginBottom: 25,
     shadowColor: "#000", // Added shadow to button
     shadowOffset: {
       width: 0,
@@ -388,32 +400,34 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   metaItem: {
+    //bar card
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: colors.secondary,
+
     padding: 12,
     borderRadius: 10,
   },
   metaLabel: {
     fontSize: 14,
-    color: "#6b7280",
+    color: colors.primary,
     marginBottom: 4,
   },
   metaValue: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#1a1a1a",
+    color: colors.primary,
   },
   progressContainer: {
     marginTop: 8,
     height: 24,
     position: "relative",
-    backgroundColor: "#f0f0f0",
-    borderRadius: 2,
+    backgroundColor: colors.secondary,
+    borderRadius: 5,
     width: "100%",
   },
   progressBar: {
     height: 4,
-    backgroundColor: "#2563eb",
+    backgroundColor: colors.primary,
     borderRadius: 2,
     position: "absolute",
     top: 10,
@@ -434,7 +448,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: "#e5e7eb",
+    backgroundColor: colors.primary,
     borderWidth: 2,
     borderColor: "#fff",
     shadowColor: "#000",

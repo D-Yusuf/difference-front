@@ -40,7 +40,7 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content" backgroundColor="#ADD8E6" />
 
       <View style={styles.innerContainer}>
         <View style={styles.headerSection}>
