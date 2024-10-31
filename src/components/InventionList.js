@@ -2,9 +2,9 @@ import React from "react";
 import { StyleSheet, FlatList, View, Text } from "react-native";
 import InventionCard from "./InventionCard";
 
-const InventionList = ({ inventions, numColumns }) => {
-  if (!inventions || !Array.isArray(inventions)) {
-    return <Text style={styles.noInventions}>No inventions found.</Text>;
+const InventionList = ({ inventions, numColumns = 1, showInvestButton = true, showEditButton = true }) => {
+  if (inventions?.length === 0 || !inventions) {
+    return <Text>No inventions found.</Text>;
   }
 
   const validInventions = inventions.filter((invention) => invention != null);

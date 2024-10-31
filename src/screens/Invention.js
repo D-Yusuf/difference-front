@@ -9,21 +9,26 @@ import {
   Image,
   Modal,
   FlatList,
+  StatusBar,
 } from "react-native";
-import React, { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import React, { useContext, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { createInvention } from "../api/invention";
 import { getCategories } from "../api/categories";
+import { colors } from "../../Colors";
+import Icon from "react-native-vector-icons/Ionicons";
+import { ThemeContext } from "../context/ThemeContext";
+
 import { getInventors } from "../api/user";
-import { BASE_URL } from "../api";
+import { BASE_URL, invalidateInventionQueries } from "../api";
 const Invention = ({ navigation }) => {
   const phases = [
     { label: "Idea", value: "idea" },
     { label: "Testing", value: "testing" },
     { label: "Market Ready", value: "market_ready" },
   ];
-
+  const queryClient = useQueryClient();
   const [invention, setInvention] = useState({});
   const [images, setImages] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -43,6 +48,7 @@ const Invention = ({ navigation }) => {
     mutationFn: () => createInvention(invention),
     mutationKey: ["create-invention"],
     onSuccess: () => {
+      invalidateInventionQueries(queryClient)
       alert("Invention created successfully");
       navigation.goBack();
     },
@@ -101,6 +107,11 @@ const Invention = ({ navigation }) => {
     }
     mutate();
   };
+  const { setBackgroundColor } = useContext(ThemeContext);
+
+  useEffect(() => {
+    setBackgroundColor(colors.primary); // Set color when component mounts
+  }, []);
 
   const renderPhaseItem = ({ item }) => (
     <TouchableOpacity
@@ -165,21 +176,31 @@ const Invention = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="dark-content" />
+
+      <View style={styles.bgCircle1} />
+      <View style={styles.bgCircle2} />
+      <View style={styles.bgCircle3} />
+
       <ScrollView contentContainerStyle={styles.scrollView}>
-        <Text style={styles.title}>New Invention</Text>
+        <View style={styles.titleContainer}>
+          <Icon name="bulb" size={30} color="orange" />
+          <Text style={styles.title}>New Invention</Text>
+        </View>
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Invention Name</Text>
           <TextInput
             style={styles.input}
             placeholder="Enter invention title"
+            placeholderTextColor="white"
             onChangeText={(text) => setInvention({ ...invention, name: text })}
           />
         </View>
+
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Description</Text>
           <TextInput
             style={styles.descriptionInput}
             placeholder="Describe your invention"
+            placeholderTextColor="white"
             multiline={true}
             numberOfLines={6}
             textAlignVertical="top"
@@ -188,15 +209,17 @@ const Invention = ({ navigation }) => {
             }
           />
         </View>
+
         <View style={styles.inputContainer}>
-          <Text style={styles.label}>Needed Funds</Text>
           <TextInput
             style={styles.input}
             placeholder="Total Costs in KWD"
+            placeholderTextColor="white"
             keyboardType="numeric"
             onChangeText={(text) => setInvention({ ...invention, cost: text })}
           />
         </View>
+
         <TouchableOpacity
           style={styles.dropdownButton}
           onPress={() => setInventorModalVisible(true)}
@@ -219,6 +242,7 @@ const Invention = ({ navigation }) => {
               : "Select Category"}
           </Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={styles.dropdownButton}
           onPress={() => setPhaseModalVisible(true)}
@@ -229,9 +253,14 @@ const Invention = ({ navigation }) => {
               : "Select Phase"}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={handleImagePicker}>
+
+        <TouchableOpacity
+          style={styles.uploadButton}
+          onPress={handleImagePicker}
+        >
           <Text style={styles.buttonText}>Upload Images</Text>
         </TouchableOpacity>
+
         <View style={styles.imageContainer}>
           {images.map((image, index) => (
             <Image
@@ -241,8 +270,9 @@ const Invention = ({ navigation }) => {
             />
           ))}
         </View>
+
         <TouchableOpacity
-          style={styles.createInventionbutton}
+          style={styles.createButton}
           onPress={handleCreateInvention}
         >
           <Text style={styles.buttonText}>Post Invention</Text>
@@ -282,6 +312,12 @@ const Invention = ({ navigation }) => {
         onRequestClose={() => setCategoryModalVisible(false)}
       >
         <View style={styles.modalView}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setCategoryModalVisible(false)}
+          >
+            <Icon name="close" size={24} color="#FF7F50" />
+          </TouchableOpacity>
           <FlatList
             data={categories}
             renderItem={renderCategoryItem}
@@ -296,6 +332,12 @@ const Invention = ({ navigation }) => {
         onRequestClose={() => setPhaseModalVisible(false)}
       >
         <View style={styles.modalView}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setPhaseModalVisible(false)}
+          >
+            <Icon name="close" size={24} color="#FF7F50" />
+          </TouchableOpacity>
           <FlatList
             data={phases}
             renderItem={renderPhaseItem}
@@ -307,94 +349,137 @@ const Invention = ({ navigation }) => {
   );
 };
 
-export default Invention;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "lightgray",
+    backgroundColor: colors.primary,
+    padding: 10,
+  },
+  bgCircle1: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: colors.secondary,
+    top: -50,
+    right: -50,
+    opacity: 0.2,
+  },
+  bgCircle2: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: colors.secondary,
+    top: 100,
+    left: -100,
+    opacity: 0.2,
+  },
+  bgCircle3: {
+    position: "absolute",
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    backgroundColor: colors.secondary,
+    bottom: -50,
+    right: -50,
+    opacity: 0.2,
   },
   scrollView: {
     flexGrow: 1,
-    padding: 20,
+    padding: 24,
+  },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 30,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    color: "black",
+    fontSize: 29,
+    fontWeight: "800",
+    color: "white",
+    marginLeft: 10,
+    lineHeight: 56,
   },
   inputContainer: {
     marginBottom: 20,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 5,
-    color: "black",
-  },
   input: {
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 8,
+    backgroundColor: "transparent",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(241, 245, 249, 0.3)",
     padding: 12,
     fontSize: 16,
+    color: "#ffffff",
+    height: 50,
   },
   inventorsContainer: {
     marginBottom: 20,
   },
   descriptionInput: {
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "black",
-    borderRadius: 8,
+    backgroundColor: "transparent",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(241, 245, 249, 0.3)",
     padding: 12,
     fontSize: 16,
-    height: 150,
+    color: "#ffffff",
+    height: 120,
     textAlignVertical: "top",
   },
-  button: {
-    backgroundColor: "black",
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 10,
-  },
-  createInventionbutton: {
-    backgroundColor: "#34A853",
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  imageContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginVertical: 10,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    margin: 5,
-    borderRadius: 8,
-  },
   dropdownButton: {
-    backgroundColor: "white",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
+    backgroundColor: "transparent",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(241, 245, 249, 0.3)",
     padding: 15,
     marginBottom: 20,
   },
   dropdownButtonText: {
     fontSize: 16,
-    color: "#333",
+    color: "white",
+  },
+  uploadButton: {
+    backgroundColor: "white",
+    padding: 15,
+    borderRadius: 30,
+    alignItems: "center",
+  },
+  createButton: {
+    flexDirection: "row",
+    backgroundColor: "#F8FAFC",
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+    marginHorizontal: 4,
+    paddingHorizontal: 24,
+    shadowColor: "#475569",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  buttonText: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  createButtonText: {
+    color: colors.primary,
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  imageContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginVertical: 10,
+    gap: 10,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
   },
   modalView: {
     margin: 20,
@@ -410,6 +495,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    padding: 10,
   },
   roleItem: {
     borderBottomWidth: 1,
@@ -475,3 +566,5 @@ const styles = StyleSheet.create({
     maxHeight: "80%",
   },
 });
+
+export default Invention;

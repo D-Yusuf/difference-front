@@ -8,6 +8,7 @@ import NAVIGATION from "./index";
 import InvestNavigation from "./InvestNav/InvestNavigation";
 import HomeNavigation from "./HomeNav/HomeNavigation";
 import InventionNavigation from "./InventionNav/InventionNavigation";
+import { colors } from "../../Colors";
 const Tab = createBottomTabNavigator();
 const MainNavigation = () => {
   return (
@@ -15,7 +16,7 @@ const MainNavigation = () => {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#ffffff",
+          backgroundColor: "white",
           borderTopWidth: 0,
           elevation: 8,
           shadowColor: "#003863",
@@ -25,9 +26,10 @@ const MainNavigation = () => {
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
+          marginBottom: 30,
         },
-        tabBarActiveTintColor: "#003863",
-        tabBarInactiveTintColor: "#88B3D4",
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.secondary,
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "600",

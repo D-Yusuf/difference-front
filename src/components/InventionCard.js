@@ -4,8 +4,9 @@ import { BASE_URL } from "../api/index";
 import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigations";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { colors } from "../../Colors";
 
-const InventionCard = ({ invention, compact }) => {
+const InventionCard = ({ invention, compact, showInvestButton = true, showEditButton = true }) => {
   const navigation = useNavigation();
 
   if (!invention || !invention._id) {
@@ -22,6 +23,8 @@ const InventionCard = ({ invention, compact }) => {
         navigation.navigate(NAVIGATION.INVENTION.INVENTION_DETAILS, {
           inventionId: invention._id,
           image: imageUrl,
+          showInvestButton: showInvestButton,
+          showEditButton: showEditButton,
         })
       }
     >
@@ -62,6 +65,8 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.primary,
     marginVertical: 8,
     marginHorizontal: 8,
     shadowColor: "#000",
@@ -94,7 +99,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
+    color: colors.primary,
     marginBottom: 8,
   },
   compactName: {
@@ -103,7 +108,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: "#666",
+    color: colors.primary,
     marginBottom: 8,
     lineHeight: 20,
   },
@@ -115,7 +120,7 @@ const styles = StyleSheet.create({
   cost: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#2E7D32",
+    color: colors.primary,
     marginBottom: 12,
   },
   compactCost: {
