@@ -6,7 +6,12 @@ import NAVIGATION from "../navigations";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { colors } from "../../Colors";
 
-const InventionCard = ({ invention, compact, showInvestButton = true, showEditButton = true }) => {
+const InventionCard = ({
+  invention,
+  compact,
+  showInvestButton = true,
+  showEditButton = true,
+}) => {
   const navigation = useNavigation();
 
   if (!invention || !invention._id) {
@@ -70,6 +75,8 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: 8,
     shadowColor: "#000",
+    overflow: "hidden",
+    height: 240,
     shadowOffset: {
       width: 0,
       height: 2,
