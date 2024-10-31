@@ -13,6 +13,7 @@ import { getProfile, updateProfile } from "../../api/profile";
 import { BASE_URL } from "../../api";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
+import { colors } from "../../../Colors";
 const EditProfile = ({ route, navigation }) => {
   const queryClient = useQueryClient();
   const { profile } = route.params;
@@ -106,17 +107,15 @@ const EditProfile = ({ route, navigation }) => {
           value={userInfo.bio}
           onChangeText={(text) => setUserInfo({ ...userInfo, bio: text })}
         />
-        <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
-          <Text style={styles.buttonText}>Update Profile</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={pickDocument}>
+            <Text style={styles.buttonText}>Upload CV</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
+            <Text style={styles.buttonText}>Update Profile</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <TouchableOpacity style={styles.button} onPress={pickDocument}>
-        <Text style={styles.buttonText}>Upload CV</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
-        <Text style={styles.buttonText}>Update Profile</Text>
-      </TouchableOpacity>
-
     </View>
   );
 };
@@ -126,12 +125,12 @@ export default EditProfile;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#88B3D4",
+    backgroundColor: colors.page,
   },
   profileContainer: {
-    marginTop: 10,
+    marginTop: 30,
     flex: 1,
-    backgroundColor: "#88B3D4",
+    backgroundColor: colors.page,
     padding: 20,
     borderRadius: 10,
     width: "100%",
@@ -170,5 +169,8 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  buttonContainer: {
+    gap: 10,
   },
 });

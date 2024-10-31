@@ -42,10 +42,10 @@ export default function App() {
         <ThemeContext.Provider value={{ backgroundColor, setBackgroundColor }}>
           <UserContext.Provider value={[user, setUser]}>
             {user.loggedIn ? (
-              <SafeAreaView style={{ flex: 1, backgroundColor }}>
-                <MainNavigation />
-              </SafeAreaView>
+              // <SafeAreaView style={{ flex: 1, backgroundColor }}>
+              <MainNavigation />
             ) : (
+              // </SafeAreaView>
               <AuthNavigation />
             )}
           </UserContext.Provider>
