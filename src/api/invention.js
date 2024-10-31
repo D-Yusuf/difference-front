@@ -14,7 +14,7 @@ export const createInvention = async (inventionData) => {
       inventionData.images.forEach((image, index) => {
         formData.append("images", {
           uri: image.uri,
-          type: image.mimeType,
+          type: "image/jpeg",
           name: `image${index}.jpg`,
         });
       });
