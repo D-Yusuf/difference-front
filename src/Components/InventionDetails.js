@@ -4,15 +4,15 @@ import {
   View,
   Image,
   ScrollView,
-
+  SafeAreaView,
   Linking,
 
 } from "react-native";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { getInvention } from "../api/invention";
-import { useQuery } from "@tanstack/react-query";
+import { getInvention, toggleLikeInvention } from "../api/invention";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
 import { getProfile } from "../api/profile"; // Import the getProfile function
 import UserContext from "../context/UserContext";
@@ -45,17 +45,13 @@ const InventionDetails = ({ route }) => {
   const [user, setUser] = useContext(UserContext);
 
   const { inventionId, image, showInvestButton, showEditButton } = route.params;
-
   const [isLiked, setIsLiked] = useState(false);
-  console.log("Image URI:", image); // Add this to debug
-
-
-  const [isLiked, setIsLiked] = useState(false);
-  const [isInterested, setIsInterested] = useState(false);
-
-  const { inventionId, image } = route.params;
-  console.log("Received inventionId:", inventionId);
-
+ const {mutate: toggleLike} = useMutation({
+  mutationFn: () => toggleLikeInvention(inventionId),
+  onSuccess: () => {
+    queryClient.invalidateQueries(["invention", inventionId]);
+  },
+ });
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention", inventionId],
 
@@ -72,10 +68,12 @@ const InventionDetails = ({ route }) => {
     },
   });
 
-  console.log("Invention ID:", inventionId);
-  console.log("Invention pending:", inventionPending);
-  console.log("Raw invention data:", invention);
-  console.log("Current phase:", invention?.phase);
+  useEffect(() => {
+    setIsLiked(invention?.likes.includes(user._id));
+  }, [invention]);
+
+
+
 
   // Handle document press
   const handleDocumentPress = (document) => {
@@ -207,9 +205,10 @@ const InventionDetails = ({ route }) => {
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
 
         <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity
-            style={[styles.actionButton, isLiked && styles.actionButtonActive]}
-            onPress={() => setIsLiked(!isLiked)}
+          {!isOwner && (
+            <TouchableOpacity
+              style={[styles.actionButton, isLiked && styles.actionButtonActive]}
+            onPress={() => {toggleLike(); setIsLiked(!isLiked)}}
           >
             <Text
               style={[
@@ -220,24 +219,10 @@ const InventionDetails = ({ route }) => {
               {isLiked ? "Liked" : "Like"}
             </Text>
           </TouchableOpacity>
+          )}
 
 
-          <TouchableOpacity
-            style={[
-              styles.actionButton,
-              isInterested && styles.actionButtonActive,
-            ]}
-            onPress={() => setIsInterested(!isInterested)}
-          >
-            <Text
-              style={[
-                styles.actionButtonText,
-                isInterested && styles.actionButtonTextActive,
-              ]}
-            >
-              {isInterested ? "Interested" : "Interest"}
-            </Text>
-          </TouchableOpacity>
+        
 
         </View>
 
@@ -257,14 +242,12 @@ const InventionDetails = ({ route }) => {
         {canInvest && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
-
-            onPress={() => navigation.navigate("Invest")}
-
+            onPress={() => navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {invention})}
           >
             <Text style={styles.buttonText}>Invest</Text>
           </TouchableOpacity>
         )}
-      </ScrollView>
+    </ScrollView>
     </SafeAreaView>
   );
 };
@@ -400,7 +383,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   metaItem: {
-    //bar card
     flex: 1,
     backgroundColor: colors.secondary,
 

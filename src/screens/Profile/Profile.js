@@ -112,7 +112,7 @@ const Profile = ({ navigation }) => {
                 />
                 <Text style={styles.buttonText}>Orders</Text>
               </TouchableOpacity>
-            )}
+            </View>
             <TouchableOpacity
               style={styles.actionButton}
               onPress={() => navigation.navigate("AddInvention")}
