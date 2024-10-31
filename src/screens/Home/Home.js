@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.page,
+    // marginTop: 40,
   },
 
   innerContainer: {
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   headerSection: {
-    marginTop: 20,
+    marginTop: 40,
     marginBottom: 20,
   },
   headerTitle: {
