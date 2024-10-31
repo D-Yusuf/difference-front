@@ -12,8 +12,9 @@ import {
   StatusBar,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { createInvention } from "../api/invention";
 import { getCategories } from "../api/categories";
 import { colors } from "../../Colors";
@@ -21,14 +22,14 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { ThemeContext } from "../context/ThemeContext";
 
 import { getInventors } from "../api/user";
-import { BASE_URL } from "../api";
+import { BASE_URL, invalidateInventionQueries } from "../api";
 const Invention = ({ navigation }) => {
   const phases = [
     { label: "Idea", value: "idea" },
     { label: "Testing", value: "testing" },
     { label: "Market Ready", value: "market_ready" },
   ];
-
+  const queryClient = useQueryClient();
   const [invention, setInvention] = useState({});
   const [images, setImages] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -38,6 +39,7 @@ const Invention = ({ navigation }) => {
   const [phaseModalVisible, setPhaseModalVisible] = useState(false);
   const [selectedInventors, setSelectedInventors] = useState([]);
   const [inventorModalVisible, setInventorModalVisible] = useState(false);
+  const [documents, setDocuments] = useState([]);
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
@@ -48,6 +50,7 @@ const Invention = ({ navigation }) => {
     mutationFn: () => createInvention(invention),
     mutationKey: ["create-invention"],
     onSuccess: () => {
+      invalidateInventionQueries(queryClient);
       alert("Invention created successfully");
       navigation.goBack();
     },
@@ -84,6 +87,24 @@ const Invention = ({ navigation }) => {
     if (!result.canceled) {
       setImages(result.assets);
       setInvention({ ...invention, images: result.assets });
+    }
+  };
+
+  const handleDocumentPicker = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        multiple: true,
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled) {
+        setDocuments(result.assets);
+        console.log("Documents:", result.assets);
+        setInvention({ ...invention, documents: result.assets });
+      }
+    } catch (err) {
+      console.log("Document picker error:", err);
+      alert("Error picking document");
     }
   };
 
@@ -267,6 +288,22 @@ const Invention = ({ navigation }) => {
               source={{ uri: image.uri }}
               style={styles.image}
             />
+          ))}
+        </View>
+
+        <TouchableOpacity
+          style={styles.uploadButton}
+          onPress={handleDocumentPicker}
+        >
+          <Text style={styles.buttonText}>Upload Documents</Text>
+        </TouchableOpacity>
+
+        <View style={styles.documentContainer}>
+          {documents.map((doc, index) => (
+            <View key={index} style={styles.documentItem}>
+              <Icon name="document-text" size={24} color="white" />
+              <Text style={styles.documentName}>{doc.name}</Text>
+            </View>
           ))}
         </View>
 
@@ -586,6 +623,22 @@ const styles = StyleSheet.create({
   inventorsList: {
     width: "100%",
     maxHeight: "80%",
+  },
+  documentContainer: {
+    marginVertical: 10,
+  },
+  documentItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
+    padding: 10,
+    borderRadius: 8,
+    marginVertical: 5,
+  },
+  documentName: {
+    color: "white",
+    marginLeft: 10,
+    flex: 1,
   },
 });
 
