@@ -195,7 +195,7 @@ const Invention = ({ navigation }) => {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
       <View style={styles.bgCircle1} />
@@ -321,44 +321,55 @@ const Invention = ({ navigation }) => {
         visible={inventorModalVisible}
         onRequestClose={() => setInventorModalVisible(false)}
       >
-        <View style={styles.modalView}>
-          <Text style={styles.modalTitle}>Select Inventors</Text>
-          {inventors && inventors?.length > 0 ? (
-            <FlatList
-              data={inventors}
-              renderItem={renderInventorItem}
-              keyExtractor={(item) => item._id}
-              style={styles.inventorsList}
-            />
-          ) : (
-            <Text style={styles.noDataText}>No inventors available</Text>
-          )}
-          <TouchableOpacity
-            style={styles.doneButton}
-            onPress={() => setInventorModalVisible(false)}
-          >
-            <Text style={styles.buttonText}>Done</Text>
-          </TouchableOpacity>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setInventorModalVisible(false)}
+            >
+              <Icon name="close" size={24} color="red" />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Select Inventors</Text>
+            {inventors && inventors?.length > 0 ? (
+              <FlatList
+                data={inventors}
+                renderItem={renderInventorItem}
+                keyExtractor={(item) => item._id}
+                style={styles.inventorsList}
+              />
+            ) : (
+              <Text style={styles.noDataText}>No inventors available</Text>
+            )}
+            <TouchableOpacity
+              style={styles.doneButton}
+              onPress={() => setInventorModalVisible(false)}
+            >
+              <Text style={styles.buttonText}>Done</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
+
       <Modal
         animationType="slide"
         transparent={true}
         visible={categoryModalVisible}
         onRequestClose={() => setCategoryModalVisible(false)}
       >
-        <View style={styles.modalView}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setCategoryModalVisible(false)}
-          >
-            <Icon name="close" size={24} color="#FF7F50" />
-          </TouchableOpacity>
-          <FlatList
-            data={categories}
-            renderItem={renderCategoryItem}
-            keyExtractor={(item) => item._id}
-          />
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setCategoryModalVisible(false)}
+            >
+              <Icon name="close" size={24} color="red" />
+            </TouchableOpacity>
+            <FlatList
+              data={categories}
+              renderItem={renderCategoryItem}
+              keyExtractor={(item) => item._id}
+            />
+          </View>
         </View>
       </Modal>
       <Modal
@@ -367,21 +378,23 @@ const Invention = ({ navigation }) => {
         visible={phaseModalVisible}
         onRequestClose={() => setPhaseModalVisible(false)}
       >
-        <View style={styles.modalView}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={() => setPhaseModalVisible(false)}
-          >
-            <Icon name="close" size={24} color="#FF7F50" />
-          </TouchableOpacity>
-          <FlatList
-            data={phases}
-            renderItem={renderPhaseItem}
-            keyExtractor={(item) => item.value}
-          />
+        <View style={styles.modalContainer}>
+          <View style={styles.modalView}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setPhaseModalVisible(false)}
+            >
+              <Icon name="close" size={24} color="red" />
+            </TouchableOpacity>
+            <FlatList
+              data={phases}
+              renderItem={renderPhaseItem}
+              keyExtractor={(item) => item.value}
+            />
+          </View>
         </View>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -390,6 +403,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.primary,
     padding: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
   },
   bgCircle1: {
     position: "absolute",
@@ -486,7 +505,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 20,
+    marginTop: 5,
     marginHorizontal: 4,
     paddingHorizontal: 24,
     shadowColor: "#475569",
@@ -519,10 +538,12 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
+    width: "90%",
     backgroundColor: "white",
     borderRadius: 20,
     padding: 35,
     alignItems: "center",
+    justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -540,13 +561,15 @@ const styles = StyleSheet.create({
   },
   roleItem: {
     borderBottomWidth: 1,
-    borderBottomColor: "#ddd",
+    borderBottomColor: colors.secondary,
     width: "100%",
   },
   roleItemText: {
-    fontSize: 16,
-    color: "#333",
+    fontSize: 20,
+    color: colors.primary,
+    paddingVertical: 10,
     fontWeight: "500",
+    textTransform: "capitalize",
   },
   selectedItem: {
     backgroundColor: "#f0f0f0",
@@ -563,7 +586,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 15,
-    color: "#333",
+    color: colors.primary,
   },
   doneButton: {
     backgroundColor: "#34A853",
@@ -620,3 +643,12 @@ const styles = StyleSheet.create({
 });
 
 export default Invention;
+// //.sort((a, b) =>
+//   `${a.firstName} ${a.lastName}`.localeCompare(
+//     `${b.firstName} ${b.lastName}`
+//   )
+// )
+
+//----------------
+
+//.sort((a, b) => a.name.localeCompare(b.name))
