@@ -6,11 +6,11 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useRef } from "react";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { getInvention } from "../api/invention";
-import { useQuery } from "@tanstack/react-query";
+import { getInvention, toggleLikeInvention } from "../api/invention";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
 import { getProfile } from "../api/profile"; // Import the getProfile function
 import UserContext from "../context/UserContext";
@@ -40,27 +40,30 @@ const InventionDetails = ({ route }) => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
   const { inventionId, image, showInvestButton, showEditButton } = route.params;
-
   const [isLiked, setIsLiked] = useState(false);
-  console.log("Image URI:", image); // Add this to debug
-
-  console.log("Received inventionId:", inventionId);
-
+ const {mutate: toggleLike} = useMutation({
+  mutationFn: () => toggleLikeInvention(inventionId),
+  onSuccess: () => {
+    queryClient.invalidateQueries(["invention", inventionId]);
+  },
+ });
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention", inventionId],
 
     queryFn: () => getInvention(inventionId),
   });
+
+  useEffect(() => {
+    setIsLiked(invention?.likes.includes(user._id));
+  }, [invention]);
   const formatPhase = (phase) => {
     return phase
       .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
-  console.log("Invention ID:", inventionId);
-  console.log("Invention pending:", inventionPending);
-  console.log("Raw invention data:", invention);
-  console.log("Current phase:", invention?.phase);
+
+
 
   const { data: category, isPending: categoryPending } = useQuery({
     queryKey: ["category", invention?.category],
@@ -166,9 +169,10 @@ const InventionDetails = ({ route }) => {
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
 
         <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity
-            style={[styles.actionButton, isLiked && styles.actionButtonActive]}
-            onPress={() => setIsLiked(!isLiked)}
+          {!isOwner && (
+            <TouchableOpacity
+              style={[styles.actionButton, isLiked && styles.actionButtonActive]}
+            onPress={() => {toggleLike(); setIsLiked(!isLiked)}}
           >
             <Text
               style={[
@@ -177,8 +181,9 @@ const InventionDetails = ({ route }) => {
               ]}
             >
               {isLiked ? "Liked" : "Like"}
-            </Text>
-          </TouchableOpacity>
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {showEditButton && isOwner && (
@@ -197,14 +202,12 @@ const InventionDetails = ({ route }) => {
         {showInvestButton && canInvest && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
-            onPress={() =>
-              navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, { invention })
-            }
+            onPress={() => navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {invention})}
           >
             <Text style={styles.buttonText}>Invest</Text>
           </TouchableOpacity>
         )}
-      </ScrollView>
+    </ScrollView>
     </SafeAreaView>
   );
 };
@@ -340,7 +343,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   metaItem: {
-    //bar card
     flex: 1,
     backgroundColor: colors.secondary,
 
