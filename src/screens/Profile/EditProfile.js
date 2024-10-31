@@ -6,6 +6,8 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  Platform,
+  Linking,
 } from "react-native";
 import React, { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,24 +23,35 @@ const EditProfile = ({ route, navigation }) => {
     firstName: profile.firstName,
     lastName: profile.lastName,
     bio: profile.bio,
+    cv: profile.cv,
   });
+
   const pickDocument = async () => {
     try {
-      let result = await DocumentPicker.pick({
-        type: DocumentPicker.types.pdf,
+      const result = await DocumentPicker.getDocumentAsync({
+        multiple: false,
+        copyToCacheDirectory: true,
       });
       if (!result.canceled) {
-        setUserInfo({ ...userInfo, cv: result.assets[0].uri });
+        setUserInfo({
+          ...userInfo,
+          cv: result.assets[0],
+        });
       }
     } catch (error) {
       console.log(error);
     }
   };
+
+  const handleCvPress = () => {
+    // console.log(userInfo.cv);
+    // if (userInfo.cv) {
+    //   Linking.openURL(BASE_URL + userInfo.cv[0]);
+    // } else {
+    pickDocument();
+    // }
+  };
   const [image, setImage] = useState(null);
-  // const { data: profile } = useQuery({
-  //   queryKey: ["profile-image"],
-  //   queryFn: () => getProfile(),
-  // }); // do navbigate and put user image inside of it noo need to do new usequery
   const { mutate: updateProfileMutate } = useMutation({
     mutationFn: () => updateProfile(userInfo),
     mutationKey: ["update-profile"],
@@ -54,15 +67,25 @@ const EditProfile = ({ route, navigation }) => {
   });
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setUserInfo({ ...userInfo, image: result.assets[0].uri });
+      const imageUri = result.assets[0].uri;
+      const fileName = imageUri.split("/").pop();
+      setImage(imageUri);
+      setUserInfo({
+        ...userInfo,
+        image: {
+          uri:
+            Platform.OS === "ios" ? imageUri.replace("file://", "") : imageUri,
+          name: fileName,
+          type: "image/jpeg",
+        },
+      });
     }
   };
   const handleUpdateProfile = () => {
@@ -108,7 +131,7 @@ const EditProfile = ({ route, navigation }) => {
           onChangeText={(text) => setUserInfo({ ...userInfo, bio: text })}
         />
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={pickDocument}>
+          <TouchableOpacity style={styles.button} onPress={handleCvPress}>
             <Text style={styles.buttonText}>Upload CV</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>

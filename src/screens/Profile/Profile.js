@@ -43,7 +43,7 @@ const Profile = ({ navigation }) => {
   if (profileLoading) {
     return <Text>Loading...</Text>;
   }
-
+  console.log(`${BASE_URL}${profile.cv}`);
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
@@ -91,7 +91,7 @@ const Profile = ({ navigation }) => {
               {profile?.cv && (
                 <TouchableOpacity
                   style={[styles.actionButton, styles.cvButton]}
-                  onPress={() => Linking.openURL(`${BASE_URL}${profile.cv}`)}
+                  onPress={() => Linking.openURL(BASE_URL + profile.cv)}
                 >
                   <Icon
                     name="document-text-outline"
