@@ -32,10 +32,37 @@ export const updateProfile = async (userInfo) => {
           uri: userInfo.image,
         });
       } else if (key === "cv") {
+        console.log(`
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          ${userInfo.cv.uri}
+          ${userInfo.cv.mimeType}
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          `);
+
         formData.append("cv", {
-          name: "cv.pdf",
-          type: "application/pdf",
-          uri: userInfo.cv,
+          uri: userInfo.cv.uri,
+          type: userInfo.cv.mimeType,
+          name: `cv.pdf`,
         });
       } else {
         formData.append(key, userInfo[key]);

@@ -4,7 +4,9 @@ import {
   View,
   Image,
   ScrollView,
-  SafeAreaView,
+
+  Linking,
+
 } from "react-native";
 import React, { useEffect, useState, useContext } from "react";
 
@@ -18,6 +20,8 @@ import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
 import { getCategory } from "../api/category"; // You'll need to create this API function
 import { colors } from "../../Colors";
+
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const PHASES = ["idea", "work-in-progress", "prototype", "market-ready"];
 
@@ -39,28 +43,46 @@ const getPhaseProgress = (currentPhase) => {
 const InventionDetails = ({ route }) => {
   const navigation = useNavigation();
   const [user, setUser] = useContext(UserContext);
+
   const { inventionId, image, showInvestButton, showEditButton } = route.params;
 
   const [isLiked, setIsLiked] = useState(false);
   console.log("Image URI:", image); // Add this to debug
 
+
+  const [isLiked, setIsLiked] = useState(false);
+  const [isInterested, setIsInterested] = useState(false);
+
+  const { inventionId, image } = route.params;
   console.log("Received inventionId:", inventionId);
 
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention", inventionId],
 
-    queryFn: () => getInvention(inventionId),
+    queryFn: async () => {
+      try {
+        console.log("Fetching invention with ID:", inventionId);
+        const response = await getInvention(inventionId);
+        console.log("Invention API response:", response);
+        return response;
+      } catch (error) {
+        console.error("Error fetching invention:", error);
+        throw error;
+      }
+    },
   });
-  const formatPhase = (phase) => {
-    return phase
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
+
   console.log("Invention ID:", inventionId);
   console.log("Invention pending:", inventionPending);
   console.log("Raw invention data:", invention);
   console.log("Current phase:", invention?.phase);
+
+  // Handle document press
+  const handleDocumentPress = (document) => {
+    console.log("Document pressed:", document);
+    console.log("Document URL:", BASE_URL + document);
+    Linking.openURL(BASE_URL + document);
+  };
 
   const { data: category, isPending: categoryPending } = useQuery({
     queryKey: ["category", invention?.category],
@@ -89,9 +111,15 @@ const InventionDetails = ({ route }) => {
   const isOwner =
     invention.inventors.find((inventor) => inventor._id === user._id) ||
     user.role === "admin";
+  const canInvest = user.role === "investor" || user.role === "admin";
 
   // Update the phase display to look nicer (capitalize first letter)
-  const canInvest = user.role === "investor" || user.role === "admin";
+  const formatPhase = (phase) => {
+    return phase
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -143,11 +171,8 @@ const InventionDetails = ({ route }) => {
                 style={styles.inventorRow}
                 onPress={() => {
                   console.log("Navigating to profile with ID:", inventor._id); // Debug log
-                  navigation.navigate(NAVIGATION.PROFILE.INDEX, {
-                    screen: NAVIGATION.PROFILE.USER_PROFILE,
-                    params: {
-                      userId: inventor._id,
-                    },
+                  navigation.navigate(NAVIGATION.PROFILE.USER_PROFILE, {
+                    userId: inventor._id,
                   });
                 }}
               >
@@ -162,6 +187,22 @@ const InventionDetails = ({ route }) => {
             );
           })}
         </View>
+
+        {invention?.documents && invention.documents.length > 0 && (
+          <View style={styles.documentsContainer}>
+            <Text style={styles.sectionTitle}>Documents</Text>
+            {invention.documents.map((doc, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.documentItem}
+                onPress={() => handleDocumentPress(doc)}
+              >
+                <Text style={styles.documentName}>{doc.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         <Text style={styles.description}>{invention?.description}</Text>
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
 
@@ -179,9 +220,28 @@ const InventionDetails = ({ route }) => {
               {isLiked ? "Liked" : "Like"}
             </Text>
           </TouchableOpacity>
+
+
+          <TouchableOpacity
+            style={[
+              styles.actionButton,
+              isInterested && styles.actionButtonActive,
+            ]}
+            onPress={() => setIsInterested(!isInterested)}
+          >
+            <Text
+              style={[
+                styles.actionButtonText,
+                isInterested && styles.actionButtonTextActive,
+              ]}
+            >
+              {isInterested ? "Interested" : "Interest"}
+            </Text>
+          </TouchableOpacity>
+
         </View>
 
-        {showEditButton && isOwner && (
+        {isOwner && (
           <TouchableOpacity
             style={styles.button}
             onPress={() =>
@@ -194,12 +254,12 @@ const InventionDetails = ({ route }) => {
           </TouchableOpacity>
         )}
 
-        {showInvestButton && canInvest && (
+        {canInvest && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
-            onPress={() =>
-              navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, { invention })
-            }
+
+            onPress={() => navigation.navigate("Invest")}
+
           >
             <Text style={styles.buttonText}>Invest</Text>
           </TouchableOpacity>
@@ -402,5 +462,30 @@ const styles = StyleSheet.create({
   },
   phaseDotActive: {
     backgroundColor: "#2563eb", // Make sure this color is visibly different
+  },
+  documentsContainer: {
+    marginBottom: 20,
+    backgroundColor: "#f8f9fa",
+    padding: 12,
+    borderRadius: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1a1a1a",
+    marginBottom: 12,
+  },
+  documentItem: {
+    backgroundColor: "#ffffff",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  documentName: {
+    fontSize: 16,
+    color: "#2563eb",
+    fontWeight: "500",
   },
 });

@@ -40,7 +40,7 @@ const Profile = ({ navigation }) => {
   if (profileLoading) {
     return <Text>Loading...</Text>;
   }
-
+  console.log(`${BASE_URL}${profile.cv}`);
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
@@ -80,6 +80,31 @@ const Profile = ({ navigation }) => {
                   })
                 }
               >
+
+                <Icon name="document-text-outline" size={20} color="#003863" />
+                <Text style={styles.buttonText}>Orders</Text>
+              </TouchableOpacity>
+            )}
+            <View style={styles.buttonContainer}>
+              {profile?.cv && (
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.cvButton]}
+                  onPress={() => Linking.openURL(BASE_URL + profile.cv)}
+                >
+                  <Icon
+                    name="document-text-outline"
+                    size={20}
+                    color={colors.primary}
+                  />
+                  <Text style={styles.buttonText}>View CV</Text>
+                </TouchableOpacity>
+              )}
+
+              <TouchableOpacity
+                style={[styles.actionButton, styles.addButton]}
+                onPress={() => navigation.navigate("AddInvention")}
+              >
+
                 <Icon
                   name="document-text-outline"
                   size={20}
