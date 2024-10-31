@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigations";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { colors } from "../../Colors";
+import shortNumber from "../utils/shortNum";
 
 const InventionCard = ({
   invention,
@@ -17,7 +18,38 @@ const InventionCard = ({
   if (!invention || !invention._id) {
     return null;
   }
-
+  const getTimeAgo = (createdAt) => {
+    const now = new Date();
+    const postDate = new Date(createdAt);
+    const diffInSeconds = Math.floor((now - postDate) / 1000);
+  
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    }
+  
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+    }
+  
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    }
+  
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 30) {
+      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    }
+  
+    const diffInMonths = Math.floor(diffInDays / 30);
+    if (diffInMonths < 12) {
+      return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
+    }
+  
+    const diffInYears = Math.floor(diffInDays / 365);
+    return `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago`;
+  };
   const imageUrl = invention.images?.[0]
     ? `${BASE_URL}${invention.images[0]}`.replace(/\\/g, "/")
     : "https://via.placeholder.com/150";
@@ -50,7 +82,7 @@ const InventionCard = ({
             {invention.description}
           </Text>
           <Text style={[styles.cost, compact && styles.compactCost]}>
-            {invention.cost} KWD
+            {shortNumber(invention.cost)} KWD
           </Text>
           <View style={[styles.icons, compact && styles.compactIcons]}>
             <TouchableOpacity style={styles.likeButton}>
@@ -59,6 +91,7 @@ const InventionCard = ({
             <TouchableOpacity style={styles.thumbsUpButton}>
               <Icon name="thumbs-up" size={compact ? 16 : 24} color="#4D79FF" />
             </TouchableOpacity>
+            <Text>{getTimeAgo(invention.createdAt)}</Text>
           </View>
         </View>
       </View>
