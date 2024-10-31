@@ -46,6 +46,7 @@ const InventionDetails = ({ route }) => {
 
   const { inventionId, image, showInvestButton, showEditButton } = route.params;
   const [isLiked, setIsLiked] = useState(false);
+  const [remainingFunds, setRemainingFunds] = useState(0);
  const {mutate: toggleLike} = useMutation({
   mutationFn: () => toggleLikeInvention(inventionId),
   onSuccess: () => {
@@ -55,21 +56,12 @@ const InventionDetails = ({ route }) => {
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention", inventionId],
 
-    queryFn: async () => {
-      try {
-        console.log("Fetching invention with ID:", inventionId);
-        const response = await getInvention(inventionId);
-        console.log("Invention API response:", response);
-        return response;
-      } catch (error) {
-        console.error("Error fetching invention:", error);
-        throw error;
-      }
-    },
+    queryFn: () => getInvention(inventionId),
   });
 
   useEffect(() => {
     setIsLiked(invention?.likes.includes(user._id));
+    setRemainingFunds(getRemainingFunds());
   }, [invention]);
 
 
@@ -99,11 +91,7 @@ const InventionDetails = ({ route }) => {
     return <Text>No invention data available</Text>;
   }
 
-  console.log("Rendering with invention:", {
-    id: invention._id,
-    name: invention.name,
-    phase: invention.phase,
-  });
+
 
   // We will check if the user is the inventor or admin appear the edit button for him.
   const isOwner =
@@ -118,6 +106,18 @@ const InventionDetails = ({ route }) => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
+  function getRemainingFunds() {
+    if (!invention) return 0;
+    
+    const funds = invention.cost || 0;
+    const fullfilled = invention.orders
+      ? invention.orders
+          .filter(order => order.status === "approved")
+          .reduce((total, order) => total + order.amount, 0)
+      : 0;
+    
+    return funds - fullfilled;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -203,7 +203,7 @@ const InventionDetails = ({ route }) => {
 
         <Text style={styles.description}>{invention?.description}</Text>
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
-
+        <Text style={styles.cost}>Remaining Funds: {remainingFunds} KWD</Text>
         <View style={styles.actionButtonsContainer}>
           {!isOwner && (
             <TouchableOpacity
@@ -242,7 +242,7 @@ const InventionDetails = ({ route }) => {
         {canInvest && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
-            onPress={() => navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {invention})}
+            onPress={() => navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {invention, remainingFunds})}
           >
             <Text style={styles.buttonText}>Invest</Text>
           </TouchableOpacity>
