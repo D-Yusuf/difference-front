@@ -9,9 +9,12 @@ import {
   ScrollView,
 } from "react-native";
 import { createOrder } from "../../api/orders";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { colors } from "../../../Colors";
+import { invalidateOrderQueries } from "../../api";
 const InvestDetails = ({ route, navigation }) => {
+  const queryClient = useQueryClient();
+
   const { invention } = route.params;
   const [percentage, setPercentage] = useState("");
   const [amount, setAmount] = useState(0);
@@ -19,6 +22,7 @@ const InvestDetails = ({ route, navigation }) => {
     mutationKey: ["create-order"],
     mutationFn: () => createOrder(invention._id, amount, Number(percentage)),
     onSuccess: () => {
+      invalidateOrderQueries(queryClient);
       alert("Success", "Investment order created successfully!");
       navigation.goBack();
     },

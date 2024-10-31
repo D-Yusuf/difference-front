@@ -12,7 +12,7 @@ import {
   StatusBar,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { createInvention } from "../api/invention";
 import { getCategories } from "../api/categories";
@@ -21,14 +21,14 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { ThemeContext } from "../context/ThemeContext";
 
 import { getInventors } from "../api/user";
-import { BASE_URL } from "../api";
+import { BASE_URL, invalidateInventionQueries } from "../api";
 const Invention = ({ navigation }) => {
   const phases = [
     { label: "Idea", value: "idea" },
     { label: "Testing", value: "testing" },
     { label: "Market Ready", value: "market_ready" },
   ];
-
+  const queryClient = useQueryClient();
   const [invention, setInvention] = useState({});
   const [images, setImages] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -48,6 +48,7 @@ const Invention = ({ navigation }) => {
     mutationFn: () => createInvention(invention),
     mutationKey: ["create-invention"],
     onSuccess: () => {
+      invalidateInventionQueries(queryClient)
       alert("Invention created successfully");
       navigation.goBack();
     },
