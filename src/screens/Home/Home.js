@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Animated,
   ScrollView,
+  Modal,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useQuery } from "@tanstack/react-query";
@@ -16,12 +17,21 @@ import { getAllInventions } from "../../api/invention";
 import InventionList from "../../components/InventionList";
 import { ThemeContext } from "../../context/ThemeContext";
 import { colors } from "../../../Colors";
+import { getCategories } from "../../api/categories";
+import FilterModal from "../../components/FilterModal";
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [gridColumns, setGridColumns] = useState(2);
+  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedPhase, setSelectedPhase] = useState(null);
   const { data: inventions, isPending: inventionsPending } = useQuery({
     queryKey: ["inventions"],
     queryFn: getAllInventions,
+  });
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
   });
   const { setBackgroundColor } = useContext(ThemeContext);
 
@@ -30,9 +40,12 @@ const Home = () => {
   }, []);
 
   // Filter inventions based on the search term
-  const filteredInventions = inventions?.filter((invention) =>
-    invention.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredInventions = inventions?.filter((invention) => {
+    const matchesSearch = invention.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory ? invention.category === selectedCategory : true;
+    const matchesPhase = selectedPhase ? invention.phase === selectedPhase : true;
+    return matchesSearch && matchesCategory && matchesPhase;
+  });
 
   if (inventionsPending) {
     return <Text>Loading...</Text>;
@@ -40,6 +53,20 @@ const Home = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+  style={{
+    backgroundColor: colors.primary,
+    padding: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+    alignSelf: 'flex-end'
+  }}
+  onPress={() => setFilterModalVisible(true)}
+>
+  <Text style={{ color: 'white' }}>Filter</Text>
+</TouchableOpacity>
+
+<FilterModal isVisible={filterModalVisible} onRequestClose={() => setFilterModalVisible(false)} categories={categories} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} selectedPhase={selectedPhase} setSelectedPhase={setSelectedPhase}/>
       <StatusBar barStyle="dark-content" backgroundColor="#ADD8E6" />
 
       <View style={styles.innerContainer}>

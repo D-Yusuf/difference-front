@@ -24,11 +24,7 @@ import { ThemeContext } from "../context/ThemeContext";
 import { getInventors } from "../api/user";
 import { BASE_URL, invalidateInventionQueries } from "../api";
 const Invention = ({ navigation }) => {
-  const phases = [
-    { label: "Idea", value: "idea" },
-    { label: "Testing", value: "testing" },
-    { label: "Market Ready", value: "market_ready" },
-  ];
+  const [phases, setPhases] = useState(["idea", "development", "market"]);
   const queryClient = useQueryClient();
   const [invention, setInvention] = useState({});
   const [images, setImages] = useState([]);
@@ -40,7 +36,7 @@ const Invention = ({ navigation }) => {
   const [selectedInventors, setSelectedInventors] = useState([]);
   const [inventorModalVisible, setInventorModalVisible] = useState(false);
   const [documents, setDocuments] = useState([]);
-
+ 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
@@ -67,6 +63,11 @@ const Invention = ({ navigation }) => {
       alert("Failed to load inventors");
     },
   });
+
+  useEffect(() => {
+      const category = categories?.find(c => c._id === selectedCategory);
+      setPhases(category?.phases);
+  }, [selectedCategory, categories]);
 
   const handleImagePicker = async () => {
     const permissionResult =
@@ -137,12 +138,12 @@ const Invention = ({ navigation }) => {
     <TouchableOpacity
       style={styles.roleItem}
       onPress={() => {
-        setSelectedPhase(item.value);
-        setInvention({ ...invention, phase: item.value });
+        setSelectedPhase(item);
+        setInvention({ ...invention, phase: item });
         setPhaseModalVisible(false);
       }}
     >
-      <Text style={styles.roleItemText}>{item.label}</Text>
+      <Text style={styles.roleItemText}>{item}</Text>
     </TouchableOpacity>
   );
 
@@ -263,16 +264,17 @@ const Invention = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
+        {selectedCategory && <TouchableOpacity
           style={styles.dropdownButton}
           onPress={() => setPhaseModalVisible(true)}
         >
           <Text style={styles.dropdownButtonText}>
             {selectedPhase
-              ? phases.find((p) => p.value === selectedPhase).label
+              ? phases.find((p) => p === selectedPhase)
               : "Select Phase"}
-          </Text>
-        </TouchableOpacity>
+            </Text>
+          </TouchableOpacity>
+        }
 
         <TouchableOpacity
           style={styles.uploadButton}
@@ -393,7 +395,7 @@ const Invention = ({ navigation }) => {
             <FlatList
               data={phases}
               renderItem={renderPhaseItem}
-              keyExtractor={(item) => item.value}
+              keyExtractor={(item) => item}
             />
           </View>
         </View>
