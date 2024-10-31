@@ -3,19 +3,32 @@ import { BASE_URL } from "../api"; // Adjust the path as needed
 
 export const createInvention = async (inventionData) => {
   try {
+    console.log("DARA", inventionData);
     const formData = new FormData();
     for (let key in inventionData) {
-      if (key !== "images") formData.append(key, inventionData[key]);
-      // if (key === "inventors") formData.append(key, JSON.stringify(inventionData[key]));
+      if (key !== "images" && key !== "documents")
+        formData.append(key, inventionData[key]);
     }
     // Append each image file individually
-    inventionData.images.forEach((image, index) => {
-      formData.append("images", {
-        uri: image.uri,
-        type: "image/jpeg", // Adjust this if you need to support other image types
-        name: `image${index}.jpg`,
+    if (inventionData.images) {
+      inventionData.images.forEach((image, index) => {
+        formData.append("images", {
+          uri: image.uri,
+          type: "image/jpeg",
+          name: `image${index}.jpg`,
+        });
       });
-    });
+    }
+    // Append documents if they exist
+    if (inventionData.documents) {
+      inventionData.documents.forEach((document, index) => {
+        formData.append("documents", {
+          uri: document.uri,
+          type: document.mimeType,
+          name: `document${index}.pdf`,
+        });
+      });
+    }
     const { data } = await instance.post("/inventions", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -66,7 +79,6 @@ export const getAllInventions = async () => {
 export const updateInvention = async (inventionId, inventionData) => {
   try {
     console.log("Updating invention with data:", inventionData);
-
     const formData = new FormData();
 
     // Handle inventors array separately
@@ -76,9 +88,9 @@ export const updateInvention = async (inventionId, inventionData) => {
       });
     }
 
-    // Append other non-image data
+    // Append other non-file data
     Object.keys(inventionData).forEach((key) => {
-      if (key !== "images" && key !== "inventors") {
+      if (!["images", "inventors", "documents"].includes(key)) {
         formData.append(key, inventionData[key]);
       }
     });
@@ -90,6 +102,17 @@ export const updateInvention = async (inventionId, inventionData) => {
           uri: image.uri,
           type: "image/jpeg",
           name: `image${index}.jpg`,
+        });
+      });
+    }
+
+    // Handle documents if they exist
+    if (inventionData.documents && inventionData.documents.length > 0) {
+      inventionData.documents.forEach((document, index) => {
+        formData.append("documents", {
+          uri: document.uri,
+          type: document.type || "application/pdf",
+          name: document.name || `document${index}.pdf`,
         });
       });
     }
