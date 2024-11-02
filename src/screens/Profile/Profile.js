@@ -68,23 +68,38 @@ const Profile = ({ navigation }) => {
           <Text style={styles.roleText}>{profile?.role}</Text>
           <Text style={styles.bio}>{profile?.bio}</Text>
 
-          <View style={styles.buttonContainer}>
-            {user.role === "inventor" && (
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={() =>
-                  navigation.navigate(NAVIGATION.PROFILE.ORDERS, {
-                    inventions: profile?.inventions.map(
-                      (invention) => invention._id
-                    ),
-                  })
-                }
-              >
-
-                <Icon name="document-text-outline" size={20} color="#003863" />
-                <Text style={styles.buttonText}>Orders</Text>
-              </TouchableOpacity>
-            )}
+          <View
+            style={[
+              styles.buttonContainer,
+              {
+                flexWrap: "wrap",
+                justifyContent: "center",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 10,
+              },
+            ]}
+          >
+            {user.role === "inventor" ||
+              (user.role === "admin" && (
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() =>
+                    navigation.navigate(NAVIGATION.PROFILE.ORDERS, {
+                      inventions: profile?.inventions.map(
+                        (invention) => invention._id
+                      ),
+                    })
+                  }
+                >
+                  <Icon
+                    name="document-text-outline"
+                    size={20}
+                    color="#003863"
+                  />
+                  <Text style={styles.buttonText}>Orders</Text>
+                </TouchableOpacity>
+              ))}
             <View style={styles.buttonContainer}>
               {profile?.cv && (
                 <TouchableOpacity
@@ -99,19 +114,6 @@ const Profile = ({ navigation }) => {
                   <Text style={styles.buttonText}>View CV</Text>
                 </TouchableOpacity>
               )}
-
-              <TouchableOpacity
-                style={[styles.actionButton, styles.addButton]}
-                onPress={() => navigation.navigate("AddInvention")}
-              >
-
-                <Icon
-                  name="document-text-outline"
-                  size={20}
-                  color={colors.primary}
-                />
-                <Text style={styles.buttonText}>Orders</Text>
-              </TouchableOpacity>
             </View>
             <TouchableOpacity
               style={styles.actionButton}
@@ -209,6 +211,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(136, 179, 212, 0.1)",
     flex: 1,
     marginHorizontal: 5,
+    gap: 7,
   },
   buttonText: {
     color: colors.primary,

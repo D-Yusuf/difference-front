@@ -40,57 +40,75 @@ const Home = () => {
     setBackgroundColor("white"); // Set color when component mounts
   }, []);
 
-  const filteredInventions = inventions?.filter((invention) => {
-    const matchesSearch = invention.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory ? invention.category === selectedCategory : true;
-    const matchesPhase = selectedPhase ? invention.phase === selectedPhase : true;
-    return matchesSearch && matchesCategory && matchesPhase;
-  }).sort((a, b) => {
-    if (sortBy === 'recent') {
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    } else if (sortBy === 'popular') {
-      return (b.likes?.length || 0) - (a.likes?.length || 0);
-    }
-    return 0;
-  });
-  
+  const filteredInventions = inventions
+    ?.filter((invention) => {
+      const matchesSearch = invention.name
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const matchesCategory = selectedCategory
+        ? invention.category === selectedCategory
+        : true;
+      const matchesPhase = selectedPhase
+        ? invention.phase === selectedPhase
+        : true;
+      return matchesSearch && matchesCategory && matchesPhase;
+    })
+    .sort((a, b) => {
+      if (sortBy === "recent") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      } else if (sortBy === "popular") {
+        return (b.likes?.length || 0) - (a.likes?.length || 0);
+      }
+      return 0;
+    });
 
   if (inventionsPending) {
     return <Text>Loading...</Text>;
   }
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-  style={{
-    backgroundColor: colors.primary,
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 10,
-    alignSelf: 'flex-end'
-  }}
-  onPress={() => setFilterModalVisible(true)}
->
-  <Text style={{ color: 'white' }}>Filter</Text>
-</TouchableOpacity>
-
-<FilterModal 
-    isVisible={filterModalVisible} 
-    onRequestClose={() => setFilterModalVisible(false)} 
-    categories={categories} 
-    selectedCategory={selectedCategory} 
-    setSelectedCategory={setSelectedCategory} 
-    selectedPhase={selectedPhase} 
-    setSelectedPhase={setSelectedPhase}
-    sortBy={sortBy}
-    setSortBy={setSortBy}
-  />
+    <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#ADD8E6" />
+
+      <FilterModal
+        isVisible={filterModalVisible}
+        onRequestClose={() => setFilterModalVisible(false)}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        selectedPhase={selectedPhase}
+        setSelectedPhase={setSelectedPhase}
+      />
 
       <View style={styles.innerContainer}>
         <View style={styles.headerSection}>
-          <Text style={styles.headerTitle}>Discover</Text>
-          <Text style={styles.headerSubtitle}>Find your next inspiration</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <View>
+              <Text style={styles.headerTitle}>Discover</Text>
+              <Text style={styles.headerSubtitle}>
+                Find your next inspiration
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={{
+                backgroundColor: colors.primary,
+                padding: 10,
+                borderRadius: 8,
+                marginBottom: 10,
+                alignSelf: "flex-end",
+              }}
+              onPress={() => setFilterModalVisible(true)}
+            >
+              <Icon name="filter-outline" size={24} color="white" />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.searchSection}>
@@ -142,7 +160,7 @@ const Home = () => {
           />
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -150,7 +168,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.page,
-    // marginTop: 40,
   },
 
   innerContainer: {
@@ -158,7 +175,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   headerSection: {
-    marginTop: 40,
+    // marginTop: 40,
     marginBottom: 20,
   },
   headerTitle: {

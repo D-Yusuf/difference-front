@@ -14,18 +14,17 @@ const InventionCard = ({
   showInvestButton = true,
   showEditButton = true,
 }) => {
-
   const queryClient = useQueryClient();
   const navigation = useNavigation();
-const {mutate:handleLike} = useMutation({
-  mutationKey: ['likeInvention'],
-  mutationFn: () => toggleLikeInvention(invention._id),
-  onSuccess: () => {
-    queryClient.invalidateQueries({ queryKey: ['inventions'] })
-    queryClient.invalidateQueries({ queryKey: ['invention', invention._id] })
-    // invalidateInventionQueries(queryClient)
-  }
-})
+  const { mutate: handleLike } = useMutation({
+    mutationKey: ["likeInvention"],
+    mutationFn: () => toggleLikeInvention(invention._id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventions"] });
+      queryClient.invalidateQueries({ queryKey: ["invention", invention._id] });
+      // invalidateInventionQueries(queryClient)
+    },
+  });
   if (!invention || !invention._id) {
     return null;
   }
@@ -33,33 +32,33 @@ const {mutate:handleLike} = useMutation({
     const now = new Date();
     const postDate = new Date(createdAt);
     const diffInSeconds = Math.floor((now - postDate) / 1000);
-  
+
     if (diffInSeconds < 60) {
       return `${diffInSeconds} seconds ago`;
     }
-  
+
     const diffInMinutes = Math.floor(diffInSeconds / 60);
     if (diffInMinutes < 60) {
-      return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+      return `${diffInMinutes} minute${diffInMinutes > 1 ? "s" : ""} ago`;
     }
-  
+
     const diffInHours = Math.floor(diffInMinutes / 60);
     if (diffInHours < 24) {
-      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+      return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
     }
-  
+
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 30) {
-      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+      return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
     }
-  
+
     const diffInMonths = Math.floor(diffInDays / 30);
     if (diffInMonths < 12) {
-      return `${diffInMonths} month${diffInMonths > 1 ? 's' : ''} ago`;
+      return `${diffInMonths} month${diffInMonths > 1 ? "s" : ""} ago`;
     }
-  
+
     const diffInYears = Math.floor(diffInDays / 365);
-    return `${diffInYears} year${diffInYears > 1 ? 's' : ''} ago`;
+    return `${diffInYears} year${diffInYears > 1 ? "s" : ""} ago`;
   };
   const imageUrl = invention.images?.[0]
     ? `${BASE_URL}${invention.images[0]}`.replace(/\\/g, "/")
@@ -95,15 +94,20 @@ const {mutate:handleLike} = useMutation({
           <Text style={[styles.cost, compact && styles.compactCost]}>
             {shortNumber(invention.cost)} KWD
           </Text>
-          <View style={[styles.icons, compact && styles.compactIcons]}>
-            <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
+          <View
+            style={[
+              styles.icons,
+              compact && styles.compactIcons,
+              { justifyContent: "space-between", alignItems: "center" },
+            ]}
+          >
+            <TouchableOpacity style={styles.likeButton}>
               <Icon name="heart" size={compact ? 16 : 24} color="#FF4D4D" />
-              <Text style={{ fontSize: 12, color: colors.primary }}>{shortNumber(invention.likes?.length || 0)}</Text>
+              <Text style={{ fontSize: 12, color: colors.primary }}>
+                {shortNumber(invention.likes?.length || 0)}
+              </Text>
+            </TouchableOpacity>
 
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.thumbsUpButton}>
-              <Icon name="thumbs-up" size={compact ? 16 : 24} color="#4D79FF" />
-            </TouchableOpacity>
             <Text>{getTimeAgo(invention.createdAt)}</Text>
           </View>
         </View>

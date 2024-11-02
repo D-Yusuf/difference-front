@@ -36,7 +36,7 @@ const Invention = ({ navigation }) => {
   const [selectedInventors, setSelectedInventors] = useState([]);
   const [inventorModalVisible, setInventorModalVisible] = useState(false);
   const [documents, setDocuments] = useState([]);
- 
+
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
@@ -65,8 +65,8 @@ const Invention = ({ navigation }) => {
   });
 
   useEffect(() => {
-      const category = categories?.find(c => c._id === selectedCategory);
-      setPhases(category?.phases);
+    const category = categories?.find((c) => c._id === selectedCategory);
+    setPhases(category?.phases);
   }, [selectedCategory, categories]);
 
   const handleImagePicker = async () => {
@@ -264,17 +264,18 @@ const Invention = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
 
-        {selectedCategory && <TouchableOpacity
-          style={styles.dropdownButton}
-          onPress={() => setPhaseModalVisible(true)}
-        >
-          <Text style={styles.dropdownButtonText}>
-            {selectedPhase
-              ? phases.find((p) => p === selectedPhase)
-              : "Select Phase"}
+        {selectedCategory && (
+          <TouchableOpacity
+            style={styles.dropdownButton}
+            onPress={() => setPhaseModalVisible(true)}
+          >
+            <Text style={styles.dropdownButtonText}>
+              {selectedPhase
+                ? phases.find((p) => p === selectedPhase)
+                : "Select Phase"}
             </Text>
           </TouchableOpacity>
-        }
+        )}
 
         <TouchableOpacity
           style={styles.uploadButton}
@@ -422,7 +423,7 @@ const styles = StyleSheet.create({
     height: 300,
     borderRadius: 150,
     backgroundColor: colors.secondary,
-    top: -50,
+    top: 170,
     right: -50,
     opacity: 0.2,
   },
@@ -432,7 +433,7 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 100,
     backgroundColor: colors.secondary,
-    top: 100,
+    top: 0,
     left: -100,
     opacity: 0.2,
   },
@@ -443,7 +444,7 @@ const styles = StyleSheet.create({
     borderRadius: 125,
     backgroundColor: colors.secondary,
     bottom: -50,
-    right: -50,
+    left: 20,
     opacity: 0.2,
   },
   scrollView: {
