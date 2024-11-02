@@ -134,7 +134,7 @@ const InventionCard = ({
                   gap: 4,
                 },
               ]}
-
+              onPress={handleLike}
             >
               <Icon name="heart" size={compact ? 16 : 24} color="#FF4D4D" />
               <Text style={{ fontSize: 12, color: colors.primary }}>
