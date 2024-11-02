@@ -101,7 +101,9 @@ const InventionCard = ({
               { justifyContent: "space-between", alignItems: "center" },
             ]}
           >
-            <TouchableOpacity style={styles.likeButton}>
+            <TouchableOpacity
+              style={[styles.likeButton, { flexDirection: "row", gap: 10 }]}
+            >
               <Icon name="heart" size={compact ? 16 : 24} color="#FF4D4D" />
               <Text style={{ fontSize: 12, color: colors.primary }}>
                 {shortNumber(invention.likes?.length || 0)}
