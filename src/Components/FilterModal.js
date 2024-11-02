@@ -2,7 +2,16 @@ import { View, Text, Modal, TouchableOpacity, ScrollView } from 'react-native'
 import React from 'react'
 import { colors } from '../../Colors'
 // made this component so styling can be easier :)
-const FilterModal = ({isVisible, onRequestClose, categories, selectedCategory, setSelectedCategory, selectedPhase, setSelectedPhase}) => {
+const FilterModal = ({ isVisible, 
+    onRequestClose, 
+    categories, 
+    selectedCategory, 
+    setSelectedCategory,
+    selectedPhase,
+    setSelectedPhase,
+    sortBy,
+    setSortBy
+}) => {
   return (
     <Modal
     animationType="slide"
@@ -17,6 +26,43 @@ const FilterModal = ({isVisible, onRequestClose, categories, selectedCategory, s
       borderRadius: 10,
       margin: 20,
     }}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 15 }}>Sort By</Text>
+        <View style={{ marginBottom: 20 }}>
+          <TouchableOpacity
+            style={{
+              padding: 10,
+              borderBottomWidth: 1,
+              borderBottomColor: '#eee',
+              backgroundColor: sortBy === null ? '#f0f0f0' : 'white'
+            }}
+            onPress={() => setSortBy(null)}
+          >
+            <Text>Default</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              padding: 10,
+              borderBottomWidth: 1,
+              borderBottomColor: '#eee',
+              backgroundColor: sortBy === 'recent' ? '#f0f0f0' : 'white'
+            }}
+            onPress={() => setSortBy('recent')}
+          >
+            <Text>Most Recent</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              padding: 10,
+              borderBottomWidth: 1,
+              borderBottomColor: '#eee',
+              backgroundColor: sortBy === 'popular' ? '#f0f0f0' : 'white'
+            }}
+            onPress={() => setSortBy('popular')}
+          >
+            <Text>Most Popular</Text>
+          </TouchableOpacity>
+        </View>
+
       <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 15 }}>Filter by Category</Text>
       
       <ScrollView style={{ maxHeight: 400 }}>

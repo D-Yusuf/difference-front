@@ -25,6 +25,7 @@ const Home = () => {
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedPhase, setSelectedPhase] = useState(null);
+  const [sortBy, setSortBy] = useState(null);
   const { data: inventions, isPending: inventionsPending } = useQuery({
     queryKey: ["inventions"],
     queryFn: getAllInventions,
@@ -39,13 +40,20 @@ const Home = () => {
     setBackgroundColor("white"); // Set color when component mounts
   }, []);
 
-  // Filter inventions based on the search term
   const filteredInventions = inventions?.filter((invention) => {
     const matchesSearch = invention.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory ? invention.category === selectedCategory : true;
     const matchesPhase = selectedPhase ? invention.phase === selectedPhase : true;
     return matchesSearch && matchesCategory && matchesPhase;
+  }).sort((a, b) => {
+    if (sortBy === 'recent') {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    } else if (sortBy === 'popular') {
+      return (b.likes?.length || 0) - (a.likes?.length || 0);
+    }
+    return 0;
   });
+  
 
   if (inventionsPending) {
     return <Text>Loading...</Text>;
@@ -66,7 +74,17 @@ const Home = () => {
   <Text style={{ color: 'white' }}>Filter</Text>
 </TouchableOpacity>
 
-<FilterModal isVisible={filterModalVisible} onRequestClose={() => setFilterModalVisible(false)} categories={categories} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} selectedPhase={selectedPhase} setSelectedPhase={setSelectedPhase}/>
+<FilterModal 
+    isVisible={filterModalVisible} 
+    onRequestClose={() => setFilterModalVisible(false)} 
+    categories={categories} 
+    selectedCategory={selectedCategory} 
+    setSelectedCategory={setSelectedCategory} 
+    selectedPhase={selectedPhase} 
+    setSelectedPhase={setSelectedPhase}
+    sortBy={sortBy}
+    setSortBy={setSortBy}
+  />
       <StatusBar barStyle="dark-content" backgroundColor="#ADD8E6" />
 
       <View style={styles.innerContainer}>
