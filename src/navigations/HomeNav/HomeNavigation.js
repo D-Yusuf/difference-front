@@ -10,14 +10,26 @@ import InvestDetails from "../../screens/Invest/InvestDetails";
 const Stack = createNativeStackNavigator();
 const HomeNavigation = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name={NAVIGATION.HOME.HOME} component={Home} />
-        <Stack.Screen
-          name={NAVIGATION.INVENTION.INVENTION_DETAILS}
-          component={InventionDetails}
-        />
-        <Stack.Screen
+    <Stack.Navigator>
+      <Stack.Screen
+        name={NAVIGATION.HOME.HOME}
+        component={Home}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={NAVIGATION.INVENTION.INVENTION_DETAILS}
+        options={{
+          headerTitle: "Invention",
+        }}
+        component={InventionDetails}
+      />
+      <Stack.Screen
         name={NAVIGATION.HOME.INVEST_DETAILS}
+        options={{
+          headerTitle: "Invest",
+        }}
         component={InvestDetails}
       />
     </Stack.Navigator>
