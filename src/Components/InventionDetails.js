@@ -6,10 +6,10 @@ import {
   ScrollView,
   SafeAreaView,
   Linking,
-
+  Platform,
+  Dimensions,
 } from "react-native";
 import React, { useEffect, useState, useContext, useRef } from "react";
-
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getInvention, toggleLikeInvention } from "../api/invention";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -22,6 +22,7 @@ import { getCategory } from "../api/category"; // You'll need to create this API
 import { colors } from "../../Colors";
 
 import Icon from "react-native-vector-icons/FontAwesome";
+import Carousel from "react-native-reanimated-carousel";
 
 const PHASES = ["idea", "work-in-progress", "prototype", "market-ready"];
 
@@ -42,17 +43,19 @@ const getPhaseProgress = (currentPhase) => {
 
 const InventionDetails = ({ route }) => {
   const navigation = useNavigation();
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const [user, setUser] = useContext(UserContext);
 
   const { inventionId, image, showInvestButton, showEditButton } = route.params;
   const [isLiked, setIsLiked] = useState(false);
   const [remainingFunds, setRemainingFunds] = useState(0);
- const {mutate: toggleLike} = useMutation({
-  mutationFn: () => toggleLikeInvention(inventionId),
-  onSuccess: () => {
-    queryClient.invalidateQueries(["invention", inventionId]);
-  },
- });
+  const { mutate: toggleLike } = useMutation({
+    mutationFn: () => toggleLikeInvention(inventionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["invention", inventionId]);
+    },
+  });
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention", inventionId],
 
@@ -63,9 +66,6 @@ const InventionDetails = ({ route }) => {
     setIsLiked(invention?.likes.includes(user._id));
     setRemainingFunds(getRemainingFunds());
   }, [invention]);
-
-
-
 
   // Handle document press
   const handleDocumentPress = (document) => {
@@ -91,8 +91,6 @@ const InventionDetails = ({ route }) => {
     return <Text>No invention data available</Text>;
   }
 
-
-
   // We will check if the user is the inventor or admin appear the edit button for him.
   const isOwner =
     invention.inventors.find((inventor) => inventor._id === user._id) ||
@@ -108,21 +106,61 @@ const InventionDetails = ({ route }) => {
   };
   function getRemainingFunds() {
     if (!invention) return 0;
-    
+
     const funds = invention.cost || 0;
     const fullfilled = invention.orders
       ? invention.orders
-          .filter(order => order.status === "approved")
+          .filter((order) => order.status === "approved")
           .reduce((total, order) => total + order.amount, 0)
       : 0;
-    
+
     return funds - fullfilled;
   }
 
+  const width = Dimensions.get("window").width;
+  console.log("IMAGES", invention?.images);
+  const FAKEIMAGES = [
+    "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
+    "https://img.freepik.com/premium-photo/chameleon-with-red-spot-its-head_924629-217761.jpg",
+    "https://img.freepik.com/premium-photo/frog-with-symbol-its-face-is-rope_956363-21877.jpg?semt=ais_hybrid",
+  ];
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.contentContainer}>
-        <Image source={{ uri: image }} style={styles.image} />
+      <ScrollView
+        style={styles.contentContainer}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <View style={{ width: width }}>
+          <Carousel
+            width={width}
+            height={300}
+            autoPlay={false}
+            data={FAKEIMAGES}
+            scrollAnimationDuration={1000}
+            renderItem={({ item }) => (
+              <Image
+                source={{ uri: item }}
+                style={styles.carouselImage}
+                resizeMode="cover"
+              />
+            )}
+            onSnapToItem={(index) => setActiveIndex(index)}
+          />
+          <View style={styles.paginationContainer}>
+            {FAKEIMAGES.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.paginationDot,
+                  {
+                    opacity: index === activeIndex ? 1 : 0.4,
+                    transform: [{ scale: index === activeIndex ? 1 : 0.6 }],
+                  },
+                ]}
+              />
+            ))}
+          </View>
+        </View>
         <Text style={styles.title}>{invention?.name}</Text>
 
         <View style={styles.metaContainer}>
@@ -207,23 +245,25 @@ const InventionDetails = ({ route }) => {
         <View style={styles.actionButtonsContainer}>
           {!isOwner && (
             <TouchableOpacity
-              style={[styles.actionButton, isLiked && styles.actionButtonActive]}
-            onPress={() => {toggleLike(); setIsLiked(!isLiked)}}
-          >
-            <Text
               style={[
-                styles.actionButtonText,
-                isLiked && styles.actionButtonTextActive,
+                styles.actionButton,
+                isLiked && styles.actionButtonActive,
               ]}
+              onPress={() => {
+                toggleLike();
+                setIsLiked(!isLiked);
+              }}
             >
-              {isLiked ? "Liked" : "Like"}
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.actionButtonText,
+                  isLiked && styles.actionButtonTextActive,
+                ]}
+              >
+                {isLiked ? "Liked" : "Like"}
+              </Text>
+            </TouchableOpacity>
           )}
-
-
-        
-
         </View>
 
         {isOwner && (
@@ -242,12 +282,17 @@ const InventionDetails = ({ route }) => {
         {canInvest && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
-            onPress={() => navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {invention, remainingFunds})}
+            onPress={() =>
+              navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {
+                invention,
+                remainingFunds,
+              })
+            }
           >
             <Text style={styles.buttonText}>Invest</Text>
           </TouchableOpacity>
         )}
-    </ScrollView>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -258,17 +303,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.page,
+    paddingTop: Platform.OS === "android" ? 25 : 0,
   },
   contentContainer: {
-    padding: 16,
-    paddingBottom: 30, // Added extra padding at bottom for better scroll experience
+    flex: 1,
   },
-  image: {
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 30,
+  },
+  carouselImage: {
     width: "100%",
-    height: 300, // Made image taller
+    height: "100%",
     borderRadius: 16,
-    marginBottom: 20,
-    shadowColor: "#000", // Added shadow to image
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -323,14 +371,14 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start", // Makes the container fit the content
   },
   button: {
-    backgroundColor: "#2563eb", // Matching blue
+    backgroundColor: "#2563eb",
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 24,
     marginBottom: 25,
-    shadowColor: "#000", // Added shadow to button
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -346,8 +394,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   investButton: {
-    backgroundColor: "#16a34a", // Green color for invest button
-    marginTop: 12, // Smaller margin since it follows another button
+    backgroundColor: "#16a34a",
+    marginTop: 12,
   },
   actionButtonsContainer: {
     flexDirection: "row",
@@ -443,7 +491,20 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   phaseDotActive: {
-    backgroundColor: "#2563eb", // Make sure this color is visibly different
+    backgroundColor: "#2563eb",
+  },
+  paginationContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+    backgroundColor: colors.primary,
   },
   documentsContainer: {
     marginBottom: 20,
