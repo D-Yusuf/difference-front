@@ -6,15 +6,25 @@ import NAVIGATION from "../navigations";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { colors } from "../../Colors";
 import shortNumber from "../utils/shortNum";
-
+import { toggleLikeInvention } from "../api/invention";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 const InventionCard = ({
   invention,
   compact,
   showInvestButton = true,
   showEditButton = true,
 }) => {
+  const queryClient = useQueryClient();
   const navigation = useNavigation();
-
+  const { mutate: handleLike } = useMutation({
+    mutationKey: ["likeInvention"],
+    mutationFn: () => toggleLikeInvention(invention._id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventions"] });
+      queryClient.invalidateQueries({ queryKey: ["invention", invention._id] });
+      // invalidateInventionQueries(queryClient)
+    },
+  });
   if (!invention || !invention._id) {
     return null;
   }
@@ -93,6 +103,9 @@ const InventionCard = ({
           >
             <TouchableOpacity style={styles.likeButton}>
               <Icon name="heart" size={compact ? 16 : 24} color="#FF4D4D" />
+              <Text style={{ fontSize: 12, color: colors.primary }}>
+                {shortNumber(invention.likes?.length || 0)}
+              </Text>
             </TouchableOpacity>
 
             <Text>{getTimeAgo(invention.createdAt)}</Text>
