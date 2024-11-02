@@ -5,14 +5,14 @@ import {
   Image,
   ScrollView,
   SafeAreaView,
+  Linking,
   Platform,
+  Dimensions,
 } from "react-native";
-import React, { useEffect, useState, useContext } from "react";
-import Carousel from "react-native-reanimated-carousel";
-import { Dimensions } from "react-native";
+import React, { useEffect, useState, useContext, useRef } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { getInvention } from "../api/invention";
-import { useQuery } from "@tanstack/react-query";
+import { getInvention, toggleLikeInvention } from "../api/invention";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
 import { getProfile } from "../api/profile"; // Import the getProfile function
 import UserContext from "../context/UserContext";
@@ -20,6 +20,10 @@ import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
 import { getCategory } from "../api/category"; // You'll need to create this API function
 import { colors } from "../../Colors";
+
+import Icon from "react-native-vector-icons/FontAwesome";
+import Carousel from "react-native-reanimated-carousel";
+
 const PHASES = ["idea", "work-in-progress", "prototype", "market-ready"];
 
 const normalizePhase = (phase) => {
@@ -42,28 +46,33 @@ const InventionDetails = ({ route }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const [user, setUser] = useContext(UserContext);
+
   const { inventionId, image, showInvestButton, showEditButton } = route.params;
-
   const [isLiked, setIsLiked] = useState(false);
-  console.log("Image URI:", image); // Add this to debug
-
-  console.log("Received inventionId:", inventionId);
-
+  const [remainingFunds, setRemainingFunds] = useState(0);
+  const { mutate: toggleLike } = useMutation({
+    mutationFn: () => toggleLikeInvention(inventionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["invention", inventionId]);
+    },
+  });
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention", inventionId],
 
     queryFn: () => getInvention(inventionId),
   });
-  const formatPhase = (phase) => {
-    return phase
-      .split("-")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+
+  useEffect(() => {
+    setIsLiked(invention?.likes.includes(user._id));
+    setRemainingFunds(getRemainingFunds());
+  }, [invention]);
+
+  // Handle document press
+  const handleDocumentPress = (document) => {
+    console.log("Document pressed:", document);
+    console.log("Document URL:", BASE_URL + document);
+    Linking.openURL(BASE_URL + document);
   };
-  console.log("Invention ID:", inventionId);
-  console.log("Invention pending:", inventionPending);
-  console.log("Raw invention data:", invention);
-  console.log("Current phase:", invention?.phase);
 
   const { data: category, isPending: categoryPending } = useQuery({
     queryKey: ["category", invention?.category],
@@ -82,19 +91,31 @@ const InventionDetails = ({ route }) => {
     return <Text>No invention data available</Text>;
   }
 
-  console.log("Rendering with invention:", {
-    id: invention._id,
-    name: invention.name,
-    phase: invention.phase,
-  });
-
   // We will check if the user is the inventor or admin appear the edit button for him.
   const isOwner =
     invention.inventors.find((inventor) => inventor._id === user._id) ||
     user.role === "admin";
+  const canInvest = user.role === "investor" || user.role === "admin";
 
   // Update the phase display to look nicer (capitalize first letter)
-  const canInvest = user.role === "investor" || user.role === "admin";
+  const formatPhase = (phase) => {
+    return phase
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+  function getRemainingFunds() {
+    if (!invention) return 0;
+
+    const funds = invention.cost || 0;
+    const fullfilled = invention.orders
+      ? invention.orders
+          .filter((order) => order.status === "approved")
+          .reduce((total, order) => total + order.amount, 0)
+      : 0;
+
+    return funds - fullfilled;
+  }
 
   const width = Dimensions.get("window").width;
   console.log("IMAGES", invention?.images);
@@ -186,11 +207,8 @@ const InventionDetails = ({ route }) => {
                 style={styles.inventorRow}
                 onPress={() => {
                   console.log("Navigating to profile with ID:", inventor._id); // Debug log
-                  navigation.navigate(NAVIGATION.PROFILE.INDEX, {
-                    screen: NAVIGATION.PROFILE.USER_PROFILE,
-                    params: {
-                      userId: inventor._id,
-                    },
+                  navigation.navigate(NAVIGATION.PROFILE.USER_PROFILE, {
+                    userId: inventor._id,
                   });
                 }}
               >
@@ -205,26 +223,50 @@ const InventionDetails = ({ route }) => {
             );
           })}
         </View>
+
+        {invention?.documents && invention.documents.length > 0 && (
+          <View style={styles.documentsContainer}>
+            <Text style={styles.sectionTitle}>Documents</Text>
+            {invention.documents.map((doc, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.documentItem}
+                onPress={() => handleDocumentPress(doc)}
+              >
+                <Text style={styles.documentName}>{doc.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
         <Text style={styles.description}>{invention?.description}</Text>
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
-
+        <Text style={styles.cost}>Remaining Funds: {remainingFunds} KWD</Text>
         <View style={styles.actionButtonsContainer}>
-          <TouchableOpacity
-            style={[styles.actionButton, isLiked && styles.actionButtonActive]}
-            onPress={() => setIsLiked(!isLiked)}
-          >
-            <Text
+          {!isOwner && (
+            <TouchableOpacity
               style={[
-                styles.actionButtonText,
-                isLiked && styles.actionButtonTextActive,
+                styles.actionButton,
+                isLiked && styles.actionButtonActive,
               ]}
+              onPress={() => {
+                toggleLike();
+                setIsLiked(!isLiked);
+              }}
             >
-              {isLiked ? "Liked" : "Like"}
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.actionButtonText,
+                  isLiked && styles.actionButtonTextActive,
+                ]}
+              >
+                {isLiked ? "Liked" : "Like"}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        {showEditButton && isOwner && (
+        {isOwner && (
           <TouchableOpacity
             style={styles.button}
             onPress={() =>
@@ -237,11 +279,14 @@ const InventionDetails = ({ route }) => {
           </TouchableOpacity>
         )}
 
-        {showInvestButton && canInvest && (
+        {canInvest && (
           <TouchableOpacity
             style={[styles.button, styles.investButton]}
             onPress={() =>
-              navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, { invention })
+              navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {
+                invention,
+                remainingFunds,
+              })
             }
           >
             <Text style={styles.buttonText}>Invest</Text>
@@ -460,5 +505,30 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginHorizontal: 4,
     backgroundColor: colors.primary,
+  },
+  documentsContainer: {
+    marginBottom: 20,
+    backgroundColor: "#f8f9fa",
+    padding: 12,
+    borderRadius: 12,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#1a1a1a",
+    marginBottom: 12,
+  },
+  documentItem: {
+    backgroundColor: "#ffffff",
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  documentName: {
+    fontSize: 16,
+    color: "#2563eb",
+    fontWeight: "500",
   },
 });

@@ -40,7 +40,7 @@ const Profile = ({ navigation }) => {
   if (profileLoading) {
     return <Text>Loading...</Text>;
   }
-
+  console.log(`${BASE_URL}${profile.cv}`);
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container}>
@@ -68,26 +68,53 @@ const Profile = ({ navigation }) => {
           <Text style={styles.roleText}>{profile?.role}</Text>
           <Text style={styles.bio}>{profile?.bio}</Text>
 
-          <View style={styles.buttonContainer}>
-            {user.role === "inventor" && (
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={() =>
-                  navigation.navigate(NAVIGATION.PROFILE.ORDERS, {
-                    inventions: profile?.inventions.map(
-                      (invention) => invention._id
-                    ),
-                  })
-                }
-              >
-                <Icon
-                  name="document-text-outline"
-                  size={20}
-                  color={colors.primary}
-                />
-                <Text style={styles.buttonText}>Orders</Text>
-              </TouchableOpacity>
-            )}
+          <View
+            style={[
+              styles.buttonContainer,
+              {
+                flexWrap: "wrap",
+                justifyContent: "center",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 10,
+              },
+            ]}
+          >
+            {user.role === "inventor" ||
+              (user.role === "admin" && (
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() =>
+                    navigation.navigate(NAVIGATION.PROFILE.ORDERS, {
+                      inventions: profile?.inventions.map(
+                        (invention) => invention._id
+                      ),
+                    })
+                  }
+                >
+                  <Icon
+                    name="document-text-outline"
+                    size={20}
+                    color="#003863"
+                  />
+                  <Text style={styles.buttonText}>Orders</Text>
+                </TouchableOpacity>
+              ))}
+            <View style={styles.buttonContainer}>
+              {profile?.cv && (
+                <TouchableOpacity
+                  style={[styles.actionButton, styles.cvButton]}
+                  onPress={() => Linking.openURL(BASE_URL + profile.cv)}
+                >
+                  <Icon
+                    name="document-text-outline"
+                    size={20}
+                    color={colors.primary}
+                  />
+                  <Text style={styles.buttonText}>View CV</Text>
+                </TouchableOpacity>
+              )}
+            </View>
             <TouchableOpacity
               style={styles.actionButton}
               onPress={() => navigation.navigate("AddInvention")}
@@ -184,6 +211,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(136, 179, 212, 0.1)",
     flex: 1,
     marginHorizontal: 5,
+    gap: 7,
   },
   buttonText: {
     color: colors.primary,

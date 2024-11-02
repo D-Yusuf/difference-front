@@ -12,12 +12,16 @@ import { createOrder } from "../../api/orders";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { colors } from "../../../Colors";
 import { invalidateOrderQueries } from "../../api";
+
 const InvestDetails = ({ route, navigation }) => {
   const queryClient = useQueryClient();
-
-  const { invention } = route.params;
+  const { invention, remainingFunds } = route.params;
   const [percentage, setPercentage] = useState("");
   const [amount, setAmount] = useState(0);
+
+  // Calculate remaining percentage
+  const remainingPercentage = Math.floor((remainingFunds / invention.cost) * 100);
+
   const { mutate } = useMutation({
     mutationKey: ["create-order"],
     mutationFn: () => createOrder(invention._id, amount, Number(percentage)),
@@ -30,6 +34,7 @@ const InvestDetails = ({ route, navigation }) => {
       alert("Error", "Failed to create investment order. Please try again.");
     },
   });
+
   useEffect(() => {
     calculateAmount();
   }, [percentage]);
@@ -39,16 +44,20 @@ const InvestDetails = ({ route, navigation }) => {
     if (!isNaN(parsedPercentage) && parsedPercentage > 0) {
       const calculatedAmount = (parsedPercentage / 100) * invention.cost;
       setAmount(calculatedAmount.toFixed(2));
-      // will do later that the number turned to fixed will be accurate to percentage
     } else {
       setAmount(0);
     }
   };
 
   const handlePercentageChange = (text) => {
-    // Allow only numbers with up to one decimal place
-    const regex = /^\d*\.?\d{0,1}$/;
-    if (regex.test(text) && Number(text) <= 100) {
+    // Allow only whole numbers
+    const regex = /^\d*$/;
+    const numValue = parseInt(text);
+    
+    if (
+      regex.test(text) && // Must be whole number
+      (!numValue || (numValue > 0 && numValue <= remainingPercentage)) // Must be within remaining percentage
+    ) {
       setPercentage(text);
     }
   };
@@ -61,8 +70,11 @@ const InvestDetails = ({ route, navigation }) => {
     <ScrollView style={{ flex: 1 }}>
       <View style={styles.container}>
         <Text style={styles.title}>{invention.name}</Text>
-        {/* <Text style={styles.description}>{invention.description}</Text> */}
         <Text style={styles.cost}>Cost: ${invention.cost}</Text>
+        <Text style={styles.remainingFunds}>Remaining Funds: ${remainingFunds}</Text>
+        <Text style={styles.remainingPercentage}>
+          Remaining Percentage: {remainingPercentage}%
+        </Text>
 
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Investment %:</Text>
@@ -71,7 +83,7 @@ const InvestDetails = ({ route, navigation }) => {
             value={percentage}
             onChangeText={handlePercentageChange}
             keyboardType="numeric"
-            placeholder="Enter percentage (e.g., 1.5)"
+            placeholder={`Enter percentage (max ${remainingPercentage}%)`}
             placeholderTextColor="white"
           />
         </View>
@@ -116,6 +128,18 @@ const styles = StyleSheet.create({
   cost: {
     fontSize: 24,
     fontWeight: "700",
+    color: "#ffffff",
+    marginBottom: 30,
+  },
+  remainingFunds: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#ffffff",
+    marginBottom: 10,
+  },
+  remainingPercentage: {
+    fontSize: 20,
+    fontWeight: "600",
     color: "#ffffff",
     marginBottom: 30,
   },
