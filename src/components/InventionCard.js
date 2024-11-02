@@ -22,7 +22,7 @@ const InventionCard = ({
   const navigation = useNavigation();
   const [activeIndex, setActiveIndex] = useState(0);
   const width = Dimensions.get("window").width - 16; // Account for margins
-
+  const [isLiked, setIsLiked] = useState(false);
   const { mutate: handleLike } = useMutation({
     mutationKey: ["likeInvention"],
     mutationFn: () => toggleLikeInvention(invention._id),
@@ -32,6 +32,9 @@ const InventionCard = ({
       // invalidateInventionQueries(queryClient)
     },
   });
+  useEffect(() => {
+      setIsLiked(invention?.likes.includes(user._id));
+    }, [invention]);
   if (!invention || !invention._id) {
     return null;
   }
@@ -136,7 +139,7 @@ const InventionCard = ({
               ]}
               onPress={handleLike}
             >
-              <Icon name="heart" size={compact ? 16 : 24} color="#FF4D4D" />
+              <Icon name={isLiked ? "heart" : "heart-o"} size={compact ? 16 : 24} color="#FF4D4D" />
               <Text style={{ fontSize: 12, color: colors.primary }}>
                 {shortNumber(invention.likes?.length || 0)}
               </Text>
