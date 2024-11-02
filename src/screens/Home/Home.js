@@ -17,6 +17,8 @@ import { getAllInventions } from "../../api/invention";
 import InventionList from "../../components/InventionList";
 import { ThemeContext } from "../../context/ThemeContext";
 import { colors } from "../../../Colors";
+import UserContext from "../../context/UserContext";
+
 import { getCategories } from "../../api/categories";
 import FilterModal from "../../components/FilterModal";
 const Home = () => {
@@ -35,9 +37,10 @@ const Home = () => {
     queryFn: getCategories,
   });
   const { setBackgroundColor } = useContext(ThemeContext);
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
-    setBackgroundColor("white"); // Set color when component mounts
+    setBackgroundColor("white");
   }, []);
 
   const filteredInventions = inventions
@@ -81,90 +84,92 @@ const Home = () => {
       />
 
       <View style={styles.innerContainer}>
-        <View style={styles.headerSection}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <View>
-              <Text style={styles.headerTitle}>Discover</Text>
-              <Text style={styles.headerSubtitle}>
-                Find your next inspiration
-              </Text>
-            </View>
-
-            <TouchableOpacity
-              style={{
-                backgroundColor: colors.primary,
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 10,
-                alignSelf: "flex-end",
-              }}
-              onPress={() => setFilterModalVisible(true)}
-            >
-              <Icon name="filter-outline" size={24} color="white" />
-            </TouchableOpacity>
+        <ScrollView style={styles.scrollView} stickyHeaderIndices={[1]}>
+          <View style={styles.headerSection}>
+            <Text style={styles.headerTitle}>
+              Hello, {user?.firstName || "there"}
+            </Text>
+            <Text style={styles.headerSubtitle}>
+              Find your next inspiration
+            </Text>
           </View>
-        </View>
 
-        <View style={styles.searchSection}>
-          <View style={styles.searchContainer}>
-            <Icon name="search-outline" size={24} color={colors.primary} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="What invention inspires you?"
-              value={searchTerm}
-              onChangeText={setSearchTerm}
-              placeholderTextColor={colors.primary}
+          <View style={styles.stickySection}>
+            <View style={styles.searchSection}>
+              <View style={styles.searchContainer}>
+                <Icon name="search-outline" size={24} color={colors.primary} />
+                <TextInput
+                  style={styles.searchInput}
+                  placeholder="What invention inspires you?"
+                  value={searchTerm}
+                  onChangeText={setSearchTerm}
+                  placeholderTextColor={colors.primary}
+                />
+              </View>
+
+              <View style={styles.gridControls}>
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  <TouchableOpacity
+                    style={[
+                      styles.gridButton,
+                      gridColumns === 2 && styles.activeGridButton,
+                    ]}
+                    onPress={() => setGridColumns(2)}
+                  >
+                    <Icon
+                      name="grid"
+                      size={24}
+                      color={gridColumns === 2 ? "#88B3D4" : "#fff"}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.gridButton,
+                      gridColumns === 1 && styles.activeGridButton,
+                    ]}
+                    onPress={() => setGridColumns(1)}
+                  >
+                    <Icon
+                      name="reorder-four"
+                      size={24}
+                      color={gridColumns === 1 ? "#88B3D4" : "#fff"}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity
+                  style={{
+                    backgroundColor: colors.primary,
+                    padding: 10,
+                    borderRadius: 8,
+                    marginBottom: 10,
+                    alignSelf: "flex-end",
+                  }}
+                  onPress={() => setFilterModalVisible(true)}
+                >
+                  <Icon name="filter-outline" size={24} color="white" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.listContainer}>
+            <InventionList
+              inventions={filteredInventions}
+              numColumns={gridColumns}
             />
           </View>
-
-          <View style={styles.gridControls}>
-            <TouchableOpacity
-              style={[
-                styles.gridButton,
-                gridColumns === 1 && styles.activeGridButton,
-              ]}
-              onPress={() => setGridColumns(1)}
-            >
-              <Icon
-                name="reorder-four"
-                size={24}
-                color={gridColumns === 1 ? "#88B3D4" : "#fff"}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.gridButton,
-                gridColumns === 2 && styles.activeGridButton,
-              ]}
-              onPress={() => setGridColumns(2)}
-            >
-              <Icon
-                name="grid"
-                size={24}
-                color={gridColumns === 2 ? "#88B3D4" : "#fff"}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.listContainer}>
-          <InventionList
-            inventions={filteredInventions}
-            numColumns={gridColumns}
-          />
-        </View>
+        </ScrollView>
       </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.page,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.page,
@@ -172,14 +177,14 @@ const styles = StyleSheet.create({
 
   innerContainer: {
     flex: 1,
-    marginHorizontal: 20,
   },
   headerSection: {
     // marginTop: 40,
-    marginBottom: 20,
+    marginBottom: 10,
+    paddingHorizontal: 20,
   },
   headerTitle: {
-    fontSize: 48,
+    fontSize: 32,
     fontWeight: "800",
     color: colors.primary,
     letterSpacing: 0.5,
@@ -210,7 +215,7 @@ const styles = StyleSheet.create({
   gridControls: {
     flexDirection: "row",
     gap: 15,
-    alignSelf: "flex-end",
+    justifyContent: "space-between",
   },
   gridButton: {
     backgroundColor: colors.primary,
@@ -232,6 +237,15 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+
+  stickySection: {
+    backgroundColor: colors.page,
+    paddingHorizontal: 20,
+    zIndex: 1,
   },
 });
 
