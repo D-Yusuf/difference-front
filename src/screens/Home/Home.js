@@ -65,7 +65,6 @@ const Home = () => {
   if (inventionsPending) {
     return <Text>Loading...</Text>;
   }
-
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#ADD8E6" />

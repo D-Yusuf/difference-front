@@ -33,31 +33,8 @@ export const updateProfile = async (userInfo) => {
         });
       } else if (key === "cv") {
         console.log(`
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
           ${userInfo.cv.uri}
-          ${userInfo.cv.mimeType}
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          `);
+          ${userInfo.cv.mimeType}`);
 
         formData.append("cv", {
           uri: userInfo.cv.uri,
