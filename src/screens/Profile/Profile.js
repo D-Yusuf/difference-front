@@ -37,7 +37,7 @@ const Profile = ({ navigation }) => {
     setUser(false);
   };
 
-  if (profileLoading) {
+  if (profileLoading || allOrdersLoading) {
     return <Text>Loading...</Text>;
   }
   console.log(`${BASE_URL}${profile.cv}`);
@@ -80,26 +80,21 @@ const Profile = ({ navigation }) => {
               },
             ]}
           >
-            {user.role === "inventor" ||
-              (user.role === "admin" && (
-                <TouchableOpacity
-                  style={styles.actionButton}
-                  onPress={() =>
-                    navigation.navigate(NAVIGATION.PROFILE.ORDERS, {
-                      inventions: profile?.inventions.map(
-                        (invention) => invention._id
-                      ),
-                    })
-                  }
-                >
-                  <Icon
-                    name="document-text-outline"
-                    size={20}
-                    color="#003863"
-                  />
-                  <Text style={styles.buttonText}>Orders</Text>
-                </TouchableOpacity>
-              ))}
+            {(user.role === "inventor" || user.role === "admin") && (
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() =>
+                  navigation.navigate(NAVIGATION.PROFILE.ORDERS, {
+                    inventions: profile?.inventions.map(
+                      (invention) => invention._id
+                    ),
+                  })
+                }
+              >
+                <Icon name="document-text-outline" size={20} color="#003863" />
+                <Text style={styles.buttonText}>Orders</Text>
+              </TouchableOpacity>
+            )}
             <View style={styles.buttonContainer}>
               {profile?.cv && (
                 <TouchableOpacity
@@ -143,20 +138,19 @@ const Profile = ({ navigation }) => {
             <View style={styles.investorHeader}>
               <Text style={styles.ordersTitle}>Number of Orders:</Text>
               <Text style={styles.ordersTitle}>
-                {
-                  allOrders?.filter(
-                    (order) => order?.investor?._id === profile?._id
-                  ).length
-                }
-                {""}
+                {allOrders?.filter(
+                  (order) => order?.investor?._id === profile?._id
+                ).length || 0}
               </Text>
             </View>
-            <OrderList
-              orders={allOrders?.filter(
-                (order) => order?.investor?._id === profile?._id
-              )}
-              own={true}
-            />
+            {allOrders && (
+              <OrderList
+                orders={allOrders.filter(
+                  (order) => order?.investor?._id === profile?._id
+                )}
+                own={true}
+              />
+            )}
           </View>
         )}
       </ScrollView>

@@ -10,6 +10,7 @@ import InventionDetails from "../../components/InventionDetails";
 import EditInvention from "../../screens/EditInvention";
 import { colors } from "../../../Colors";
 import OrderList from "../../components/OrderList";
+import Orders from "../../screens/Profile/Orders";
 
 const Stack = createNativeStackNavigator();
 
@@ -61,7 +62,7 @@ const ProfileNavigation = () => {
       />
       <Stack.Screen
         name={NAVIGATION.PROFILE.ORDERS}
-        component={OrderList}
+        component={Orders}
         options={{
           headerTitle: "Orders",
           headerShadowVisible: false,
