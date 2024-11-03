@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -176,7 +176,11 @@ const Home = () => {
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [sortBy, setSortBy] = useState(null);
 
-  const { data: inventions, isPending: inventionsPending } = useQuery({
+  const {
+    data: inventions,
+    isPending: inventionsPending,
+    refetch,
+  } = useQuery({
     queryKey: ["inventions"],
     queryFn: getAllInventions,
   });
@@ -192,6 +196,10 @@ const Home = () => {
   useEffect(() => {
     setBackgroundColor("white");
   }, []);
+
+  useLayoutEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const filteredInventions = inventions
     ?.filter((invention) => {
