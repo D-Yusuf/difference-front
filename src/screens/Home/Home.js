@@ -216,7 +216,6 @@ const Home = () => {
   if (inventionsPending) {
     return <LoadingView />;
   }
-
   return (
     <SafeAreaView style={styles.container}>
       {/* Add decorative elements */}

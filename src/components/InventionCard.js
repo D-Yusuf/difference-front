@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  useEffect,
+} from "react-native";
 import { BASE_URL } from "../api/index";
 import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigations";
@@ -25,6 +32,7 @@ const InventionCard = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const width = Dimensions.get("window").width - 16; // Account for margins
   const { user } = useContext(UserContext);
+  const [isLiked, setIsLiked] = useState(false);
   const { mutate: handleLike } = useMutation({
     mutationKey: ["likeInvention"],
     mutationFn: () => toggleLikeInvention(invention._id),
