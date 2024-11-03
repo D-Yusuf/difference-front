@@ -648,7 +648,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   doneButton: {
-    backgroundColor: "#34A853",
+    backgroundColor: colors.secondary,
     padding: 12,
     borderRadius: 8,
     marginTop: 15,
