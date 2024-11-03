@@ -29,6 +29,11 @@ const NAVIGATION = {
     CREATE_INVENTION: "CreateInvention",
     EDIT_INVENTION: "EditInvention",
   },
+  CHAT: {
+    INDEX: "Chat",
+    CHAT_LIST: "ChatList",
+    CHAT_ROOM: "ChatRoom",
+  },
 };
 
 export default NAVIGATION;

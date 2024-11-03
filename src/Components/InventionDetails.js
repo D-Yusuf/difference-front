@@ -9,7 +9,9 @@ import {
   Platform,
   Dimensions,
 } from "react-native";
+
 import React, { useEffect, useState, useContext, useRef } from "react";
+
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getInvention, toggleLikeInvention } from "../api/invention";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -19,8 +21,7 @@ import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
 import { getCategory } from "../api/category";
 import { colors } from "../../Colors";
-
-import Icon from "react-native-vector-icons/FontAwesome";
+import Icon from "react-native-vector-icons/Ionicons";
 import Carousel from "react-native-reanimated-carousel";
 import Animated, {
   useAnimatedStyle,
@@ -310,14 +311,11 @@ const InventionDetails = ({ route }) => {
         </View>
 
         <View style={styles.inventorContainer}>
-          {invention?.inventors?.map((inventor) => {
-            console.log("Inventor ID:", inventor._id); // Debug log
-            return (
+          {invention?.inventors?.map((inventor) => (
+            <View key={inventor._id} style={styles.inventorRow}>
               <TouchableOpacity
-                key={inventor._id}
-                style={styles.inventorRow}
+                style={styles.inventorInfo}
                 onPress={() => {
-                  console.log("Navigating to profile with ID:", inventor._id); // Debug log
                   navigation.navigate(NAVIGATION.PROFILE.USER_PROFILE, {
                     userId: inventor._id,
                   });
@@ -331,8 +329,33 @@ const InventionDetails = ({ route }) => {
                   {inventor.firstName + " " + inventor.lastName}
                 </Text>
               </TouchableOpacity>
-            );
-          })}
+
+              {/* Add chat button if the user is not the inventor */}
+              {user._id !== inventor._id && (
+                <TouchableOpacity
+                  style={styles.chatButton}
+                  onPress={() => {
+                    navigation.navigate(NAVIGATION.CHAT.INDEX, {
+                      screen: NAVIGATION.CHAT.CHAT_ROOM,
+                      params: {
+                        recipientId: inventor._id,
+                        userName: `${inventor.firstName} ${inventor.lastName}`,
+                        userImage: inventor.image,
+                        messageRoomId: "",
+                      },
+                    });
+                  }}
+                >
+                  <Icon
+                    name="chatbubble-outline"
+                    size={20}
+                    color={colors.primary}
+                  />
+                  <Text style={styles.chatButtonText}>Chat</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          ))}
         </View>
 
         {invention?.documents && invention.documents.length > 0 && (
@@ -455,7 +478,13 @@ const styles = StyleSheet.create({
   inventorRow: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
     marginBottom: 10,
+  },
+  inventorInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
   },
   inventorImage: {
     width: 50, // Made avatar slightly larger
@@ -679,5 +708,20 @@ const styles = StyleSheet.create({
     height: 24,
     width: "40%",
     marginVertical: 12,
+  },
+  chatButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.secondary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    marginLeft: 10,
+  },
+  chatButtonText: {
+    color: colors.primary,
+    marginLeft: 4,
+    fontSize: 14,
+    fontWeight: "500",
   },
 });

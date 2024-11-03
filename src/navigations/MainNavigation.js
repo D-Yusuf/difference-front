@@ -8,6 +8,8 @@ import NAVIGATION from "./index";
 import InvestNavigation from "./InvestNav/InvestNavigation";
 import HomeNavigation from "./HomeNav/HomeNavigation";
 import InventionNavigation from "./InventionNav/InventionNavigation";
+import ChatNavigation from "./ChatNav/ChatNavigation";
+
 import { colors } from "../../Colors";
 const Tab = createBottomTabNavigator();
 const MainNavigation = () => {
@@ -44,6 +46,16 @@ const MainNavigation = () => {
             <Icon name="home-outline" size={24} color={color} />
           ),
           tabBarLabel: "Discover",
+        }}
+      />
+      <Tab.Screen
+        name={NAVIGATION.CHAT.INDEX}
+        component={ChatNavigation}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="chatbubble-outline" size={24} color={color} />
+          ),
+          tabBarLabel: "Chat",
         }}
       />
       <Tab.Screen
