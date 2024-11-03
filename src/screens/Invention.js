@@ -99,14 +99,27 @@ const Invention = ({ navigation }) => {
       });
 
       if (!result.canceled) {
-        setDocuments(result.assets);
-        console.log("Documents:", result.assets);
-        setInvention({ ...invention, documents: result.assets });
+        const namedDocuments = result.assets.map((doc) => ({
+          ...doc,
+          displayName: doc.name, // Default to original name, will be editable
+        }));
+        setDocuments(namedDocuments);
+        setInvention({ ...invention, documents: namedDocuments });
       }
     } catch (err) {
       console.log("Document picker error:", err);
       alert("Error picking document");
     }
+  };
+
+  const updateDocumentName = (index, newName) => {
+    const updatedDocs = [...documents];
+    updatedDocs[index] = {
+      ...updatedDocs[index],
+      displayName: newName,
+    };
+    setDocuments(updatedDocs);
+    setInvention({ ...invention, documents: updatedDocs });
   };
 
   const handleCreateInvention = () => {
@@ -198,6 +211,29 @@ const Invention = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" />
+
+      <View style={styles.decorativeDots}>
+        {[...Array(24)].map((_, index) => (
+          <View key={`dot-${index}`} style={styles.dot} />
+        ))}
+      </View>
+
+      <View style={styles.decorativeCurves}>
+        {[...Array(4)].map((_, index) => (
+          <View
+            key={`curve-${index}`}
+            style={[
+              styles.curve,
+              {
+                width: 200 + index * 40,
+                height: 200 + index * 40,
+                bottom: -100 - index * 20,
+                right: -100 - index * 20,
+              },
+            ]}
+          />
+        ))}
+      </View>
 
       <View style={styles.bgCircle1} />
       <View style={styles.bgCircle2} />
@@ -305,7 +341,13 @@ const Invention = ({ navigation }) => {
           {documents.map((doc, index) => (
             <View key={index} style={styles.documentItem}>
               <Icon name="document-text" size={24} color="white" />
-              <Text style={styles.documentName}>{doc.name}</Text>
+              <TextInput
+                style={styles.documentNameInput}
+                value={doc.displayName}
+                onChangeText={(newName) => updateDocumentName(index, newName)}
+                placeholder="Enter document name"
+                placeholderTextColor="rgba(255, 255, 255, 0.6)"
+              />
             </View>
           ))}
         </View>
@@ -335,6 +377,7 @@ const Invention = ({ navigation }) => {
             <Text style={styles.modalTitle}>Select Inventors</Text>
             {inventors && inventors?.length > 0 ? (
               <FlatList
+                scrollEnabled={false}
                 data={inventors?.sort((a, b) =>
                   `${a.firstName} ${a.lastName}`.localeCompare(
                     `${b.firstName} ${b.lastName}`
@@ -372,6 +415,7 @@ const Invention = ({ navigation }) => {
               <Icon name="close" size={24} color="red" />
             </TouchableOpacity>
             <FlatList
+              scrollEnabled={false}
               data={categories?.sort((a, b) => a.name.localeCompare(b.name))}
               renderItem={renderCategoryItem}
               keyExtractor={(item) => item._id}
@@ -394,6 +438,7 @@ const Invention = ({ navigation }) => {
               <Icon name="close" size={24} color="red" />
             </TouchableOpacity>
             <FlatList
+              scrollEnabled={false}
               data={phases}
               renderItem={renderPhaseItem}
               keyExtractor={(item) => item}
@@ -410,6 +455,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.primary,
     padding: 10,
+    position: "relative",
+    overflow: "hidden",
   },
   modalContainer: {
     flex: 1,
@@ -425,7 +472,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     top: 170,
     right: -50,
-    opacity: 0.2,
+    opacity: 0.15,
+    zIndex: 0,
   },
   bgCircle2: {
     position: "absolute",
@@ -435,7 +483,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     top: 0,
     left: -100,
-    opacity: 0.2,
+    opacity: 0.15,
+    zIndex: 0,
   },
   bgCircle3: {
     position: "absolute",
@@ -445,11 +494,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
     bottom: -50,
     left: 20,
-    opacity: 0.2,
+    opacity: 0.15,
+    zIndex: 0,
   },
   scrollView: {
     flexGrow: 1,
     padding: 24,
+    zIndex: 1,
+    position: "relative",
   },
   titleContainer: {
     flexDirection: "row",
@@ -638,14 +690,48 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "rgba(255, 255, 255, 0.1)",
-    padding: 10,
+    padding: 12,
     borderRadius: 8,
     marginVertical: 5,
   },
-  documentName: {
+  documentNameInput: {
     color: "white",
     marginLeft: 10,
     flex: 1,
+    fontSize: 14,
+    padding: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255, 255, 255, 0.3)",
+  },
+  decorativeDots: {
+    position: "absolute",
+    top: 100,
+    right: 30,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: 120,
+    gap: 8,
+    opacity: 0.15,
+    zIndex: 0,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "white",
+  },
+  decorativeCurves: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    opacity: 0.1,
+    zIndex: 0,
+  },
+  curve: {
+    position: "absolute",
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "white",
   },
 });
 

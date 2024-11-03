@@ -9,6 +9,10 @@ import { SafeAreaView, Text } from "react-native";
 import { logout } from "./src/api/auth";
 import { getProfile } from "./src/api/profile";
 import { ThemeContext } from "./src/context/ThemeContext";
+import { UserProvider } from "./src/context/UserProvider";
+import { LogBox } from "react-native";
+LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
+LogBox.ignoreAllLogs();
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -17,6 +21,7 @@ export default function App() {
     loggedIn: false,
     _id: null,
     role: null,
+    firstName: null,
   });
   const [loading, setLoading] = useState(false);
   const checkToken = async () => {
@@ -24,7 +29,13 @@ export default function App() {
     const token = await getToken();
     // console.log(token)
     if (token) {
-      setUser({ ...user, loggedIn: true, _id: token?._id, role: token?.role });
+      setUser({
+        ...user,
+        loggedIn: true,
+        _id: token?._id,
+        role: token?.role,
+        firstName: token?.firstName,
+      });
     }
     setLoading(false);
   };
@@ -37,20 +48,24 @@ export default function App() {
     return <Text>Loading...</Text>;
   }
   return (
-    <NavigationContainer>
-      <QueryClientProvider client={queryClient}>
-        <ThemeContext.Provider value={{ backgroundColor, setBackgroundColor }}>
-          <UserContext.Provider value={[user, setUser]}>
-            {user.loggedIn ? (
-              // <SafeAreaView style={{ flex: 1, backgroundColor }}>
-              <MainNavigation />
-            ) : (
-              // </SafeAreaView>
-              <AuthNavigation />
-            )}
-          </UserContext.Provider>
-        </ThemeContext.Provider>
-      </QueryClientProvider>
-    </NavigationContainer>
+    <UserProvider>
+      <NavigationContainer>
+        <QueryClientProvider client={queryClient}>
+          <ThemeContext.Provider
+            value={{ backgroundColor, setBackgroundColor }}
+          >
+            <UserContext.Provider value={[user, setUser]}>
+              {user.loggedIn ? (
+                // <SafeAreaView style={{ flex: 1, backgroundColor }}>
+                <MainNavigation />
+              ) : (
+                // </SafeAreaView>
+                <AuthNavigation />
+              )}
+            </UserContext.Provider>
+          </ThemeContext.Provider>
+        </QueryClientProvider>
+      </NavigationContainer>
+    </UserProvider>
   );
 }

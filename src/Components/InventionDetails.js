@@ -14,15 +14,22 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { getInvention, toggleLikeInvention } from "../api/invention";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
-import { getProfile } from "../api/profile"; // Import the getProfile function
 import UserContext from "../context/UserContext";
 import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
-import { getCategory } from "../api/category"; // You'll need to create this API function
+import { getCategory } from "../api/category";
 import { colors } from "../../Colors";
 
 import Icon from "react-native-vector-icons/FontAwesome";
 import Carousel from "react-native-reanimated-carousel";
+import Animated, {
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+  useSharedValue,
+  withDelay,
+} from "react-native-reanimated";
 
 const PHASES = ["idea", "work-in-progress", "prototype", "market-ready"];
 
@@ -39,6 +46,91 @@ const getPhaseProgress = (currentPhase) => {
   const index = PHASES.indexOf(normalizedPhase);
   if (index === -1) return 0;
   return ((index + 1) / PHASES.length) * 100;
+};
+
+const LoadingView = () => {
+  const opacity = useSharedValue(0.3);
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 800 }),
+        withTiming(0.3, { duration: 800 })
+      ),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        style={styles.contentContainer}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Carousel placeholder */}
+        <Animated.View
+          style={[styles.loadingBlock, styles.loadingCarousel, animatedStyle]}
+        />
+
+        {/* Title placeholder */}
+        <Animated.View
+          style={[styles.loadingBlock, styles.loadingTitle, animatedStyle]}
+        />
+
+        {/* Meta container */}
+        <View style={styles.metaContainer}>
+          <Animated.View
+            style={[styles.loadingBlock, styles.loadingMeta, animatedStyle]}
+          />
+          <Animated.View
+            style={[styles.loadingBlock, styles.loadingMeta, animatedStyle]}
+          />
+        </View>
+
+        {/* Inventor placeholder */}
+        <Animated.View
+          style={[styles.loadingBlock, styles.loadingInventor, animatedStyle]}
+        />
+
+        {/* Description placeholders */}
+        <Animated.View
+          style={[
+            styles.loadingBlock,
+            styles.loadingDescription,
+            animatedStyle,
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.loadingBlock,
+            styles.loadingDescription,
+            animatedStyle,
+          ]}
+        />
+        <Animated.View
+          style={[
+            styles.loadingBlock,
+            styles.loadingDescription,
+            { width: "60%" },
+            animatedStyle,
+          ]}
+        />
+
+        {/* Cost placeholders */}
+        <Animated.View
+          style={[styles.loadingBlock, styles.loadingCost, animatedStyle]}
+        />
+        <Animated.View
+          style={[styles.loadingBlock, styles.loadingCost, animatedStyle]}
+        />
+      </ScrollView>
+    </SafeAreaView>
+  );
 };
 
 const InventionDetails = ({ route }) => {
@@ -58,9 +150,14 @@ const InventionDetails = ({ route }) => {
   });
   const { data: invention, isPending: inventionPending } = useQuery({
     queryKey: ["invention", inventionId],
-
     queryFn: () => getInvention(inventionId),
   });
+
+  useEffect(() => {
+    console.log("Invention data:", invention);
+    console.log("Images array:", invention?.images);
+    console.log("Number of images:", invention?.images?.length);
+  }, [invention]);
 
   useEffect(() => {
     setIsLiked(invention?.likes.includes(user._id));
@@ -83,7 +180,7 @@ const InventionDetails = ({ route }) => {
   console.log("Category data:", category);
 
   if (inventionPending || categoryPending) {
-    return <Text>Loading...</Text>;
+    return <LoadingView />;
   }
 
   if (!invention) {
@@ -118,12 +215,11 @@ const InventionDetails = ({ route }) => {
   }
 
   const width = Dimensions.get("window").width;
-  console.log("IMAGES", invention?.images);
-  const FAKEIMAGES = [
-    "https://letsenhance.io/static/8f5e523ee6b2479e26ecc91b9c25261e/1015f/MainAfter.jpg",
-    "https://img.freepik.com/premium-photo/chameleon-with-red-spot-its-head_924629-217761.jpg",
-    "https://img.freepik.com/premium-photo/frog-with-symbol-its-face-is-rope_956363-21877.jpg?semt=ais_hybrid",
-  ];
+  const dataImages = invention?.images.map(
+    (image) => BASE_URL + image.replace(/\\/g, "/")
+  );
+  console.log("WIDTH", width);
+  console.log("IMAGES", dataImages);
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -132,11 +228,15 @@ const InventionDetails = ({ route }) => {
       >
         <View style={{ width: width }}>
           <Carousel
-            width={width}
+            width={width - 32}
+            style={{
+              justifyContent: "center",
+              alignItems: "center",
+            }}
             height={300}
-            autoPlay={false}
-            data={FAKEIMAGES}
-            scrollAnimationDuration={1000}
+            // autoPlay={false}
+            data={dataImages}
+            // scrollAnimationDuration={1000}
             renderItem={({ item }) => (
               <Image
                 source={{ uri: item }}
@@ -146,8 +246,8 @@ const InventionDetails = ({ route }) => {
             )}
             onSnapToItem={(index) => setActiveIndex(index)}
           />
-          <View style={styles.paginationContainer}>
-            {FAKEIMAGES.map((_, index) => (
+          <View style={[styles.paginationContainer, { width: width - 32 }]}>
+            {dataImages.map((_, index) => (
               <View
                 key={index}
                 style={[
@@ -170,30 +270,41 @@ const InventionDetails = ({ route }) => {
               {category?.name || "Loading..."}
             </Text>
           </View>
-          <View style={styles.metaItem}>
-            <Text style={styles.metaLabel}>Phase</Text>
+          <View style={[styles.metaItem, styles.phaseItem]}>
+            <Text style={styles.metaLabel}>Current Phase</Text>
             <Text style={styles.metaValue}>
               {formatPhase(invention?.phase)}
             </Text>
             <View style={styles.progressContainer}>
-              <View
-                style={[
-                  styles.progressBar,
-                  { width: `${getPhaseProgress(invention?.phase)}%` },
-                ]}
-              />
-              <View style={styles.phaseMarkers}>
-                {PHASES.map((phase, index) => (
+              {PHASES.map((phase, index) => (
+                <View key={phase} style={styles.phaseStep}>
                   <View
-                    key={phase}
                     style={[
                       styles.phaseDot,
                       PHASES.indexOf(normalizePhase(invention?.phase)) >=
                         index && styles.phaseDotActive,
                     ]}
                   />
-                ))}
-              </View>
+                  <Text
+                    style={[
+                      styles.phaseLabel,
+                      PHASES.indexOf(normalizePhase(invention?.phase)) >=
+                        index && styles.phaseLabelActive,
+                    ]}
+                  >
+                    {formatPhase(phase)}
+                  </Text>
+                  {index < PHASES.length - 1 && (
+                    <View
+                      style={[
+                        styles.phaseConnector,
+                        PHASES.indexOf(normalizePhase(invention?.phase)) >
+                          index && styles.phaseConnectorActive,
+                      ]}
+                    />
+                  )}
+                </View>
+              ))}
             </View>
           </View>
         </View>
@@ -233,7 +344,10 @@ const InventionDetails = ({ route }) => {
                 style={styles.documentItem}
                 onPress={() => handleDocumentPress(doc)}
               >
-                <Text style={styles.documentName}>{doc.name}</Text>
+                <Icon name="document-text" size={24} color={colors.primary} />
+                <Text style={styles.documentName}>
+                  {doc.displayName || doc.name}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -425,73 +539,70 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
   metaContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
     marginBottom: 20,
     gap: 12,
   },
   metaItem: {
-    flex: 1,
     backgroundColor: colors.secondary,
-
-    padding: 12,
-    borderRadius: 10,
+    padding: 16,
+    borderRadius: 12,
+  },
+  phaseItem: {
+    padding: 16,
   },
   metaLabel: {
     fontSize: 14,
     color: colors.primary,
-    marginBottom: 4,
+    marginBottom: 8,
+    fontWeight: "500",
   },
   metaValue: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "600",
     color: colors.primary,
+    marginBottom: 16,
   },
   progressContainer: {
     marginTop: 8,
-    height: 24,
-    position: "relative",
-    backgroundColor: colors.secondary,
-    borderRadius: 5,
-    width: "100%",
   },
-  progressBar: {
-    height: 4,
-    backgroundColor: colors.primary,
-    borderRadius: 2,
-    position: "absolute",
-    top: 10,
-    left: 0,
-    zIndex: 1,
-  },
-  phaseMarkers: {
+  phaseStep: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    paddingHorizontal: 4,
     alignItems: "center",
-    zIndex: 2,
+    marginBottom: 12,
   },
   phaseDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: colors.primary,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: colors.secondary,
     borderWidth: 2,
-    borderColor: "#fff",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    elevation: 2,
+    borderColor: colors.primary,
   },
   phaseDotActive: {
-    backgroundColor: "#2563eb",
+    backgroundColor: colors.primary,
+  },
+  phaseLabel: {
+    marginLeft: 12,
+    fontSize: 14,
+    color: colors.primary,
+    opacity: 0.6,
+    flex: 1,
+  },
+  phaseLabelActive: {
+    opacity: 1,
+    fontWeight: "500",
+  },
+  phaseConnector: {
+    position: "absolute",
+    left: 7,
+    top: 16,
+    width: 2,
+    height: 24,
+    backgroundColor: colors.secondary,
+    zIndex: -1,
+  },
+  phaseConnectorActive: {
+    backgroundColor: colors.primary,
   },
   paginationContainer: {
     flexDirection: "row",
@@ -530,5 +641,43 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#2563eb",
     fontWeight: "500",
+  },
+  loadingContainer: {
+    flex: 1,
+    padding: 16,
+    backgroundColor: colors.page,
+  },
+  loadingBlock: {
+    backgroundColor: colors.secondary,
+    borderRadius: 12,
+  },
+  loadingCarousel: {
+    width: "100%",
+    height: 300,
+    marginBottom: 16,
+  },
+  loadingTitle: {
+    height: 32,
+    width: "70%",
+    marginBottom: 16,
+  },
+  loadingMeta: {
+    flex: 1,
+    height: 80,
+  },
+  loadingInventor: {
+    height: 80,
+    width: "100%",
+    marginVertical: 20,
+  },
+  loadingDescription: {
+    height: 16,
+    width: "100%",
+    marginBottom: 12,
+  },
+  loadingCost: {
+    height: 24,
+    width: "40%",
+    marginVertical: 12,
   },
 });

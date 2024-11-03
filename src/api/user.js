@@ -18,3 +18,8 @@ export const getInventors = async () => {
     return error;
   }
 };
+
+export const getProfile = async () => {
+  const response = await instance.get("/users/profile");
+  return response.data;
+};

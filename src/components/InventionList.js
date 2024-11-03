@@ -16,6 +16,7 @@ const InventionList = ({
 
   return (
     <FlatList
+      scrollEnabled={false}
       data={validInventions}
       renderItem={({ item }) => (
         <View style={[styles.cardWrapper, { width: `${100 / numColumns}%` }]}>

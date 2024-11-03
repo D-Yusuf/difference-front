@@ -1,5 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  useEffect,
+} from "react-native";
 import { BASE_URL } from "../api/index";
 import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigations";
@@ -8,10 +15,11 @@ import { colors } from "../../Colors";
 import Carousel from "react-native-reanimated-carousel";
 import { Dimensions } from "react-native";
 import { Pagination } from "react-native-reanimated-carousel";
-
 import shortNumber from "../utils/shortNum";
 import { toggleLikeInvention } from "../api/invention";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import UserContext from "../context/UserContext";
+import { useContext } from "react";
 const InventionCard = ({
   invention,
   compact,
@@ -20,8 +28,10 @@ const InventionCard = ({
 }) => {
   const queryClient = useQueryClient();
   const navigation = useNavigation();
+
   const [activeIndex, setActiveIndex] = useState(0);
   const width = Dimensions.get("window").width - 16; // Account for margins
+  const { user } = useContext(UserContext);
   const [isLiked, setIsLiked] = useState(false);
   const { mutate: handleLike } = useMutation({
     mutationKey: ["likeInvention"],
@@ -32,9 +42,6 @@ const InventionCard = ({
       // invalidateInventionQueries(queryClient)
     },
   });
-  useEffect(() => {
-      setIsLiked(invention?.likes.includes(user._id));
-    }, [invention]);
   if (!invention || !invention._id) {
     return null;
   }
@@ -90,62 +97,79 @@ const InventionCard = ({
         })
       }
     >
-      <View style={[styles.card, compact && styles.compactCard]}>
-        <Carousel
-          // loop
-          pagingEnabled={true}
-          width={width}
-          height={compact ? 90 : 180}
-          data={images}
-          scrollAnimationDuration={1000}
-          renderItem={({ item }) => (
+      <View style={[styles.card, !compact && styles.singleColumnCard]}>
+        <View
+          style={[
+            styles.imageContainer,
+            !compact && styles.singleColumnImageContainer,
+          ]}
+        >
+          {compact ? (
+            // Grid layout - simple Image component
             <Image
-              source={{ uri: item }}
-              style={[styles.image, compact && styles.compactImage]}
+              source={{ uri: images[0] }}
+              style={styles.gridImage}
               resizeMode="cover"
             />
+          ) : (
+            // Single column layout - Carousel
+            <Carousel
+              pagingEnabled={true}
+              width={width - 24}
+              height={300}
+              data={images}
+              scrollAnimationDuration={1000}
+              renderItem={({ item }) => (
+                <Image
+                  source={{ uri: item }}
+                  style={styles.singleColumnImage}
+                  resizeMode="cover"
+                />
+              )}
+              onSnapToItem={(index) => setActiveIndex(index)}
+            />
           )}
-          onSnapToItem={(index) => setActiveIndex(index)}
-        />
-        <View style={[styles.content, compact && styles.compactContent]}>
-          <Text style={[styles.name, compact && styles.compactName]}>
-            {invention.name}
-          </Text>
-          <Text
-            style={[styles.description, compact && styles.compactDescription]}
-            numberOfLines={compact ? 1 : 2}
-          >
-            {invention.description}
-          </Text>
-          <Text style={[styles.cost, compact && styles.compactCost]}>
-            {shortNumber(invention.cost)} KWD
-          </Text>
-          <View
-            style={[
-              styles.icons,
-              compact && styles.compactIcons,
-              { justifyContent: "space-between", alignItems: "center" },
-            ]}
-          >
-            <TouchableOpacity
-
-              style={[
-                styles.likeButton,
-                {
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 4,
-                },
-              ]}
-              onPress={handleLike}
+        </View>
+        <View style={[styles.content, !compact && styles.singleColumnContent]}>
+          <View style={styles.textContainer}>
+            <Text
+              style={[styles.name, !compact && styles.singleColumnName]}
+              numberOfLines={compact ? 1 : 2}
             >
-              <Icon name={isLiked ? "heart" : "heart-o"} size={compact ? 16 : 24} color="#FF4D4D" />
-              <Text style={{ fontSize: 12, color: colors.primary }}>
+              {invention.name}
+            </Text>
+            <Text
+              style={[
+                styles.description,
+                !compact && styles.singleColumnDescription,
+              ]}
+              numberOfLines={compact ? 1 : 2}
+            >
+              {invention.description}
+            </Text>
+            <Text style={[styles.cost, !compact && styles.singleColumnCost]}>
+              {shortNumber(invention.cost)} KWD
+            </Text>
+          </View>
+          <View style={styles.footer}>
+            <View style={styles.timeContainer}>
+              <Icon name="clock-o" size={14} color={colors.primary} />
+              <Text style={styles.timeText} numberOfLines={1}>
+                {getTimeAgo(invention.createdAt)}
+              </Text>
+            </View>
+            <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
+              <Icon
+                name={
+                  invention.likes?.includes(user?._id) ? "heart" : "heart-o"
+                }
+                size={14}
+                color="#FF4D4D"
+              />
+              <Text style={styles.likesCount} numberOfLines={1}>
                 {shortNumber(invention.likes?.length || 0)}
               </Text>
             </TouchableOpacity>
-
-            <Text>{getTimeAgo(invention.createdAt)}</Text>
           </View>
         </View>
       </View>
@@ -157,100 +181,120 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    marginVertical: 8,
-    marginHorizontal: 8,
-    shadowColor: "#000",
     overflow: "hidden",
-    height: 240,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.23,
-    shadowRadius: 2.62,
-    elevation: 4,
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+    height: 300, // Fixed height for grid view
+    borderWidth: 1,
+    borderColor: colors.secondary,
+  },
+  singleColumnCard: {
+    height: 450, // Fixed height for single column
+    marginVertical: 12,
+    marginHorizontal: 12,
+  },
+  imageContainer: {
+    height: "66%",
+    width: "100%",
     overflow: "hidden",
   },
-  compactCard: {
-    marginVertical: 4,
-    marginHorizontal: 4,
+  gridImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  singleColumnImageContainer: {
+    height: "66%", // Takes up 2/3 of the card
   },
   image: {
     width: "100%",
-    height: 180,
+    height: "100%",
   },
-  compactImage: {
-    height: 90,
+  singleColumnImage: {
+    width: "100%",
+    height: "100%",
   },
   content: {
-    padding: 16,
-  },
-  compactContent: {
     padding: 8,
+    height: "34%",
+    justifyContent: "space-between",
+  },
+  singleColumnContent: {
+    padding: 16,
+    height: "34%",
+  },
+  textContainer: {
+    flex: 1,
+    marginBottom: 4,
   },
   name: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: colors.primary,
-    marginBottom: 8,
-  },
-  compactName: {
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  description: {
-    fontSize: 14,
-    color: colors.primary,
-    marginBottom: 8,
-    lineHeight: 20,
-  },
-  compactDescription: {
-    fontSize: 12,
-    marginBottom: 4,
-    lineHeight: 16,
-  },
-  cost: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: "600",
     color: colors.primary,
-    marginBottom: 12,
+    marginBottom: 2,
+    lineHeight: 18,
   },
-  compactCost: {
-    fontSize: 13,
+  singleColumnName: {
+    fontSize: 18,
     marginBottom: 6,
+    lineHeight: 24,
   },
-  icons: {
+  description: {
+    fontSize: 11,
+    color: colors.primary,
+    opacity: 0.8,
+    marginBottom: 2,
+    lineHeight: 16,
+  },
+  singleColumnDescription: {
+    fontSize: 14,
+    marginBottom: 6,
+    lineHeight: 20,
+  },
+  cost: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: colors.primary,
+    lineHeight: 16,
+  },
+  singleColumnCost: {
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  footer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 4,
     borderTopWidth: 1,
-    borderTopColor: "#eee",
-    paddingTop: 12,
-    marginTop: 4,
+    borderTopColor: colors.secondary,
   },
-  compactIcons: {
-    paddingTop: 6,
-    marginTop: 2,
+  timeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    flex: 1,
+  },
+  timeText: {
+    fontSize: 11,
+    color: colors.primary,
+    opacity: 0.7,
+    flex: 1,
   },
   likeButton: {
-    padding: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
   },
-  thumbsUpButton: {
-    padding: 8,
-  },
-  paginationContainer: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    paddingVertical: 4,
-  },
-  paginationDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    marginHorizontal: 1,
-    backgroundColor: colors.primary,
+  likesCount: {
+    fontSize: 11,
+    color: "#FF4D4D",
   },
 });
 

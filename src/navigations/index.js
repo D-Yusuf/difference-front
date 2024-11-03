@@ -3,7 +3,6 @@ const NAVIGATION = {
     INDEX: "HomeIndex",
     HOME: "Home",
     INVEST_DETAILS: "InvestDetails-Home",
-    
   },
   AUTH: {
     INDEX: "AuthIndex",

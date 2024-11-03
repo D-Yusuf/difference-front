@@ -6,16 +6,19 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  ScrollView,
   Platform,
   Linking,
 } from "react-native";
 import React, { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getProfile, updateProfile } from "../../api/profile";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateProfile } from "../../api/profile";
 import { BASE_URL } from "../../api";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 import { colors } from "../../../Colors";
+import Icon from "react-native-vector-icons/Ionicons";
+
 const EditProfile = ({ route, navigation }) => {
   const queryClient = useQueryClient();
   const { profile } = route.params;
@@ -25,6 +28,7 @@ const EditProfile = ({ route, navigation }) => {
     bio: profile.bio,
     cv: profile.cv,
   });
+  const [image, setImage] = useState(null);
 
   const pickDocument = async () => {
     try {
@@ -44,27 +48,9 @@ const EditProfile = ({ route, navigation }) => {
   };
 
   const handleCvPress = () => {
-    // console.log(userInfo.cv);
-    // if (userInfo.cv) {
-    //   Linking.openURL(BASE_URL + userInfo.cv[0]);
-    // } else {
     pickDocument();
-    // }
   };
-  const [image, setImage] = useState(null);
-  const { mutate: updateProfileMutate } = useMutation({
-    mutationFn: () => updateProfile(userInfo),
-    mutationKey: ["update-profile"],
-    onSuccess: () => {
-      alert("Profile updated successfully");
-      queryClient.invalidateQueries(["profile"]);
-      navigation.goBack();
-    },
-    onError: (error) => {
-      alert(userInfo);
-      // alert(error);
-    },
-  });
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -88,6 +74,7 @@ const EditProfile = ({ route, navigation }) => {
       });
     }
   };
+
   const handleUpdateProfile = () => {
     if (validateInputs()) {
       updateProfileMutate();
@@ -102,98 +89,202 @@ const EditProfile = ({ route, navigation }) => {
 
     return true;
   };
+
+  const { mutate: updateProfileMutate } = useMutation({
+    mutationFn: () => updateProfile(userInfo),
+    mutationKey: ["update-profile"],
+    onSuccess: () => {
+      alert("Profile updated successfully");
+      queryClient.invalidateQueries(["profile"]);
+      navigation.goBack();
+    },
+    onError: (error) => {
+      alert(userInfo);
+    },
+  });
+
   return (
-    <View style={styles.container}>
-      <View style={styles.profileContainer}>
-        <TouchableOpacity onPress={pickImage}>
-          <Image
-            source={image ? { uri: image } : { uri: BASE_URL + profile.image }}
-            style={styles.image}
-          />
-          <Text style={styles.imageText}>Change Image</Text>
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          placeholder="First Name"
-          value={userInfo.firstName}
-          onChangeText={(text) => setUserInfo({ ...userInfo, firstName: text })}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Last Name"
-          value={userInfo.lastName}
-          onChangeText={(text) => setUserInfo({ ...userInfo, lastName: text })}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Bio"
-          value={userInfo.bio}
-          onChangeText={(text) => setUserInfo({ ...userInfo, bio: text })}
-        />
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleCvPress}>
-            <Text style={styles.buttonText}>Upload CV</Text>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Profile Image Section */}
+        <View style={styles.imageSection}>
+          <TouchableOpacity onPress={pickImage} style={styles.imageContainer}>
+            <Image
+              source={
+                image ? { uri: image } : { uri: BASE_URL + profile.image }
+              }
+              style={styles.profileImage}
+            />
+            <View style={styles.imageOverlay}>
+              <Icon name="camera" size={24} color="white" />
+            </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
-            <Text style={styles.buttonText}>Update Profile</Text>
-          </TouchableOpacity>
+          <Text style={styles.changePhotoText}>Change Profile Photo</Text>
         </View>
-      </View>
-    </View>
+
+        {/* Form Section */}
+        <View style={styles.formSection}>
+          <View style={styles.inputGroup}>
+            <TextInput
+              style={styles.input}
+              placeholder="First Name"
+              placeholderTextColor={colors.primary + "80"}
+              value={userInfo.firstName}
+              onChangeText={(text) =>
+                setUserInfo({ ...userInfo, firstName: text })
+              }
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              placeholderTextColor={colors.primary + "80"}
+              value={userInfo.lastName}
+              onChangeText={(text) =>
+                setUserInfo({ ...userInfo, lastName: text })
+              }
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <TextInput
+              style={[styles.input, styles.bioInput]}
+              placeholder="Bio"
+              placeholderTextColor={colors.primary + "80"}
+              value={userInfo.bio}
+              onChangeText={(text) => setUserInfo({ ...userInfo, bio: text })}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
+          </View>
+
+          {/* CV Upload Button */}
+          <TouchableOpacity style={styles.cvButton} onPress={handleCvPress}>
+            <Icon
+              name="document-text-outline"
+              size={24}
+              color={colors.primary}
+            />
+            <Text style={styles.cvButtonText}>
+              {userInfo.cv ? "Update CV" : "Upload CV"}
+            </Text>
+          </TouchableOpacity>
+          {userInfo.cv && (
+            <Text style={styles.cvFileName}>
+              {typeof userInfo.cv === "string"
+                ? userInfo.cv.split("/").pop()
+                : userInfo.cv.name}
+            </Text>
+          )}
+        </View>
+
+        {/* Save Button */}
+        <TouchableOpacity
+          style={styles.saveButton}
+          onPress={handleUpdateProfile}
+        >
+          <Text style={styles.saveButtonText}>Save Changes</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
-
-export default EditProfile;
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.page,
   },
-  profileContainer: {
-    marginTop: 30,
-    flex: 1,
-    backgroundColor: colors.page,
+  scrollContent: {
     padding: 20,
-    borderRadius: 10,
+  },
+  imageSection: {
+    alignItems: "center",
+    marginVertical: 20,
+  },
+  imageContainer: {
+    position: "relative",
+    marginBottom: 8,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
+  imageOverlay: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: colors.primary,
+    padding: 8,
+    borderRadius: 20,
+  },
+  changePhotoText: {
+    color: colors.primary,
+    fontSize: 14,
+    marginTop: 8,
+  },
+  formSection: {
+    gap: 16,
+    marginTop: 20,
+  },
+  inputGroup: {
     width: "100%",
   },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 1,
-    borderColor: "#003863",
-    alignSelf: "center",
-  },
-  imageText: {
-    color: "#003863",
-    fontWeight: "bold",
-    textAlign: "center",
-    marginTop: 5,
-    marginBottom: 10,
-  },
   input: {
+    backgroundColor: "white",
     height: 50,
-    borderColor: "#003863",
-    borderWidth: 1,
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    marginBottom: 15,
-    backgroundColor: "#f9f9f9",
-  },
-  button: {
-    backgroundColor: "#003863",
-    padding: 12,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
+    borderRadius: 8,
+    paddingHorizontal: 16,
     fontSize: 16,
+    color: colors.primary,
+    borderWidth: 1,
+    borderColor: colors.secondary,
   },
-  buttonContainer: {
+  bioInput: {
+    height: 120,
+    paddingTop: 16,
+    textAlignVertical: "top",
+  },
+  cvButton: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: 10,
+    backgroundColor: "white",
+    height: 50,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: colors.secondary,
+  },
+  cvButtonText: {
+    fontSize: 16,
+    color: colors.primary,
+  },
+  cvFileName: {
+    fontSize: 14,
+    color: colors.primary,
+    opacity: 0.7,
+    marginLeft: 4,
+  },
+  saveButton: {
+    backgroundColor: colors.primary,
+    height: 50,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 30,
+  },
+  saveButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
   },
 });
+
+export default EditProfile;
