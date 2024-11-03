@@ -263,6 +263,7 @@ const InventionDetails = ({ route }) => {
           </View>
         </View>
         <Text style={styles.title}>{invention?.name}</Text>
+        <Text style={styles.views}>{invention?.views} views</Text>
 
         <View style={styles.metaContainer}>
           <View style={styles.metaItem}>
