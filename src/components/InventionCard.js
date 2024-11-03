@@ -16,7 +16,7 @@ import Carousel from "react-native-reanimated-carousel";
 import { Dimensions } from "react-native";
 import { Pagination } from "react-native-reanimated-carousel";
 import shortNumber from "../utils/shortNum";
-import { toggleLikeInvention } from "../api/invention";
+import { toggleLikeInvention, incrementInventionViews } from "../api/invention";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import UserContext from "../context/UserContext";
 import { useContext } from "react";
@@ -40,6 +40,19 @@ const InventionCard = ({
       queryClient.invalidateQueries({ queryKey: ["inventions"] });
       queryClient.invalidateQueries({ queryKey: ["invention", invention._id] });
       // invalidateInventionQueries(queryClient)
+    },
+  });
+  const { mutate: handleView } = useMutation({
+    mutationFn: () => incrementInventionViews(invention._id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["inventions"] });
+      queryClient.invalidateQueries({ queryKey: ["invention", invention._id] });
+      navigation.navigate(NAVIGATION.INVENTION.INVENTION_DETAILS, {
+        inventionId: invention._id,
+        image: images[0],
+        showInvestButton: showInvestButton,
+        showEditButton: showEditButton,
+      });
     },
   });
   if (!invention || !invention._id) {
@@ -88,14 +101,9 @@ const InventionCard = ({
 
   return (
     <TouchableOpacity
-      onPress={() =>
-        navigation.navigate(NAVIGATION.INVENTION.INVENTION_DETAILS, {
-          inventionId: invention._id,
-          image: images[0],
-          showInvestButton: showInvestButton,
-          showEditButton: showEditButton,
-        })
-      }
+      onPress={() => {
+        handleView();
+      }}
     >
       <View style={[styles.card, !compact && styles.singleColumnCard]}>
         <View
@@ -158,18 +166,26 @@ const InventionCard = ({
                 {getTimeAgo(invention.createdAt)}
               </Text>
             </View>
-            <TouchableOpacity onPress={handleLike} style={styles.likeButton}>
-              <Icon
-                name={
-                  invention.likes?.includes(user?._id) ? "heart" : "heart-o"
-                }
-                size={14}
-                color="#FF4D4D"
-              />
-              <Text style={styles.likesCount} numberOfLines={1}>
-                {shortNumber(invention.likes?.length || 0)}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.statsContainer}>
+              <TouchableOpacity onPress={handleLike} style={styles.statItem}>
+                <Icon
+                  name={
+                    invention.likes?.includes(user?._id) ? "heart" : "heart-o"
+                  }
+                  size={14}
+                  color="#FF4D4D"
+                />
+                <Text style={styles.likesCount} numberOfLines={1}>
+                  {shortNumber(invention.likes?.length || 0)}
+                </Text>
+              </TouchableOpacity>
+              <View style={styles.statItem}>
+                <Icon name="eye" size={14} color={colors.primary} />
+                <Text style={styles.viewsCount} numberOfLines={1}>
+                  {shortNumber(invention.views || 0)}
+                </Text>
+              </View>
+            </View>
           </View>
         </View>
       </View>
@@ -295,6 +311,21 @@ const styles = StyleSheet.create({
   likesCount: {
     fontSize: 11,
     color: "#FF4D4D",
+  },
+  statsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  statItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  viewsCount: {
+    fontSize: 11,
+    color: colors.primary,
+    opacity: 0.7,
   },
 });
 

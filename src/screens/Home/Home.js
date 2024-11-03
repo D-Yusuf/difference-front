@@ -175,10 +175,12 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [sortBy, setSortBy] = useState(null);
+
   const { data: inventions, isPending: inventionsPending } = useQuery({
     queryKey: ["inventions"],
     queryFn: getAllInventions,
   });
+
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
