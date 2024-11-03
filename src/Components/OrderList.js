@@ -189,7 +189,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: colors.page,
   },
   card: {
     backgroundColor: "white",
