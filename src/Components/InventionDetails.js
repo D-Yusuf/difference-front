@@ -368,9 +368,7 @@ const InventionDetails = ({ route }) => {
                 onPress={() => handleDocumentPress(doc)}
               >
                 <Icon name="document-text" size={24} color={colors.primary} />
-                <Text style={styles.documentName}>
-                  {doc.displayName || doc.name}
-                </Text>
+                <Text style={styles.documentName}>Document {index + 1}</Text>
               </TouchableOpacity>
             ))}
           </View>
