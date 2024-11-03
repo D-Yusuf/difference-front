@@ -14,7 +14,7 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getInvention, toggleLikeInvention } from "../api/invention";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
 import UserContext from "../context/UserContext";
 import { BASE_URL } from "../api";
@@ -139,7 +139,7 @@ const InventionDetails = ({ route }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const [user, setUser] = useContext(UserContext);
-
+  const queryClient = useQueryClient();
   const { inventionId, image, showInvestButton, showEditButton } = route.params;
   const [isLiked, setIsLiked] = useState(false);
   const [remainingFunds, setRemainingFunds] = useState(0);
@@ -149,16 +149,14 @@ const InventionDetails = ({ route }) => {
       queryClient.invalidateQueries(["invention", inventionId]);
     },
   });
-  const { data: invention, isPending: inventionPending } = useQuery({
+  const {
+    data: invention,
+    isPending: inventionPending,
+    isSuccess,
+  } = useQuery({
     queryKey: ["invention", inventionId],
     queryFn: () => getInvention(inventionId),
   });
-
-  useEffect(() => {
-    console.log("Invention data:", invention);
-    console.log("Images array:", invention?.images);
-    console.log("Number of images:", invention?.images?.length);
-  }, [invention]);
 
   useEffect(() => {
     setIsLiked(invention?.likes.includes(user._id));
@@ -221,6 +219,7 @@ const InventionDetails = ({ route }) => {
   );
   console.log("WIDTH", width);
   console.log("IMAGES", dataImages);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -263,7 +262,18 @@ const InventionDetails = ({ route }) => {
           </View>
         </View>
         <Text style={styles.title}>{invention?.name}</Text>
-        <Text style={styles.views}>{invention?.views} views</Text>
+        <View style={styles.statsContainer}>
+          <View style={styles.statItem}>
+            <Icon name="eye-outline" size={20} color={colors.primary} />
+            <Text style={styles.statText}>{invention?.views} views</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Icon name="heart-outline" size={20} color={colors.primary} />
+            <Text style={styles.statText}>
+              {invention?.likes?.length || 0} likes
+            </Text>
+          </View>
+        </View>
 
         <View style={styles.metaContainer}>
           <View style={styles.metaItem}>
@@ -720,6 +730,26 @@ const styles = StyleSheet.create({
   chatButtonText: {
     color: colors.primary,
     marginLeft: 4,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  statsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    gap: 16,
+  },
+  statItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.secondary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 6,
+  },
+  statText: {
+    color: colors.primary,
     fontSize: 14,
     fontWeight: "500",
   },

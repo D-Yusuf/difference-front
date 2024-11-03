@@ -199,6 +199,7 @@ const Home = () => {
 
   useLayoutEffect(() => {
     refetch();
+    console.log("Refetching");
   }, [refetch]);
 
   const filteredInventions = inventions
@@ -344,6 +345,7 @@ const Home = () => {
           <View style={styles.listContainer}>
             <InventionList
               inventions={filteredInventions}
+              refetch={refetch}
               numColumns={gridColumns}
             />
           </View>
