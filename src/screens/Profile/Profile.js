@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -20,6 +20,131 @@ import { colors } from "../../../Colors";
 import { getOrders } from "../../api/orders";
 import NAVIGATION from "../../navigations";
 import OrderList from "../../components/OrderList";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+
+const LoadingView = () => {
+  const opacity = useSharedValue(0.3);
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 800 }),
+        withTiming(0.3, { duration: 800 })
+      ),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        <View style={styles.glassCard}>
+          <View style={styles.navButtons}>
+            <Animated.View
+              style={[
+                styles.loadingBlock,
+                { width: 40, height: 40, borderRadius: 20 },
+                animatedStyle,
+              ]}
+            />
+            <Animated.View
+              style={[
+                styles.loadingBlock,
+                { width: 40, height: 40, borderRadius: 20 },
+                animatedStyle,
+              ]}
+            />
+          </View>
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              { width: 120, height: 120, borderRadius: 60, marginBottom: 15 },
+              animatedStyle,
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              { width: "60%", height: 30, marginBottom: 5 },
+              animatedStyle,
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              { width: "40%", height: 24, marginBottom: 5 },
+              animatedStyle,
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              { width: "30%", height: 20, marginBottom: 10 },
+              animatedStyle,
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              { width: "90%", height: 60, marginBottom: 20 },
+              animatedStyle,
+            ]}
+          />
+          <View style={styles.buttonContainer}>
+            <Animated.View
+              style={[
+                styles.loadingBlock,
+                { width: "45%", height: 50, borderRadius: 10 },
+                animatedStyle,
+              ]}
+            />
+            <Animated.View
+              style={[
+                styles.loadingBlock,
+                { width: "45%", height: 50, borderRadius: 10 },
+                animatedStyle,
+              ]}
+            />
+          </View>
+        </View>
+        <View style={styles.inventionsContainer}>
+          <View style={styles.sectionHeader}>
+            <Animated.View
+              style={[
+                styles.loadingBlock,
+                { width: "50%", height: 24, marginBottom: 20 },
+                animatedStyle,
+              ]}
+            />
+          </View>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+            {[1, 2, 3, 4].map((item) => (
+              <Animated.View
+                key={item}
+                style={[
+                  styles.loadingBlock,
+                  { width: "48%", height: 200, borderRadius: 12 },
+                  animatedStyle,
+                ]}
+              />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 const Profile = ({ navigation }) => {
   const [user, setUser] = useContext(UserContext);
@@ -38,7 +163,7 @@ const Profile = ({ navigation }) => {
   };
 
   if (profileLoading) {
-    return <Text>Loading...</Text>;
+    return <LoadingView />;
   }
   console.log(`${BASE_URL}${profile.cv}`);
   return (
@@ -255,7 +380,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    padding: 20,
+    padding: 2,
     marginTop: 20,
   },
   sectionHeader: {
@@ -265,6 +390,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionTitle: {
+    marginLeft: 20,
+    marginTop: 20,
+
     fontSize: 20,
     fontWeight: "700",
     color: colors.primary,
@@ -279,6 +407,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginTop: 20,
+  },
+  loadingBlock: {
+    backgroundColor: colors.secondary,
+    borderRadius: 8,
   },
 });
 

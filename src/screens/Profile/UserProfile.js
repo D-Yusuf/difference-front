@@ -1,19 +1,145 @@
-import { StyleSheet, Text, View, Image, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  ScrollView,
+  SafeAreaView,
+} from "react-native";
 import React from "react";
 import { getProfileById } from "../../api/profile";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { BASE_URL } from "../../api";
 import InventionList from "../../components/InventionList";
 import { getInventionById } from "../../api/invention";
+import { colors } from "../../../Colors";
+import Icon from "react-native-vector-icons/Ionicons";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+import { useEffect } from "react";
+
+const LoadingView = () => {
+  const opacity = useSharedValue(0.3);
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 800 }),
+        withTiming(0.3, { duration: 800 })
+      ),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        <View style={styles.glassCard}>
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              { width: 120, height: 120, borderRadius: 60, marginBottom: 15 },
+              animatedStyle,
+            ]}
+          />
+
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              { width: "60%", height: 30, marginBottom: 5 },
+              animatedStyle,
+            ]}
+          />
+
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              { width: "40%", height: 24, marginBottom: 5 },
+              animatedStyle,
+            ]}
+          />
+
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              { width: "30%", height: 20, marginBottom: 10 },
+              animatedStyle,
+            ]}
+          />
+
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              { width: "90%", height: 60, marginBottom: 20 },
+              animatedStyle,
+            ]}
+          />
+
+          <View style={styles.contactContainer}>
+            <Animated.View
+              style={[
+                styles.loadingBlock,
+                {
+                  width: "100%",
+                  height: 44,
+                  borderRadius: 10,
+                  marginBottom: 12,
+                },
+                animatedStyle,
+              ]}
+            />
+            <Animated.View
+              style={[
+                styles.loadingBlock,
+                { width: "100%", height: 44, borderRadius: 10 },
+                animatedStyle,
+              ]}
+            />
+          </View>
+        </View>
+
+        <View style={styles.inventionsContainer}>
+          <View style={styles.sectionHeader}>
+            <Animated.View
+              style={[
+                styles.loadingBlock,
+                { width: "50%", height: 24, marginBottom: 20 },
+                animatedStyle,
+              ]}
+            />
+          </View>
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+            {[1, 2, 3, 4].map((item) => (
+              <Animated.View
+                key={item}
+                style={[
+                  styles.loadingBlock,
+                  { width: "48%", height: 200, borderRadius: 12 },
+                  animatedStyle,
+                ]}
+              />
+            ))}
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 const UserProfile = ({ route }) => {
   const { userId } = route.params;
 
-  const {
-    data: userInfo,
-    isLoading: isLoadingProfile,
-    error: profileError,
-  } = useQuery({
+  const { data: userInfo, isLoading: isLoadingProfile } = useQuery({
     queryKey: ["userProfile", userId],
     queryFn: () => getProfileById(userId),
   });
@@ -21,206 +147,170 @@ const UserProfile = ({ route }) => {
   const inventionQueries = useQueries({
     queries: (userInfo?.inventions || []).map((inventionId) => ({
       queryKey: ["invention", inventionId],
-      queryFn: async () => {
-        try {
-          console.log(`Fetching invention with ID: ${inventionId}`);
-          const result = await getInventionById(inventionId);
-          console.log(`Invention data received for ${inventionId}:`, result);
-          return result;
-        } catch (error) {
-          console.error(`Error fetching invention ${inventionId}:`, error);
-          throw error;
-        }
-      },
+      queryFn: () => getInventionById(inventionId),
       enabled: !!userInfo?.inventions,
     })),
   });
-
-  console.log(
-    "Invention Queries Status:",
-    inventionQueries.map((q) => ({
-      isLoading: q.isLoading,
-      isError: q.isError,
-      error: q.error,
-      data: q.data,
-    }))
-  );
 
   const isLoadingInventions = inventionQueries.some((query) => query.isLoading);
   const inventionsData = inventionQueries
     .filter((query) => query.data)
     .map((query) => query.data);
 
-  console.log("Final inventionsData:", inventionsData);
-
-  console.log("UserInfo:", userInfo); // Debug log
-  console.log("Inventions:", userInfo?.inventions); // Add this debug log
-
   if (isLoadingProfile || isLoadingInventions) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
-  if (profileError || !userInfo) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text>Could not load profile. Please try again later.</Text>
-      </View>
-    );
+    return <LoadingView />;
   }
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Profile Header */}
-      <View style={styles.header}>
-        <Image
-          source={{
-            uri: userInfo?.image
-              ? `${BASE_URL}${userInfo.image}`.replace(/\\/g, "/")
-              : "https://via.placeholder.com/150",
-          }}
-          style={styles.avatar}
-        />
-        <View style={styles.headerInfo}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        <View style={styles.glassCard}>
+          <Image
+            source={{
+              uri: userInfo?.image
+                ? `${BASE_URL}${userInfo.image}`.replace(/\\/g, "/")
+                : "https://via.placeholder.com/150",
+            }}
+            style={styles.profileImage}
+          />
+
           <Text style={styles.name}>
             {userInfo?.firstName || ""} {userInfo?.lastName || ""}
           </Text>
-          <Text style={styles.role}>{userInfo?.role || "User"}</Text>
-        </View>
-      </View>
+          <Text style={styles.email}>{userInfo?.email}</Text>
+          <Text style={styles.roleText}>{userInfo?.role || "User"}</Text>
+          {userInfo?.bio && <Text style={styles.bio}>{userInfo.bio}</Text>}
 
-      {/* Bio Section */}
-      {userInfo?.bio && (
-        <View style={styles.section}>
-          <View style={styles.backColor}>
-            <Text style={styles.sectionTitle}>About</Text>
-            <Text style={styles.bio}>{userInfo.bio}</Text>
-          </View>
+          {/* Contact Information */}
+          {(userInfo?.phone || userInfo?.location) && (
+            <View style={styles.contactContainer}>
+              {userInfo?.phone && (
+                <View style={styles.contactItem}>
+                  <Icon name="call-outline" size={20} color={colors.primary} />
+                  <Text style={styles.contactText}>{userInfo.phone}</Text>
+                </View>
+              )}
+              {userInfo?.location && (
+                <View style={styles.contactItem}>
+                  <Icon
+                    name="location-outline"
+                    size={20}
+                    color={colors.primary}
+                  />
+                  <Text style={styles.contactText}>{userInfo.location}</Text>
+                </View>
+              )}
+            </View>
+          )}
         </View>
-      )}
 
-      {/* Contact Information */}
-      <View style={styles.section}>
-        <View style={styles.backColor}>
-          <Text style={styles.sectionTitle}>Contact Information</Text>
-          <View style={styles.infoContainer}>
-            {userInfo?.email && (
-              <InfoItem label="Email" value={userInfo.email} />
-            )}
-            {userInfo?.phone && (
-              <InfoItem label="Phone" value={userInfo.phone} />
-            )}
-            {userInfo?.location && (
-              <InfoItem label="Location" value={userInfo.location} />
-            )}
-          </View>
-        </View>
-      </View>
-
-      {/* Inventions Section */}
-      {inventionsData.length > 0 && (
-        <View style={styles.section}>
-          <View>
-            <Text style={styles.sectionTitle}>
-              {userInfo?.firstName}'s Inventions
-            </Text>
-          </View>
+        {/* Inventions Section */}
+        {inventionsData.length > 0 && (
           <View style={styles.inventionsContainer}>
-            <InventionList inventions={inventionsData} />
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>
+                {userInfo?.firstName}'s Inventions
+              </Text>
+            </View>
+            <InventionList inventions={inventionsData} numColumns={2} />
           </View>
-        </View>
-      )}
-    </ScrollView>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
-const InfoItem = ({ label, value }) => (
-  <View style={styles.infoItem}>
-    <Text style={styles.label}>{label}:</Text>
-    <Text style={styles.value}>{value?.toString() || ""}</Text>
-  </View>
-);
-
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.page,
+  },
   container: {
     flex: 1,
-    backgroundColor: "#88B3D4",
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  header: {
-    flexDirection: "row",
-    padding: 20,
-    alignItems: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  headerInfo: {
-    marginLeft: 15,
-    flex: 1,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "#f0f0f0",
-  },
-  backColor: {
-    backgroundColor: "white",
-    flex: 1,
-    borderRadius: 20,
+    backgroundColor: colors.page,
     padding: 10,
-    display: "flex",
+  },
+  glassCard: {
+    backgroundColor: "white",
+    borderRadius: 25,
+    padding: 20,
+    alignItems: "center",
+    shadowColor: "#003863",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    elevation: 8,
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
   name: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: "700",
+    color: colors.primary,
     marginBottom: 5,
   },
-  role: {
+  email: {
     fontSize: 16,
-    color: "#666",
+    color: colors.primary,
+    marginBottom: 5,
   },
-  section: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    backgroundColor: "#88B3D4",
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-    color: "#333",
+  roleText: {
+    fontSize: 14,
+    color: "#88B3D4",
+    fontWeight: "600",
+    marginBottom: 10,
   },
   bio: {
     fontSize: 16,
-    lineHeight: 24,
-    color: "#444",
+    color: colors.primary,
+    textAlign: "center",
+    marginBottom: 20,
+    paddingHorizontal: 10,
   },
-
-  infoItem: {
+  contactContainer: {
+    width: "100%",
+    gap: 12,
+  },
+  contactItem: {
     flexDirection: "row",
-    paddingVertical: 8,
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "rgba(136, 179, 212, 0.1)",
+    padding: 12,
+    borderRadius: 10,
   },
-  label: {
-    fontWeight: "600",
-    width: 100,
-    color: "#666",
-  },
-  value: {
-    flex: 1,
-    color: "#333",
+  contactText: {
+    color: colors.primary,
+    fontSize: 14,
   },
   inventionsContainer: {
-    marginTop: 10,
+    flex: 1,
+    backgroundColor: "#ffffff",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    padding: 20,
+    marginTop: 20,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: colors.primary,
+  },
+  loadingBlock: {
+    backgroundColor: colors.secondary,
+    borderRadius: 8,
   },
 });
 

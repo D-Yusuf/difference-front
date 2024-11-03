@@ -7,10 +7,16 @@ import {
   TouchableOpacity,
   StatusBar,
   SafeAreaView,
-  Animated,
   ScrollView,
-  Modal,
 } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+
 import Icon from "react-native-vector-icons/Ionicons";
 import { useQuery } from "@tanstack/react-query";
 import { getAllInventions } from "../../api/invention";
@@ -18,11 +24,152 @@ import InventionList from "../../components/InventionList";
 import { ThemeContext } from "../../context/ThemeContext";
 import { colors } from "../../../Colors";
 import UserContext from "../../context/UserContext";
-
 import { getCategories } from "../../api/categories";
 import FilterModal from "../../components/FilterModal";
+import { getProfile } from "../../api/user";
+
+const LoadingView = () => {
+  const opacity = useSharedValue(0.3);
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 800 }),
+        withTiming(0.3, { duration: 800 })
+      ),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Header Section with adjusted padding */}
+        <View style={[styles.headerSection, { paddingTop: 20 }]}>
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              styles.loadingHeaderTitle,
+              animatedStyle,
+            ]}
+          />
+          <Animated.View
+            style={[
+              styles.loadingBlock,
+              styles.loadingHeaderSubtitle,
+              animatedStyle,
+            ]}
+          />
+        </View>
+
+        {/* Search Section */}
+        <View style={styles.stickySection}>
+          <View style={styles.searchSection}>
+            <Animated.View
+              style={[
+                styles.loadingBlock,
+                styles.loadingSearchBar,
+                animatedStyle,
+              ]}
+            />
+
+            <View style={styles.gridControls}>
+              <View style={{ flexDirection: "row", gap: 10 }}>
+                <Animated.View
+                  style={[
+                    styles.loadingBlock,
+                    styles.loadingGridButton,
+                    animatedStyle,
+                  ]}
+                />
+                <Animated.View
+                  style={[
+                    styles.loadingBlock,
+                    styles.loadingGridButton,
+                    animatedStyle,
+                  ]}
+                />
+              </View>
+              <Animated.View
+                style={[
+                  styles.loadingBlock,
+                  styles.loadingFilterButton,
+                  animatedStyle,
+                ]}
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* Invention Cards */}
+        <View style={styles.listContainer}>
+          {[1, 2, 3].map((item) => (
+            <Animated.View
+              key={item}
+              style={[
+                styles.loadingBlock,
+                styles.loadingSingleCard,
+                animatedStyle,
+              ]}
+            >
+              <Animated.View
+                style={[
+                  styles.loadingBlock,
+                  styles.loadingSingleImage,
+                  animatedStyle,
+                ]}
+              />
+              <View style={styles.loadingSingleContent}>
+                <Animated.View
+                  style={[
+                    styles.loadingBlock,
+                    styles.loadingSingleTitle,
+                    animatedStyle,
+                  ]}
+                />
+                <Animated.View
+                  style={[
+                    styles.loadingBlock,
+                    styles.loadingSingleDescription,
+                    animatedStyle,
+                  ]}
+                />
+                <View style={styles.loadingSingleMeta}>
+                  <Animated.View
+                    style={[
+                      styles.loadingBlock,
+                      { width: "30%", height: 16 },
+                      animatedStyle,
+                    ]}
+                  />
+                  <Animated.View
+                    style={[
+                      styles.loadingBlock,
+                      { width: 50, height: 16 },
+                      animatedStyle,
+                    ]}
+                  />
+                </View>
+              </View>
+            </Animated.View>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
+
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [user, setUser] = useContext(UserContext);
   const [gridColumns, setGridColumns] = useState(2);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -37,7 +184,8 @@ const Home = () => {
     queryFn: getCategories,
   });
   const { setBackgroundColor } = useContext(ThemeContext);
-  const { user } = useContext(UserContext);
+
+  console.log("Full context value:", user);
 
   useEffect(() => {
     setBackgroundColor("white");
@@ -66,11 +214,42 @@ const Home = () => {
     });
 
   if (inventionsPending) {
-    return <Text>Loading...</Text>;
+    return <LoadingView />;
   }
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Add decorative elements */}
+      <View style={styles.topRightDots}>
+        {[...Array(28)].map((_, index) => (
+          <View key={`dot-tr-${index}`} style={styles.dot} />
+        ))}
+      </View>
+
+      <View style={styles.bottomLeftDots}>
+        {[...Array(28)].map((_, index) => (
+          <View key={`dot-bl-${index}`} style={styles.dot} />
+        ))}
+      </View>
+
+      <View style={styles.bottomRightCurves}>
+        {[...Array(5)].map((_, index) => (
+          <View
+            key={`curve-${index}`}
+            style={[
+              styles.curve,
+              {
+                width: 150 + index * 30,
+                height: 150 + index * 30,
+                bottom: -75 - index * 15,
+                right: -75 - index * 15,
+              },
+            ]}
+          />
+        ))}
+      </View>
+
+      {/* Existing content */}
       <StatusBar barStyle="dark-content" backgroundColor="#ADD8E6" />
 
       <FilterModal
@@ -87,7 +266,7 @@ const Home = () => {
         <ScrollView style={styles.scrollView} stickyHeaderIndices={[1]}>
           <View style={styles.headerSection}>
             <Text style={styles.headerTitle}>
-              Hello, {user?.firstName || "there"}
+              Hello, {user?.firstName || "there"}!
             </Text>
             <Text style={styles.headerSubtitle}>
               Find your next inspiration
@@ -179,12 +358,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerSection: {
-    // marginTop: 40,
     marginBottom: 10,
     paddingHorizontal: 20,
+    paddingTop: 20,
   },
   headerTitle: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "800",
     color: colors.primary,
     letterSpacing: 0.5,
@@ -246,6 +425,126 @@ const styles = StyleSheet.create({
     backgroundColor: colors.page,
     paddingHorizontal: 20,
     zIndex: 1,
+  },
+
+  scrollContent: {
+    padding: 16,
+    paddingBottom: 30,
+  },
+  loadingBlock: {
+    backgroundColor: colors.secondary,
+    borderRadius: 12,
+  },
+  loadingHeaderTitle: {
+    height: 28,
+    width: "70%",
+    marginBottom: 8,
+  },
+  loadingHeaderSubtitle: {
+    height: 16,
+    width: "50%",
+    marginBottom: 20,
+  },
+  loadingSearchBar: {
+    height: 50,
+    width: "100%",
+    marginBottom: 20,
+  },
+  loadingGridButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 15,
+  },
+  loadingFilterButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
+  loadingInventionCard: {
+    height: 200,
+    width: "100%",
+    marginBottom: 16,
+  },
+  loadingSingleCard: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    marginBottom: 16,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  loadingSingleImage: {
+    width: "100%",
+    height: 250,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  loadingSingleContent: {
+    padding: 16,
+  },
+  loadingSingleTitle: {
+    height: 24,
+    width: "80%",
+    marginBottom: 8,
+  },
+  loadingSingleDescription: {
+    height: 16,
+    width: "100%",
+    marginBottom: 12,
+  },
+  loadingSingleMeta: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  topRightDots: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: 100,
+    gap: 8,
+    opacity: 0.1,
+    zIndex: 0,
+  },
+  bottomLeftDots: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: 120,
+    gap: 8,
+    opacity: 0.1,
+    zIndex: 0,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.primary,
+  },
+  bottomRightCurves: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    opacity: 0.05,
+    zIndex: 0,
+  },
+  curve: {
+    position: "absolute",
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
 });
 

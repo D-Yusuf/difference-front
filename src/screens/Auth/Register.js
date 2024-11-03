@@ -213,6 +213,7 @@ const Register = () => {
             <Icon name="close" size={24} color="#FF7F50" />
           </TouchableOpacity>
           <FlatList
+            scrollEnabled={false}
             data={roles}
             renderItem={renderRoleItem}
             keyExtractor={(item) => item.value}
