@@ -8,18 +8,31 @@ import UserProfile from "../../screens/Profile/UserProfile";
 const Stack = createNativeStackNavigator();
 const InventionNavigation = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerShadowVisible: false,
+      }}
+    >
       <Stack.Screen
         name={NAVIGATION.INVENTION.INVENTION_DETAILS}
         component={InventionDetails}
+        options={{
+          headerTitle: "Invention",
+        }}
       />
       <Stack.Screen
         name={NAVIGATION.INVENTION.USER_PROFILE}
         component={UserProfile}
+        options={{
+          headerTitle: "Profile",
+        }}
       />
       <Stack.Screen
         name={NAVIGATION.INVENTION.EDIT_INVENTION}
         component={EditInvention}
+        options={{
+          headerTitle: "Edit Invention",
+        }}
       />
     </Stack.Navigator>
   );

@@ -228,7 +228,6 @@ const Home = () => {
       }
       return 0;
     });
-   
 
   if (inventionsPending) {
     return <LoadingView />;
@@ -352,6 +351,7 @@ const Home = () => {
 
           <View style={styles.listContainer}>
             <InventionList
+              page="home"
               inventions={filteredInventions}
               refetch={refetch}
               numColumns={gridColumns}

@@ -8,6 +8,7 @@ const InventionList = ({
   showInvestButton = true,
   showEditButton = true,
   refetch,
+  page,
 }) => {
   if (inventions?.length === 0 || !inventions) {
     return <Text>No inventions found.</Text>;
@@ -25,6 +26,7 @@ const InventionList = ({
             refetch={refetch}
             invention={item}
             compact={numColumns === 2}
+            page={page}
           />
         </View>
       )}

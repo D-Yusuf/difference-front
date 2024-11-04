@@ -25,12 +25,15 @@ const ProfileNavigation = () => {
         }}
       />
       <Stack.Screen
-        name={NAVIGATION.PROFILE.EDIT_PROFILE}
-        component={EditProfile}
-      />
-      <Stack.Screen
         name={NAVIGATION.PROFILE.USER_PROFILE}
         component={UserProfile}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name={NAVIGATION.PROFILE.EDIT_PROFILE}
+        component={EditProfile}
       />
       <Stack.Screen
         name="AddInvention"
@@ -45,20 +48,8 @@ const ProfileNavigation = () => {
         }}
       />
       <Stack.Screen
-        name={NAVIGATION.INVENTION.INVENTION_DETAILS}
-        options={{
-          headerTitle: "Invention",
-          headerShadowVisible: false,
-        }}
+        name={NAVIGATION.PROFILE.INVENTION_DETAILS}
         component={InventionDetails}
-      />
-      <Stack.Screen
-        name={NAVIGATION.INVENTION.EDIT_INVENTION}
-        options={{
-          headerTitle: "Edit Invention",
-          headerShadowVisible: false,
-        }}
-        component={EditInvention}
       />
       <Stack.Screen
         name={NAVIGATION.PROFILE.ORDERS}

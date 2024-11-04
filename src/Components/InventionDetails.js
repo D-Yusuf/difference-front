@@ -378,7 +378,7 @@ const InventionDetails = ({ route }) => {
               <TouchableOpacity
                 style={styles.inventorInfo}
                 onPress={() => {
-                  navigation.navigate(NAVIGATION.PROFILE.USER_PROFILE, {
+                  navigation.push(NAVIGATION.HOME.USER_PROFILE, {
                     userId: inventor._id,
                   });
                 }}
