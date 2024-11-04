@@ -170,7 +170,7 @@ const LoadingView = () => {
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [user, setUser] = useContext(UserContext);
-  const [gridColumns, setGridColumns] = useState(2);
+  const [gridColumns, setGridColumns] = useState(1);
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedPhase, setSelectedPhase] = useState(null);

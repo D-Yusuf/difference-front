@@ -25,6 +25,7 @@
     "jwt-decode": "^4.0.0",
     "react": "18.2.0",
     "react-native": "0.74.5",
+    "react-native-circular-progress-indicator": "^4.4.2",
     "react-native-gesture-handler": "^2.20.2",
     "react-native-reanimated": "~3.10.1",
     "react-native-reanimated-carousel": "^3.5.1",
