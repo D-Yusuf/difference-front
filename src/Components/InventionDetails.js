@@ -198,7 +198,7 @@ const InventionDetails = ({ route }) => {
     console.log("No invention data available");
     return <Text>No invention data available</Text>;
   }
-
+  console.log("INVENTION", invention?.documents);
   // We will check if the user is the inventor or admin appear the edit button for him.
   const isOwner =
     invention.inventors.find((inventor) => inventor._id === user._id) ||
@@ -344,7 +344,7 @@ const InventionDetails = ({ route }) => {
               {formatPhase(invention?.phase)}
             </Text>
             <View style={styles.progressContainer}>
-                {PHASES.map((phase, index) => (
+              {PHASES.map((phase, index) => (
                 <View key={phase} style={styles.phaseStep}>
                   <View
                     style={[
@@ -371,7 +371,7 @@ const InventionDetails = ({ route }) => {
                       ]}
                     />
                   )}
-              </View>
+                </View>
               ))}
             </View>
           </View>
@@ -428,6 +428,22 @@ const InventionDetails = ({ route }) => {
             </View>
           ))}
         </View>
+
+        {invention?.documents && invention.documents.length > 0 && (
+          <View style={styles.documentsContainer}>
+            <Text style={styles.sectionTitle}>Documents</Text>
+            {invention.documents.map((doc, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.documentItem}
+                onPress={() => handleDocumentPress(doc)}
+              >
+                <Icon name="document-text" size={24} color={colors.primary} />
+                <Text style={styles.documentName}>Document {index + 1}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
         <Text style={styles.cost}>Remaining Funds: {remainingFunds} KWD</Text>
@@ -785,6 +801,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   documentItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
     backgroundColor: "#ffffff",
     padding: 12,
     borderRadius: 8,
