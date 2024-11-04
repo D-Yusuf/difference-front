@@ -38,9 +38,9 @@ const ProfileNavigation = () => {
         options={{
           headerTitle: "Add Invention",
           headerStyle: {
-            backgroundColor: colors.primary,
+            backgroundColor: "transparent",
           },
-          headerTintColor: "white",
+          headerTintColor: colors.primary,
           headerShadowVisible: false,
         }}
       />
@@ -64,7 +64,7 @@ const ProfileNavigation = () => {
         name={NAVIGATION.PROFILE.ORDERS}
         component={Orders}
         options={{
-          headerTitle: "Orders",
+          headerTitle: "Investment Requests",
           headerShadowVisible: false,
         }}
       />

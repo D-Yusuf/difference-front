@@ -193,18 +193,7 @@ const Profile = ({ navigation }) => {
           <Text style={styles.roleText}>{profile?.role}</Text>
           <Text style={styles.bio}>{profile?.bio}</Text>
 
-          <View
-            style={[
-              styles.buttonContainer,
-              {
-                flexWrap: "wrap",
-                justifyContent: "center",
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 10,
-              },
-            ]}
-          >
+          <View style={styles.buttonContainer}>
             {(user.role === "inventor" || user.role === "admin") && (
               <TouchableOpacity
                 style={styles.actionButton}
@@ -216,25 +205,29 @@ const Profile = ({ navigation }) => {
                   })
                 }
               >
-                <Icon name="document-text-outline" size={20} color="#003863" />
-                <Text style={styles.buttonText}>Orders</Text>
+                <Icon
+                  name="document-text-outline"
+                  size={20}
+                  color={colors.primary}
+                />
+                <Text style={styles.buttonText}>Investment Requests</Text>
               </TouchableOpacity>
             )}
-            <View style={styles.buttonContainer}>
-              {profile?.cv && (
-                <TouchableOpacity
-                  style={[styles.actionButton, styles.cvButton]}
-                  onPress={() => Linking.openURL(BASE_URL + profile.cv)}
-                >
-                  <Icon
-                    name="document-text-outline"
-                    size={20}
-                    color={colors.primary}
-                  />
-                  <Text style={styles.buttonText}>View CV</Text>
-                </TouchableOpacity>
-              )}
-            </View>
+
+            {profile?.cv && (
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => Linking.openURL(BASE_URL + profile.cv)}
+              >
+                <Icon
+                  name="document-text-outline"
+                  size={20}
+                  color={colors.primary}
+                />
+                <Text style={styles.buttonText}>View CV</Text>
+              </TouchableOpacity>
+            )}
+
             {user.role === "inventor" && (
               <TouchableOpacity
                 style={styles.actionButton}
@@ -263,7 +256,7 @@ const Profile = ({ navigation }) => {
         {user.role === "investor" && (
           <View>
             <View style={styles.investorHeader}>
-              <Text style={styles.ordersTitle}>Number of Orders:</Text>
+              <Text style={styles.ordersTitle}>Number of Investments:</Text>
               <Text style={styles.ordersTitle}>
                 {allOrders?.filter(
                   (order) => order?.investor?._id === profile?._id
@@ -320,24 +313,38 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-    marginTop: 10,
+    flexWrap: "wrap",
+    gap: 10,
+    paddingHorizontal: 5,
+    marginTop: 16,
+    marginBottom: 8,
+    justifyContent: "center",
   },
   actionButton: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
-    borderRadius: 10,
-    backgroundColor: "rgba(136, 179, 212, 0.1)",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: `${colors.primary}10`,
+    minWidth: 100,
+    maxWidth: "45%",
     flex: 1,
-    marginHorizontal: 5,
-    gap: 7,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: `${colors.primary}20`,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   buttonText: {
     color: colors.primary,
     fontSize: 14,
     fontWeight: "600",
+    textAlign: "center",
   },
   profileImage: {
     width: 120,

@@ -138,7 +138,7 @@ const Register = () => {
             placeholder="Email"
             keyboardType="email-address"
             placeholderTextColor="#888"
-            onChangeText={(text) => setUserInfo({ ...userInfo, email: text })}
+            onChangeText={(text) => setUserInfo({ ...userInfo, email: text.toLowerCase() })}
           />
           {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 

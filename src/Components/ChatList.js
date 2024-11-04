@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -8,27 +8,83 @@ import {
   StyleSheet,
 } from "react-native";
 import { colors } from "../../Colors";
-import { BASE_URL } from "../api/index";
+import { BASE_URL, socket } from "../api/index";
 import { getAllMessageRooms } from "../api/chat";
 import { useQuery } from "@tanstack/react-query";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+
+const LoadingView = () => {
+  const opacity = useSharedValue(0.3);
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 800 }),
+        withTiming(0.3, { duration: 800 })
+      ),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  return (
+    <View style={styles.container}>
+      {[1, 2, 3, 4, 5].map((item) => (
+        <View key={item} style={styles.chatItem}>
+          <Animated.View
+            style={[styles.loadingBlock, styles.loadingAvatar, animatedStyle]}
+          />
+          <View style={styles.chatInfo}>
+            <Animated.View
+              style={[styles.loadingBlock, styles.loadingName, animatedStyle]}
+            />
+            <Animated.View
+              style={[
+                styles.loadingBlock,
+                styles.loadingMessage,
+                animatedStyle,
+              ]}
+            />
+          </View>
+          <Animated.View
+            style={[styles.loadingBlock, styles.loadingTime, animatedStyle]}
+          />
+        </View>
+      ))}
+    </View>
+  );
+};
 
 const ChatList = ({ navigation }) => {
   const {
     data: chats,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["getAllMessageRooms"],
     queryFn: getAllMessageRooms,
   });
 
+  useEffect(() => {
+    socket.on("message", (data) => {
+      refetch();
+    });
+  }, []);
+
   console.log(chats);
   if (isLoading) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>Loading...</Text>
-      </View>
-    );
+    return <LoadingView />;
   }
 
   if (error) {
@@ -129,6 +185,32 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: "#666",
+  },
+  loadingBlock: {
+    backgroundColor: colors.secondary,
+    borderRadius: 8,
+  },
+  loadingAvatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  loadingName: {
+    width: "60%",
+    height: 16,
+    marginBottom: 8,
+    borderRadius: 4,
+  },
+  loadingMessage: {
+    width: "80%",
+    height: 14,
+    borderRadius: 4,
+  },
+  loadingTime: {
+    width: 50,
+    height: 12,
+    borderRadius: 4,
+    marginLeft: 8,
   },
 });
 

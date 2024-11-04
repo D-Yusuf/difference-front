@@ -3,7 +3,6 @@ import { BASE_URL } from "../api"; // Adjust the path as needed
 
 export const createInvention = async (inventionData) => {
   try {
-    console.log("DARA", inventionData);
     const formData = new FormData();
     for (let key in inventionData) {
       if (key !== "images" && key !== "documents")
@@ -22,6 +21,7 @@ export const createInvention = async (inventionData) => {
     // Append documents if they exist
     if (inventionData.documents) {
       inventionData.documents.forEach((document, index) => {
+        console.log("document", index, document);
         formData.append("documents", {
           uri: document.uri,
           type: document.mimeType,
