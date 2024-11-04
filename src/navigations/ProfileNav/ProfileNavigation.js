@@ -28,10 +28,10 @@ const ProfileNavigation = () => {
         name={NAVIGATION.PROFILE.EDIT_PROFILE}
         component={EditProfile}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name={NAVIGATION.PROFILE.USER_PROFILE}
         component={UserProfile}
-      />
+      /> */}
       <Stack.Screen
         name="AddInvention"
         component={invention}
