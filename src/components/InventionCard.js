@@ -231,8 +231,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     height: 300, // Fixed height for grid view
-    borderWidth: 1,
-    borderColor: colors.secondary,
   },
   singleColumnCard: {
     height: 450, // Fixed height for single column
