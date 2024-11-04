@@ -9,13 +9,13 @@ import {
   Platform,
   Dimensions,
 } from "react-native";
-
 import React, { useEffect, useState, useContext, useRef } from "react";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getInvention, toggleLikeInvention } from "../api/invention";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
+import { getProfile } from "../api/profile"; // Import the getProfile function
 import UserContext from "../context/UserContext";
 import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
@@ -288,7 +288,7 @@ const InventionDetails = ({ route }) => {
               {formatPhase(invention?.phase)}
             </Text>
             <View style={styles.progressContainer}>
-              {PHASES.map((phase, index) => (
+                {PHASES.map((phase, index) => (
                 <View key={phase} style={styles.phaseStep}>
                   <View
                     style={[
@@ -315,7 +315,7 @@ const InventionDetails = ({ route }) => {
                       ]}
                     />
                   )}
-                </View>
+              </View>
               ))}
             </View>
           </View>
@@ -327,7 +327,7 @@ const InventionDetails = ({ route }) => {
               <TouchableOpacity
                 style={styles.inventorInfo}
                 onPress={() => {
-                  navigation.navigate(NAVIGATION.PROFILE.USER_PROFILE, {
+                  navigation.navigate(NAVIGATION.INVENTION.USER_PROFILE, {
                     userId: inventor._id,
                   });
                 }}

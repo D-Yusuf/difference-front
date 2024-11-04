@@ -11,11 +11,11 @@ const NAVIGATION = {
   },
   PROFILE: {
     INDEX: "ProfileIndex",
-    PROFILE: "Profile",
     EDIT_PROFILE: "EditProfile",
     ORDERS: "Orders",
+    PROFILE: "Profile",
     INVEST_DETAILS: "InvestDetails-Profile",
-    USER_PROFILE: "UserProfile",
+    // USER_PROFILE: "UserProfile",
   },
   // INVEST: {
   //   INDEX: "InvestIndex",
@@ -28,6 +28,7 @@ const NAVIGATION = {
     INVEST: "InvestInInvention",
     CREATE_INVENTION: "CreateInvention",
     EDIT_INVENTION: "EditInvention",
+    USER_PROFILE: "UserProfile",
   },
   CHAT: {
     INDEX: "Chat",
