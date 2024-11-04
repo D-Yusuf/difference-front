@@ -78,8 +78,7 @@ const Login = () => {
                 style={styles.input}
                 placeholder="Email"
                 value={email}
-                // onChangeText={(text) => setEmail(text.toLowerCase())}
-                onChangeText={setEmail}
+                onChangeText={(text) => setEmail(text.toLowerCase())}
                 placeholderTextColor="rgba(255,255,255,0.7)"
                 keyboardType="email-address"
                 autoCapitalize="none"
