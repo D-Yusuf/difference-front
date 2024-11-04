@@ -22,7 +22,7 @@ const ChatRoom = ({ route }) => {
   const [user] = useContext(UserContext);
   const { recipientId, userName, messageRoomId } = route.params;
   const queryClient = useQueryClient();
-
+  const scrollRef = useRef();
   const { data, refetch: refetchMessages } = useQuery({
     queryKey: ["messageRoom", messageRoomId],
     queryFn: () => getMessageRoomById(messageRoomId),
@@ -40,6 +40,10 @@ const ChatRoom = ({ route }) => {
         console.log("Hi");
         refetchMessages();
       });
+      // Scroll to bottom after new message
+      if (scrollRef.current) {
+        scrollRef.current.scrollToEnd({ animated: true });
+      }
     },
     onError: (error) => {
       console.log("Error creating message room:", error);
@@ -48,7 +52,7 @@ const ChatRoom = ({ route }) => {
 
   useEffect(() => {
     socket.on("message", (data) => {
-      refetch();
+      queryClient.refetchQueries({ queryKey: ["messageRoom"] });
     });
   }, []);
 
@@ -111,6 +115,12 @@ const ChatRoom = ({ route }) => {
         renderItem={(item) => renderMessage(item)}
         keyExtractor={(item) => item._id.toString()}
         contentContainerStyle={styles.messagesList}
+        ref={(ref) => (scrollRef.current = ref)}
+        onContentSizeChange={() => {
+          if (scrollRef.current) {
+            scrollRef.current.scrollToEnd({ animated: true });
+          }
+        }}
       />
       <View style={styles.inputContainer}>
         <TextInput
