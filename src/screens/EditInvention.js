@@ -62,6 +62,7 @@ const EditInvention = ({ route, navigation }) => {
       navigation.goBack();
     },
     onError: (error) => {
+      console.log("Failed... Invention info: ", inventionInfo);
       console.error("Mutation error:", error);
       alert(error.response?.data?.message || "Error updating invention");
     },
