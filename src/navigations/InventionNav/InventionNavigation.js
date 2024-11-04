@@ -13,10 +13,7 @@ const InventionNavigation = () => {
         name={NAVIGATION.INVENTION.INVENTION_DETAILS}
         component={InventionDetails}
       />
-        <Stack.Screen
-          name={NAVIGATION.INVENTION.USER_PROFILE}
-          component={UserProfile}
-        />
+      
       <Stack.Screen
         name={NAVIGATION.INVENTION.EDIT_INVENTION}
         component={EditInvention}
