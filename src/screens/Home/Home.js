@@ -223,9 +223,12 @@ const Home = () => {
         return new Date(b.createdAt) - new Date(a.createdAt);
       } else if (sortBy === "popular") {
         return (b.likes?.length || 0) - (a.likes?.length || 0);
+      } else if (sortBy === "views") {
+        return b.views - a.views;
       }
       return 0;
     });
+   
 
   if (inventionsPending) {
     return <LoadingView />;
@@ -273,6 +276,8 @@ const Home = () => {
         setSelectedCategory={setSelectedCategory}
         selectedPhase={selectedPhase}
         setSelectedPhase={setSelectedPhase}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
       />
 
       <View style={styles.innerContainer}>

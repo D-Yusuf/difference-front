@@ -94,6 +94,22 @@ const FilterModal = ({
                     Most Popular
                   </Text>
                 </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.optionButton,
+                    sortBy === "views" && styles.selectedOption,
+                  ]}
+                  onPress={() => setSortBy("views")}
+                >
+                  <Text
+                    style={[
+                      styles.optionText,
+                      sortBy === "views" && styles.selectedOptionText,
+                    ]}
+                  >
+                    Most Viewed
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
 
