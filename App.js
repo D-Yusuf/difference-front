@@ -15,7 +15,16 @@ LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 LogBox.ignoreAllLogs();
 
 export default function App() {
-  const queryClient = new QueryClient();
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 0,
+        cacheTime: 0,
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
+      },
+    },
+  });
   const [backgroundColor, setBackgroundColor] = useState("#88B3D4");
   const [user, setUser] = useState({
     loggedIn: false,
