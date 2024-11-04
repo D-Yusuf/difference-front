@@ -25,19 +25,30 @@ const InventionCard = ({
 
   const [activeIndex, setActiveIndex] = useState(0);
   const width = Dimensions.get("window").width - 16; // Account for margins
-  const { user } = useContext(UserContext);
+  const [user, setUser] = useContext(UserContext);
+  const [likedInvention, setLikedInvention] = useState(invention);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const { mutate: handleLike } = useMutation({
     mutationKey: ["likeInvention"],
     mutationFn: () => toggleLikeInvention(invention._id),
-    onSuccess: () => {
+    onSuccess: (data) => {
       setIsLiked(!isLiked);
       setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
-
       console.log("Invalidating queries");
       queryClient.invalidateQueries({ queryKey: ["inventions"] });
-      queryClient.invalidateQueries({ queryKey: ["invention", invention._id] });
+      queryClient.invalidateQueries({
+        queryKey: ["invention", invention._id],
+      });
+      // Force a refetch
+      queryClient.refetchQueries({
+        queryKey: ["inventions"],
+        exact: false,
+      });
+      queryClient.refetchQueries({
+        queryKey: ["invention", invention._id],
+        exact: false,
+      });
     },
   });
   const { mutate: handleView } = useMutation({
@@ -214,6 +225,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     height: 300, // Fixed height for grid view
+    borderWidth: 1,
+    borderColor: colors.secondary,
   },
   singleColumnCard: {
     height: 450, // Fixed height for single column

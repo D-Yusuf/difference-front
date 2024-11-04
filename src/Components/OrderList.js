@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,12 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Animated,
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSequence,
+  withRepeat,
 } from "react-native";
 import { getOrders, updateOrder } from "../api/orders";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +20,139 @@ import NAVIGATION from "../navigations";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../Colors";
 import getTimeAgo from "../utils/getTimeAgo";
+
+const LoadingView = () => {
+  const opacity = useSharedValue(0.3);
+
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(1, { duration: 800 }),
+        withTiming(0.3, { duration: 800 })
+      ),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
+
+  return (
+    <View style={styles.container}>
+      {/* Filter Section Loading */}
+      <View style={styles.filterContainer}>
+        {["all", "pending", "approved", "declined"].map((_, index) => (
+          <Animated.View
+            key={`filter-${index}`}
+            style={[
+              styles.loadingBlock,
+              {
+                width: 80,
+                height: 36,
+                borderRadius: 20,
+              },
+              animatedStyle,
+            ]}
+          />
+        ))}
+      </View>
+
+      {/* Order Cards Loading */}
+      <ScrollView>
+        {[1, 2, 3].map((index) => (
+          <View key={`order-${index}`} style={styles.card}>
+            <View style={styles.header}>
+              <Animated.View
+                style={[
+                  styles.loadingBlock,
+                  { width: 50, height: 50, borderRadius: 12 },
+                  animatedStyle,
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.loadingBlock,
+                  { width: "40%", height: 20, marginHorizontal: 12 },
+                  animatedStyle,
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.loadingBlock,
+                  { width: 80, height: 30, borderRadius: 8 },
+                  animatedStyle,
+                ]}
+              />
+            </View>
+
+            <View style={styles.details}>
+              <Animated.View
+                style={[
+                  styles.loadingBlock,
+                  { width: "60%", height: 20, marginBottom: 8 },
+                  animatedStyle,
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.loadingBlock,
+                  { width: "70%", height: 20 },
+                  animatedStyle,
+                ]}
+              />
+            </View>
+
+            <View style={styles.investorInfo}>
+              <View style={styles.investorProfile}>
+                <Animated.View
+                  style={[
+                    styles.loadingBlock,
+                    { width: 40, height: 40, borderRadius: 20 },
+                    animatedStyle,
+                  ]}
+                />
+                <View style={styles.investorTextContainer}>
+                  <Animated.View
+                    style={[
+                      styles.loadingBlock,
+                      { width: "60%", height: 20 },
+                      animatedStyle,
+                    ]}
+                  />
+                </View>
+                <Animated.View
+                  style={[
+                    styles.loadingBlock,
+                    { width: 60, height: 16 },
+                    animatedStyle,
+                  ]}
+                />
+              </View>
+              <View style={styles.buttonGroup}>
+                <Animated.View
+                  style={[
+                    styles.loadingBlock,
+                    { width: "48%", height: 45, borderRadius: 12 },
+                    animatedStyle,
+                  ]}
+                />
+                <Animated.View
+                  style={[
+                    styles.loadingBlock,
+                    { width: "48%", height: 45, borderRadius: 12 },
+                    animatedStyle,
+                  ]}
+                />
+              </View>
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
 
 const OrderList = ({ orders, own = false }) => {
   const [statusFilter, setStatusFilter] = useState("all");
@@ -39,6 +178,11 @@ const OrderList = ({ orders, own = false }) => {
   const handleStatusUpdate = (orderId, newStatus) => {
     updateOrderStatus({ orderId, newStatus });
   };
+
+  // Add loading state check
+  if (!orders) {
+    return <LoadingView />;
+  }
 
   return (
     <View style={styles.container}>
@@ -114,16 +258,16 @@ const OrderList = ({ orders, own = false }) => {
                 {!own && order.status === "pending" ? (
                   <View style={styles.buttonGroup}>
                     <TouchableOpacity
-                      onPress={() => handleStatusUpdate(order._id, "approved")}
-                      style={[styles.actionButton, styles.approveButton]}
-                    >
-                      <Text style={styles.actionButtonText}>Accept</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
                       onPress={() => handleStatusUpdate(order._id, "declined")}
                       style={[styles.actionButton, styles.declineButton]}
                     >
                       <Text style={styles.actionButtonText}>Reject</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => handleStatusUpdate(order._id, "approved")}
+                      style={[styles.actionButton, styles.approveButton]}
+                    >
+                      <Text style={styles.actionButtonText}>Accept</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
@@ -154,31 +298,30 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "white",
     borderRadius: 13,
+    width: "98%",
+    alignSelf: "center",
     marginVertical: 12,
-    overflow: "hidden",
+    padding: 16,
+    gap: 16,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    borderWidth: 1,
-    borderColor: colors.secondary,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.secondary,
+    marginBottom: 8,
   },
   inventionImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    width: 50,
+    height: 50,
+    borderRadius: 12,
     marginRight: 12,
   },
   title: {
@@ -191,10 +334,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.page,
     textTransform: "capitalize",
-    backgroundColor: "orange",
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 10,
+    borderRadius: 8,
+    overflow: "hidden",
   },
   approvedStatus: {
     backgroundColor: "green",
@@ -210,33 +353,39 @@ const styles = StyleSheet.create({
   },
 
   details: {
-    padding: 16,
+    padding: 12,
+    backgroundColor: colors.page,
+    borderRadius: 12,
+    gap: 8,
   },
   detailText: {
     fontSize: 15,
     color: colors.primary,
-    marginBottom: 8,
+    fontWeight: "500",
+    marginBottom: 0,
   },
   investorInfo: {
-    borderTopWidth: 1,
-    borderTopColor: colors.secondary,
-    padding: 16,
+    padding: 12,
     backgroundColor: colors.page,
+    borderRadius: 12,
+    gap: 12,
   },
   investorProfile: {
     flexDirection: "row",
     alignItems: "center",
   },
   profilePic: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     marginRight: 8,
+    borderWidth: 2,
+    borderColor: colors.primary,
   },
   investorText: {
     fontSize: 14,
+    fontWeight: "600",
     color: colors.primary,
-    opacity: 0.8,
   },
   filterContainer: {
     flexDirection: "row",
@@ -261,50 +410,60 @@ const styles = StyleSheet.create({
     color: colors.page,
   },
   actionButtons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 8,
+    marginTop: 0,
   },
   actionButton: {
-    width: 80,
-    height: 40,
-    borderRadius: 20,
+    borderRadius: 12,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 4,
-    margin: 5,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.84,
+    elevation: 3,
   },
   approveButton: {
-    backgroundColor: "green",
-    width: "50%",
+    backgroundColor: "#15803d",
+    width: "48%",
   },
   declineButton: {
-    backgroundColor: "red",
-    width: "50%",
+    backgroundColor: "#b91c1c",
+    width: "48%",
   },
   actionButtonText: {
     color: "white",
     fontSize: 14,
+    fontWeight: "600",
+    letterSpacing: 0.3,
   },
   buttonGroup: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
+    width: "100%",
+    gap: 8,
   },
   pendingButton: {
-    backgroundColor: "red",
-    width: "100%",
-    borderRadius: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#b91c1c",
+    width: "90%",
   },
   timeAgo: {
     fontSize: 12,
     color: colors.primary,
     opacity: 0.8,
+    marginLeft: "auto",
   },
   investorTextContainer: {
     flex: 1,
+  },
+  loadingBlock: {
+    backgroundColor: colors.secondary,
+    borderRadius: 8,
   },
 });
 
