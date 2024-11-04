@@ -1,12 +1,5 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  useEffect,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { BASE_URL } from "../api/index";
 import { useNavigation } from "@react-navigation/native";
 import NAVIGATION from "../navigations";
@@ -25,6 +18,7 @@ const InventionCard = ({
   compact,
   showInvestButton = true,
   showEditButton = true,
+  refetch,
 }) => {
   const queryClient = useQueryClient();
   const navigation = useNavigation();
@@ -33,20 +27,23 @@ const InventionCard = ({
   const width = Dimensions.get("window").width - 16; // Account for margins
   const { user } = useContext(UserContext);
   const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const { mutate: handleLike } = useMutation({
     mutationKey: ["likeInvention"],
     mutationFn: () => toggleLikeInvention(invention._id),
     onSuccess: () => {
+      setIsLiked(!isLiked);
+      setLikeCount((prevCount) => (isLiked ? prevCount - 1 : prevCount + 1));
+
+      console.log("Invalidating queries");
       queryClient.invalidateQueries({ queryKey: ["inventions"] });
       queryClient.invalidateQueries({ queryKey: ["invention", invention._id] });
-      // invalidateInventionQueries(queryClient)
     },
   });
   const { mutate: handleView } = useMutation({
     mutationFn: () => incrementInventionViews(invention._id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["inventions"] });
-      queryClient.invalidateQueries({ queryKey: ["invention", invention._id] });
+      // queryClient.invalidateQueries({ queryKey: ["invention", invention._id] });
       navigation.navigate(NAVIGATION.INVENTION.INVENTION_DETAILS, {
         inventionId: invention._id,
         image: images[0],
@@ -58,6 +55,16 @@ const InventionCard = ({
   if (!invention || !invention._id) {
     return null;
   }
+  // useLayoutEffect(() => {
+  //   console.log("InventionCard mounted");
+  //   refetch();
+  // }, [isLiked]);
+
+  useEffect(() => {
+    setIsLiked(invention.likes.includes(user?._id));
+    setLikeCount(invention.likes.length);
+  }, [invention, user?._id]);
+
   const images =
     invention.images?.length > 0
       ? invention.images.map((img) => `${BASE_URL}${img}`.replace(/\\/g, "/"))
@@ -176,7 +183,7 @@ const InventionCard = ({
                   color="#FF4D4D"
                 />
                 <Text style={styles.likesCount} numberOfLines={1}>
-                  {shortNumber(invention.likes?.length || 0)}
+                  {shortNumber(likeCount)}
                 </Text>
               </TouchableOpacity>
               <View style={styles.statItem}>

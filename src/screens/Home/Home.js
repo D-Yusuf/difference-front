@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -175,7 +175,12 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [sortBy, setSortBy] = useState(null);
-  const { data: inventions, isPending: inventionsPending } = useQuery({
+
+  const {
+    data: inventions,
+    isPending: inventionsPending,
+    refetch,
+  } = useQuery({
     queryKey: ["inventions"],
     queryFn: getAllInventions,
   });
@@ -194,6 +199,11 @@ const Home = () => {
   useEffect(() => {
     setBackgroundColor("white");
   }, []);
+
+  useLayoutEffect(() => {
+    refetch();
+    console.log("Refetching");
+  }, [refetch]);
 
   const filteredInventions = inventions
     ?.filter((invention) => {
@@ -338,6 +348,7 @@ const Home = () => {
           <View style={styles.listContainer}>
             <InventionList
               inventions={filteredInventions}
+              refetch={refetch}
               numColumns={gridColumns}
             />
           </View>
