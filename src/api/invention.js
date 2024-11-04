@@ -3,7 +3,6 @@ import { BASE_URL } from "../api"; // Adjust the path as needed
 
 export const createInvention = async (inventionData) => {
   try {
-    console.log("DARA", inventionData);
     const formData = new FormData();
     for (let key in inventionData) {
       if (key !== "images" && key !== "documents")
@@ -22,6 +21,7 @@ export const createInvention = async (inventionData) => {
     // Append documents if they exist
     if (inventionData.documents) {
       inventionData.documents.forEach((document, index) => {
+        console.log("document", index, document);
         formData.append("documents", {
           uri: document.uri,
           type: document.mimeType,
@@ -81,39 +81,42 @@ export const updateInvention = async (inventionId, inventionData) => {
     console.log("Updating invention with data:", inventionData);
     const formData = new FormData();
 
-    // Handle inventors array separately
-    if (inventionData.inventors) {
-      inventionData.inventors.forEach((inventorId) => {
-        formData.append("inventors[]", inventorId);
-      });
-    }
-
-    // Append other non-file data
-    Object.keys(inventionData).forEach((key) => {
-      if (!["images", "inventors", "documents"].includes(key)) {
+    // Append basic fields (similar to createInvention)
+    for (let key in inventionData) {
+      if (key !== "images" && key !== "documents") {
         formData.append(key, inventionData[key]);
       }
-    });
+    }
 
-    // Handle images if they exist
-    if (inventionData.images && inventionData.images.length > 0) {
+    // Handle images
+    if (inventionData.images) {
       inventionData.images.forEach((image, index) => {
-        formData.append("images", {
-          uri: image.uri,
-          type: "image/jpeg",
-          name: `image${index}.jpg`,
-        });
+        // If it's an existing image (just a path string)
+        if (typeof image === 'string') {
+          formData.append("images", image);
+        } else {
+          // If it's a new image object
+          formData.append("images", {
+            uri: image.uri,
+            type: "image/jpeg",
+            name: `image${index}.jpg`,
+          });
+        }
       });
     }
 
-    // Handle documents if they exist
-    if (inventionData.documents && inventionData.documents.length > 0) {
+    // Handle documents
+    if (inventionData.documents) {
       inventionData.documents.forEach((document, index) => {
-        formData.append("documents", {
-          uri: document.uri,
-          type: document.type || "application/pdf",
-          name: document.name || `document${index}.pdf`,
-        });
+        if (typeof document === 'string') {
+          formData.append("documents", document);
+        } else {
+          formData.append("documents", {
+            uri: document.uri,
+            type: document.mimeType,
+            name: `document${index}.pdf`,
+          });
+        }
       });
     }
 

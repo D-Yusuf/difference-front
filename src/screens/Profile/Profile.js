@@ -256,7 +256,7 @@ const Profile = ({ navigation }) => {
         {user.role === "investor" && (
           <View>
             <View style={styles.investorHeader}>
-              <Text style={styles.ordersTitle}>Number of Orders:</Text>
+              <Text style={styles.ordersTitle}>Number of Investments:</Text>
               <Text style={styles.ordersTitle}>
                 {allOrders?.filter(
                   (order) => order?.investor?._id === profile?._id

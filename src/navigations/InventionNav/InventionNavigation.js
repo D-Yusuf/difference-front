@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import InventionDetails from "../../components/InventionDetails";
 import NAVIGATION from "../index";
 import EditInvention from "../../screens/EditInvention";
+import UserProfile from "../../screens/Profile/UserProfile";
 const Stack = createNativeStackNavigator();
 const InventionNavigation = () => {
   return (
@@ -12,6 +13,10 @@ const InventionNavigation = () => {
         name={NAVIGATION.INVENTION.INVENTION_DETAILS}
         component={InventionDetails}
       />
+        <Stack.Screen
+          name={NAVIGATION.INVENTION.USER_PROFILE}
+          component={UserProfile}
+        />
       <Stack.Screen
         name={NAVIGATION.INVENTION.EDIT_INVENTION}
         component={EditInvention}

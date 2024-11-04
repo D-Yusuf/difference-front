@@ -9,13 +9,13 @@ import {
   Platform,
   Dimensions,
 } from "react-native";
-
 import React, { useEffect, useState, useContext, useRef } from "react";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { getInvention, toggleLikeInvention } from "../api/invention";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { TouchableOpacity } from "react-native";
+import { getProfile } from "../api/profile"; // Import the getProfile function
 import UserContext from "../context/UserContext";
 import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
@@ -198,7 +198,7 @@ const InventionDetails = ({ route }) => {
     console.log("No invention data available");
     return <Text>No invention data available</Text>;
   }
-
+  console.log("INVENTION", invention?.documents);
   // We will check if the user is the inventor or admin appear the edit button for him.
   const isOwner =
     invention.inventors.find((inventor) => inventor._id === user._id) ||
@@ -378,7 +378,7 @@ const InventionDetails = ({ route }) => {
               <TouchableOpacity
                 style={styles.inventorInfo}
                 onPress={() => {
-                  navigation.navigate(NAVIGATION.PROFILE.USER_PROFILE, {
+                  navigation.navigate(NAVIGATION.INVENTION.USER_PROFILE, {
                     userId: inventor._id,
                   });
                 }}
@@ -417,6 +417,22 @@ const InventionDetails = ({ route }) => {
             </View>
           ))}
         </View>
+
+        {invention?.documents && invention.documents.length > 0 && (
+          <View style={styles.documentsContainer}>
+            <Text style={styles.sectionTitle}>Documents</Text>
+            {invention.documents.map((doc, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.documentItem}
+                onPress={() => handleDocumentPress(doc)}
+              >
+                <Icon name="document-text" size={24} color={colors.primary} />
+                <Text style={styles.documentName}>Document {index + 1}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
         <Text style={styles.cost}>Remaining Funds: {remainingFunds} KWD</Text>
@@ -811,6 +827,9 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   documentItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
     backgroundColor: "#ffffff",
     padding: 12,
     borderRadius: 8,

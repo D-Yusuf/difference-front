@@ -15,6 +15,7 @@ import React, { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { updateInvention } from "../api/invention";
 import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { BASE_URL } from "../api";
 import { getCategories } from "../api/categories";
 import { getInventors } from "../api/user";
@@ -29,43 +30,16 @@ const EditInvention = ({ route, navigation }) => {
     description: invention.description || "",
     cost: invention.cost ? invention.cost.toString() : "",
   });
-  const [images, setImages] = useState(null);
-  const { mutate: editInvention } = useMutation({
-    mutationFn: (updatedData) => updateInvention(invention._id, updatedData),
-    onSuccess: () => {
-      alert("Invention updated successfully");
-      queryClient.invalidateQueries(["profile"]);
-      queryClient.invalidateQueries(["inventions"]);
-      queryClient.invalidateQueries(["invention", invention._id]);
-      navigation.goBack();
-    },
-    onError: (error) => {
-      console.error("Mutation error:", error);
-      alert(error.response?.data?.message || "Error updating invention");
-    },
-  });
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImages(result.assets);
-      setInventionInfo({
-        ...inventionInfo,
-        images: result.assets,
-      });
-    }
-  };
-
-  const phases = [
-    { label: "Idea", value: "idea" },
-    { label: "Testing", value: "testing" },
-    { label: "Market Ready", value: "market_ready" },
-  ];
-
+  const [images, setImages] = useState(
+    invention.images
+      ? invention.images.map((img) => ({
+          uri: `${BASE_URL}${img}`,
+          isExisting: true,
+          path: img, // Keep the original path for existing images
+        }))
+      : []
+  );
+  const [documents, setDocuments] = useState(invention.documents || []);
   const [modalVisible, setModalVisible] = useState(false);
   const [categoryModalVisible, setCategoryModalVisible] = useState(false);
   const [phaseModalVisible, setPhaseModalVisible] = useState(false);
@@ -78,6 +52,95 @@ const EditInvention = ({ route, navigation }) => {
     invention.inventors ? invention.inventors.map((inv) => inv._id) : []
   );
 
+  const { mutate: editInvention } = useMutation({
+    mutationFn: (updatedData) => updateInvention(invention._id, updatedData),
+    onSuccess: () => {
+      alert("Invention updated successfully");
+      queryClient.invalidateQueries(["profile"]);
+      queryClient.invalidateQueries(["inventions"]);
+      queryClient.invalidateQueries(["invention", invention._id]);
+      navigation.goBack();
+    },
+    onError: (error) => {
+      console.log("Failed... Invention info: ", inventionInfo);
+      console.error("Mutation error:", error);
+      alert(error.response?.data?.message || "Error updating invention");
+    },
+  });
+  
+
+  const handleInputChange = (field, value) => {
+    setInventionInfo((prev) => ({
+      ...prev,
+      [field]: value === "" ? null : value,
+    }));
+  };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsMultipleSelection: true,
+      quality: 1,
+    });
+  
+    if (!result.canceled) {
+      const newImages = result.assets.map(img => ({
+        uri: img.uri,
+        isExisting: false,
+      }));
+      setImages([...images, ...newImages]);
+    }
+  };
+
+  // Update the removeImage function
+  const removeImage = (index) => {
+    const updatedImages = images.filter((_, i) => i !== index);
+    setImages(updatedImages);
+    setInventionInfo({
+      ...inventionInfo,
+      images: updatedImages,
+    });
+  };
+
+  const handleDocumentPicker = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        multiple: true,
+        copyToCacheDirectory: true,
+      });
+
+      if (!result.canceled) {
+        const newDocuments = result.assets.map((doc) => ({
+          ...doc,
+          displayName: doc.name,
+        }));
+        setDocuments([...documents, ...newDocuments]);
+        setInventionInfo({
+          ...inventionInfo,
+          documents: [...documents, ...newDocuments],
+        });
+      }
+    } catch (err) {
+      console.log("Document picker error:", err);
+      alert("Error picking document");
+    }
+  };
+
+  const removeDocument = (index) => {
+    const updatedDocs = documents.filter((_, i) => i !== index);
+    setDocuments(updatedDocs);
+    setInventionInfo({
+      ...inventionInfo,
+      documents: updatedDocs,
+    });
+  };
+
+  const phases = [
+    { label: "Idea", value: "idea" },
+    { label: "Testing", value: "testing" },
+    { label: "Market Ready", value: "market_ready" },
+  ];
+
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
@@ -87,66 +150,6 @@ const EditInvention = ({ route, navigation }) => {
     queryKey: ["inventors"],
     queryFn: getInventors,
   });
-
-  const renderPhaseItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.roleItem}
-      onPress={() => {
-        setSelectedPhase(item.value);
-        setInventionInfo({ ...inventionInfo, phase: item.value });
-        setPhaseModalVisible(false);
-      }}
-    >
-      <Text style={styles.roleItemText}>{item.label}</Text>
-    </TouchableOpacity>
-  );
-
-  const renderCategoryItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.roleItem}
-      onPress={() => {
-        setSelectedCategory(item._id);
-        setCategoryModalVisible(false);
-      }}
-    >
-      <Text style={styles.roleItemText}>{item.name}</Text>
-    </TouchableOpacity>
-  );
-
-  const renderInventorItem = ({ item }) => (
-    <TouchableOpacity
-      style={[
-        styles.roleItem,
-        selectedInventors.includes(item._id) && styles.selectedItem,
-      ]}
-      onPress={() => {
-        const updatedInventors = selectedInventors.includes(item._id)
-          ? selectedInventors.filter((id) => id !== item._id)
-          : [...selectedInventors, item._id];
-
-        setSelectedInventors(updatedInventors);
-      }}
-    >
-      <View style={styles.inventorItemContainer}>
-        {item.image && (
-          <Image
-            source={{ uri: `${BASE_URL}${item.image}` }}
-            style={styles.inventorImage}
-          />
-        )}
-        <View style={styles.inventorInfo}>
-          <Text style={styles.roleItemText}>
-            {item.firstName} {item.lastName}
-          </Text>
-          {item.bio && <Text style={styles.inventorBio}>{item.bio}</Text>}
-        </View>
-        {selectedInventors.includes(item._id) && (
-          <Text style={styles.checkmark}>✓</Text>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
-
   const validateInputs = () => {
     if (!inventionInfo.name && !invention.name) {
       alert("Please enter an invention name");
@@ -177,7 +180,7 @@ const EditInvention = ({ route, navigation }) => {
 
   const handleEditInvention = () => {
     if (!validateInputs()) return;
-
+  
     const updatedInvention = {
       name: inventionInfo.name || invention.name,
       description: inventionInfo.description || invention.description,
@@ -185,12 +188,19 @@ const EditInvention = ({ route, navigation }) => {
       phase: selectedPhase,
       category: selectedCategory,
       inventors: selectedInventors,
+      documents: documents,
     };
-
-    if (images && images.length > 0) {
-      updatedInvention.images = images;
+  
+    // Handle both existing and new images
+    if (images.length > 0) {
+      updatedInvention.images = images.map(img => {
+        if (img.isExisting) {
+          return img.path;
+        }
+        return img;
+      });
     }
-
+  
     console.log("Submitting update with:", updatedInvention);
     editInvention(updatedInvention);
   };
@@ -226,13 +236,8 @@ const EditInvention = ({ route, navigation }) => {
               />
               <TextInput
                 style={styles.input}
-                value={inventionInfo.name || invention.name}
-                onChangeText={(value) =>
-                  setInventionInfo({
-                    ...inventionInfo,
-                    name: value,
-                  })
-                }
+                value={inventionInfo.name ?? ""}
+                onChangeText={(value) => handleInputChange("name", value)}
                 placeholder="Enter invention name"
                 placeholderTextColor="#94A3B8"
               />
@@ -250,12 +255,9 @@ const EditInvention = ({ route, navigation }) => {
               />
               <TextInput
                 style={[styles.input, styles.textArea]}
-                value={inventionInfo.description || invention.description}
+                value={inventionInfo.description ?? ""}
                 onChangeText={(value) =>
-                  setInventionInfo({
-                    ...inventionInfo,
-                    description: value,
-                  })
+                  handleInputChange("description", value)
                 }
                 placeholder="Describe your invention"
                 placeholderTextColor="#94A3B8"
@@ -264,7 +266,6 @@ const EditInvention = ({ route, navigation }) => {
               />
             </View>
           </View>
-
           <View style={styles.inputContainer}>
             <Text style={styles.inputLabel}>Cost</Text>
             <View style={styles.inputWrapper}>
@@ -276,301 +277,245 @@ const EditInvention = ({ route, navigation }) => {
               />
               <TextInput
                 style={styles.input}
-                value={inventionInfo.cost || invention.cost.toString()}
-                onChangeText={(value) =>
-                  setInventionInfo({
-                    ...inventionInfo,
-                    cost: value,
-                  })
-                }
+                value={inventionInfo.cost ?? ""}
+                onChangeText={(value) => handleInputChange("cost", value)}
                 placeholder="Enter cost in KWD"
                 placeholderTextColor="#94A3B8"
                 keyboardType="numeric"
               />
             </View>
           </View>
+          <TouchableOpacity
+            style={styles.selectionButton}
+            onPress={() => setInventorModalVisible(true)}
+          >
+            <Icon name="people-outline" size={20} color={colors.primary} />
+            <Text style={styles.selectionButtonText}>
+              {selectedInventors.length > 0
+                ? `${selectedInventors.length} Inventor${
+                    selectedInventors.length > 1 ? "s" : ""
+                  } Selected`
+                : "Select Inventors"}
+            </Text>
+            <Icon name="chevron-forward" size={20} color={colors.primary} />
+          </TouchableOpacity>
 
-          <View style={styles.selectionSection}>
-            <TouchableOpacity
-              style={styles.selectionButton}
-              onPress={() => setInventorModalVisible(true)}
-            >
-              <View style={styles.selectionContent}>
-                <View style={styles.iconContainer}>
-                  <Icon name="people" size={20} color={colors.primary} />
-                </View>
-                <View style={styles.selectionTextContainer}>
-                  <Text style={styles.selectionLabel}>Inventors</Text>
-                  <Text style={styles.selectionValue}>
-                    {selectedInventors?.length > 0
-                      ? `${selectedInventors.length} Selected`
-                      : "Select inventors"}
-                  </Text>
-                </View>
-              </View>
-              <Icon name="chevron-forward" size={20} color={colors.primary} />
-            </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.selectionButton}
+            onPress={() => setCategoryModalVisible(true)}
+          >
+            <Icon name="grid-outline" size={20} color={colors.primary} />
+            <Text style={styles.selectionButtonText}>
+              {selectedCategory
+                ? categories?.find((c) => c._id === selectedCategory)?.name
+                : "Select Category"}
+            </Text>
+            <Icon name="chevron-forward" size={20} color={colors.primary} />
+          </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.selectionButton}
-              onPress={() => setCategoryModalVisible(true)}
-            >
-              <View style={styles.selectionContent}>
-                <View style={styles.iconContainer}>
-                  <Icon name="pricetag" size={20} color={colors.primary} />
-                </View>
-                <View style={styles.selectionTextContainer}>
-                  <Text style={styles.selectionLabel}>Category</Text>
-                  <Text style={styles.selectionValue}>
-                    {selectedCategory
-                      ? categories?.find((c) => c._id === selectedCategory)
-                          ?.name
-                      : "Select category"}
-                  </Text>
-                </View>
-              </View>
-              <Icon name="chevron-forward" size={20} color={colors.primary} />
-            </TouchableOpacity>
-
+          {selectedCategory && (
             <TouchableOpacity
               style={styles.selectionButton}
               onPress={() => setPhaseModalVisible(true)}
             >
-              <View style={styles.selectionContent}>
-                <View style={styles.iconContainer}>
-                  <Icon name="trending-up" size={20} color={colors.primary} />
-                </View>
-                <View style={styles.selectionTextContainer}>
-                  <Text style={styles.selectionLabel}>Phase</Text>
-                  <Text style={styles.selectionValue}>
-                    {selectedPhase
-                      ? phases.find((p) => p.value === selectedPhase)?.label
-                      : "Select phase"}
-                  </Text>
-                </View>
-              </View>
+              <Icon name="flag-outline" size={20} color={colors.primary} />
+              <Text style={styles.selectionButtonText}>
+                {selectedPhase || "Select Phase"}
+              </Text>
               <Icon name="chevron-forward" size={20} color={colors.primary} />
             </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.imagesSection}>
-          {!images && !invention.images ? (
-            <TouchableOpacity style={styles.addImageButton} onPress={pickImage}>
-              <View style={styles.addImageContent}>
-                <Icon name="camera-outline" size={24} color={colors.primary} />
-                <Text style={styles.addImageText}>Add Images</Text>
-              </View>
-            </TouchableOpacity>
-          ) : (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.imagesContainer}
-            >
-              {(images || invention.images).map((image, index) => (
-                <View key={index} style={styles.imageContainer}>
-                  <Image
-                    source={{
-                      uri: images ? image.uri : `${BASE_URL}${image}`,
-                    }}
-                    style={styles.image}
-                  />
-                  <TouchableOpacity
-                    style={styles.removeImageButton}
-                    onPress={() => {
-                      /* Add remove image handler */
-                    }}
-                  >
-                    <Icon
-                      name="close-circle"
-                      size={20}
-                      color={colors.primary}
-                    />
-                  </TouchableOpacity>
-                </View>
-              ))}
-              <TouchableOpacity
-                style={styles.addMoreButton}
-                onPress={pickImage}
-              >
-                <Icon name="add-circle" size={24} color={colors.primary} />
-              </TouchableOpacity>
-            </ScrollView>
           )}
-        </View>
-      </View>
 
-      <View style={styles.submitButtonContainer}>
-        <Pressable
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          onPress={handleEditInvention}
-        >
+          <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
+            <Icon name="images-outline" size={24} color={colors.primary} />
+            <Text style={styles.uploadButtonText}>Upload Images</Text>
+          </TouchableOpacity>
+
+          <View style={styles.imageContainer}>
+            {images.map((image, index) => (
+              <View key={index} style={styles.imageWrapper}>
+                <Image
+                  source={{ uri: image.uri }}
+                  style={styles.uploadedImage}
+                />
+                <TouchableOpacity
+                  style={styles.removeImageButton}
+                  onPress={() => removeImage(index)}
+                >
+                  <Icon name="close-circle" size={20} color={colors.primary} />
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+
+          <View style={styles.documentsSection}>
+            <Text style={styles.sectionTitle}>Documents</Text>
+
+            {documents.length > 0 && (
+              <View style={styles.documentsList}>
+                {documents.map((doc, index) => (
+                  <View key={index} style={styles.documentItem}>
+                    <View style={styles.documentInfo}>
+                      <Icon
+                        name="document-text-outline"
+                        size={24}
+                        color={colors.primary}
+                      />
+                      <Text style={styles.documentName}>
+                        {doc.displayName || `Document ${index + 1}`}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.removeDocButton}
+                      onPress={() => removeDocument(index)}
+                    >
+                      <Icon
+                        name="close-circle"
+                        size={20}
+                        color={colors.primary}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <TouchableOpacity
+              style={styles.addDocumentButton}
+              onPress={handleDocumentPicker}
+            >
+              <Icon
+                name="add-circle-outline"
+                size={24}
+                color={colors.primary}
+              />
+              <Text style={styles.addDocumentText}>
+                {documents.length > 0 ? "Add More Documents" : "Add Documents"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           <Animated.View
             style={[
-              styles.submitButton,
-              {
-                transform: [{ scale: animatedValue }],
-              },
+              styles.submitButtonContainer,
+              { transform: [{ scale: animatedValue }] },
             ]}
           >
-            <Text style={styles.submitButtonText}>Save Changes</Text>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleEditInvention}
+              onPressIn={handlePressIn}
+              onPressOut={handlePressOut}
+            >
+              <Text style={styles.submitButtonText}>Update Invention</Text>
+            </TouchableOpacity>
           </Animated.View>
-        </Pressable>
+        </View>
       </View>
 
+      {/* Modals */}
       <Modal
         animationType="slide"
         transparent={true}
         visible={inventorModalVisible}
         onRequestClose={() => setInventorModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Select Inventors</Text>
               <TouchableOpacity
-                onPress={() => setInventorModalVisible(false)}
                 style={styles.closeButton}
+                onPress={() => setInventorModalVisible(false)}
               >
                 <Icon name="close" size={24} color={colors.primary} />
               </TouchableOpacity>
             </View>
-
-            <ScrollView style={styles.scrollContent}>
-              {inventors && inventors?.length > 0 ? (
-                inventors.map((inventor) => (
-                  <TouchableOpacity
-                    key={inventor._id}
-                    style={[
-                      styles.inventorItemButton,
-                      selectedInventors.includes(inventor._id) &&
-                        styles.selectedOption,
-                    ]}
-                    onPress={() => {
-                      const updatedInventors = selectedInventors.includes(
-                        inventor._id
-                      )
-                        ? selectedInventors.filter((id) => id !== inventor._id)
-                        : [...selectedInventors, inventor._id];
-                      setSelectedInventors(updatedInventors);
-                    }}
-                  >
-                    <View style={styles.inventorItemContainer}>
-                      {inventor.image && (
-                        <Image
-                          source={{ uri: `${BASE_URL}${inventor.image}` }}
-                          style={styles.inventorImage}
-                        />
-                      )}
-                      <View style={styles.inventorInfo}>
-                        <Text
-                          style={[
-                            styles.inventorName,
-                            selectedInventors.includes(inventor._id) &&
-                              styles.selectedOptionText,
-                          ]}
-                        >
-                          {inventor.firstName} {inventor.lastName}
-                        </Text>
-                        {inventor.bio && (
-                          <Text
-                            style={[
-                              styles.inventorBio,
-                              selectedInventors.includes(inventor._id) &&
-                                styles.selectedOptionText,
-                            ]}
-                          >
-                            {inventor.bio}
-                          </Text>
-                        )}
-                      </View>
-                      {selectedInventors.includes(inventor._id) && (
-                        <Icon
-                          name="checkmark-circle"
-                          size={24}
-                          color="#FFFFFF"
-                          style={styles.checkmark}
-                        />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <Text style={styles.noDataText}>No inventors available</Text>
+            <FlatList
+              data={inventors}
+              keyExtractor={(item) => item._id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.modalItem,
+                    selectedInventors.includes(item._id) &&
+                      styles.selectedModalItem,
+                  ]}
+                  onPress={() => {
+                    const updatedInventors = selectedInventors.includes(
+                      item._id
+                    )
+                      ? selectedInventors.filter((id) => id !== item._id)
+                      : [...selectedInventors, item._id];
+                    setSelectedInventors(updatedInventors);
+                  }}
+                >
+                  <View style={styles.inventorItemContent}>
+                    {item.image && (
+                      <Image
+                        source={{ uri: `${BASE_URL}${item.image}` }}
+                        style={styles.inventorImage}
+                      />
+                    )}
+                    <Text style={styles.inventorName}>
+                      {item.firstName} {item.lastName}
+                    </Text>
+                  </View>
+                  {selectedInventors.includes(item._id) && (
+                    <Icon
+                      name="checkmark-circle"
+                      size={24}
+                      color={colors.primary}
+                    />
+                  )}
+                </TouchableOpacity>
               )}
-            </ScrollView>
-
-            <View style={styles.footer}>
-              <TouchableOpacity
-                style={styles.applyButton}
-                onPress={() => setInventorModalVisible(false)}
-              >
-                <Text style={styles.applyButtonText}>Done</Text>
-              </TouchableOpacity>
-            </View>
+            />
           </View>
         </View>
       </Modal>
-
       <Modal
         animationType="slide"
         transparent={true}
         visible={categoryModalVisible}
         onRequestClose={() => setCategoryModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Select Category</Text>
               <TouchableOpacity
-                onPress={() => setCategoryModalVisible(false)}
                 style={styles.closeButton}
+                onPress={() => setCategoryModalVisible(false)}
               >
                 <Icon name="close" size={24} color={colors.primary} />
               </TouchableOpacity>
             </View>
-
-            <ScrollView style={styles.scrollContent}>
-              {categories && categories?.length > 0 ? (
-                categories.map((category) => (
-                  <TouchableOpacity
-                    key={category._id}
-                    style={[
-                      styles.optionButton,
-                      selectedCategory === category._id &&
-                        styles.selectedOption,
-                    ]}
-                    onPress={() => {
-                      setSelectedCategory(category._id);
-                      setCategoryModalVisible(false);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.optionText,
-                        selectedCategory === category._id &&
-                          styles.selectedOptionText,
-                      ]}
-                    >
-                      {category.name}
-                    </Text>
-                  </TouchableOpacity>
-                ))
-              ) : (
-                <Text style={styles.noDataText}>No categories available</Text>
+            <FlatList
+              data={categories}
+              keyExtractor={(item) => item._id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.modalItem,
+                    selectedCategory === item._id && styles.selectedModalItem,
+                  ]}
+                  onPress={() => {
+                    setSelectedCategory(item._id);
+                    setCategoryModalVisible(false);
+                  }}
+                >
+                  <Text style={styles.modalItemText}>{item.name}</Text>
+                  {selectedCategory === item._id && (
+                    <Icon
+                      name="checkmark-circle"
+                      size={24}
+                      color={colors.primary}
+                    />
+                  )}
+                </TouchableOpacity>
               )}
-            </ScrollView>
-
-            <View style={styles.footer}>
-              <TouchableOpacity
-                style={styles.applyButton}
-                onPress={() => setCategoryModalVisible(false)}
-              >
-                <Text style={styles.applyButtonText}>Done</Text>
-              </TouchableOpacity>
-            </View>
+            />
           </View>
         </View>
       </Modal>
@@ -581,52 +526,42 @@ const EditInvention = ({ route, navigation }) => {
         visible={phaseModalVisible}
         onRequestClose={() => setPhaseModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>Select Phase</Text>
               <TouchableOpacity
-                onPress={() => setPhaseModalVisible(false)}
                 style={styles.closeButton}
+                onPress={() => setPhaseModalVisible(false)}
               >
                 <Icon name="close" size={24} color={colors.primary} />
               </TouchableOpacity>
             </View>
-
-            <ScrollView style={styles.scrollContent}>
-              {phases.map((phase, index) => (
+            <FlatList
+              data={phases}
+              keyExtractor={(item) => item.value}
+              renderItem={({ item }) => (
                 <TouchableOpacity
-                  key={index}
                   style={[
-                    styles.optionButton,
-                    selectedPhase === phase.value && styles.selectedOption,
+                    styles.modalItem,
+                    selectedPhase === item.value && styles.selectedModalItem,
                   ]}
                   onPress={() => {
-                    setSelectedPhase(phase.value);
+                    setSelectedPhase(item.value);
                     setPhaseModalVisible(false);
                   }}
                 >
-                  <Text
-                    style={[
-                      styles.optionText,
-                      selectedPhase === phase.value &&
-                        styles.selectedOptionText,
-                    ]}
-                  >
-                    {phase.label}
-                  </Text>
+                  <Text style={styles.modalItemText}>{item.label}</Text>
+                  {selectedPhase === item.value && (
+                    <Icon
+                      name="checkmark-circle"
+                      size={24}
+                      color={colors.primary}
+                    />
+                  )}
                 </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            <View style={styles.footer}>
-              <TouchableOpacity
-                style={styles.applyButton}
-                onPress={() => setPhaseModalVisible(false)}
-              >
-                <Text style={styles.applyButtonText}>Done</Text>
-              </TouchableOpacity>
-            </View>
+              )}
+            />
           </View>
         </View>
       </Modal>
@@ -640,18 +575,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.page,
   },
   form: {
-    flex: 1,
-    padding: 20,
+    padding: 16,
   },
   formSection: {
-    gap: 24,
+    gap: 16,
   },
   inputContainer: {
     gap: 8,
   },
   inputLabel: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: 14,
+    fontWeight: "500",
     color: colors.primary,
     marginLeft: 4,
   },
@@ -660,262 +594,207 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.secondary,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.1)",
-    overflow: "hidden",
-  },
-  inputIcon: {
-    marginLeft: 12,
-  },
-  input: {
-    flex: 1,
-    padding: 12,
-    fontSize: 15,
-    color: colors.primary,
+    paddingHorizontal: 12,
   },
   textAreaWrapper: {
     alignItems: "flex-start",
+    paddingVertical: 12,
+  },
+  inputIcon: {
+    marginRight: 8,
+  },
+  input: {
+    flex: 1,
+    color: colors.primary,
+    fontSize: 15,
+    padding: 12,
   },
   textArea: {
-    height: 120,
+    height: 100,
     textAlignVertical: "top",
-  },
-  selectionSection: {
-    gap: 16,
   },
   selectionButton: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
     backgroundColor: colors.secondary,
-    borderRadius: 12,
     padding: 16,
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.1)",
-  },
-  selectionContent: {
-    flexDirection: "row",
-    alignItems: "center",
+    borderRadius: 12,
     gap: 12,
   },
-  iconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "rgba(0,0,0,0.05)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  selectionTextContainer: {
-    gap: 2,
-  },
-  selectionLabel: {
+  selectionButtonText: {
+    flex: 1,
+    color: colors.primary,
     fontSize: 15,
-    fontWeight: "600",
-    color: colors.primary,
   },
-  selectionValue: {
-    fontSize: 13,
-    color: colors.primary,
-    opacity: 0.7,
-  },
-  imagesSection: {
-    marginTop: 20,
-  },
-  addImageButton: {
-    backgroundColor: colors.secondary,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderStyle: "dashed",
-    height: 90,
+  uploadButton: {
+    flexDirection: "row",
+    alignItems: "center",
     justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: colors.secondary,
+    padding: 16,
+    borderRadius: 12,
+    gap: 8,
   },
-  addImageContent: {
-    alignItems: "center",
-    gap: 6,
-  },
-  addImageText: {
+  uploadButtonText: {
     color: colors.primary,
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "500",
   },
-  imagesContainer: {
-    gap: 10,
-    padding: 4,
-  },
   imageContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  imageWrapper: {
     position: "relative",
   },
-  image: {
-    width: 90,
-    height: 90,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.primary,
+  uploadedImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
   },
   removeImageButton: {
     position: "absolute",
-    top: -6,
-    right: -6,
+    top: -8,
+    right: -8,
     backgroundColor: colors.page,
-    borderRadius: 10,
-  },
-  addMoreButton: {
-    width: 90,
-    height: 90,
     borderRadius: 12,
-    backgroundColor: colors.secondary,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderStyle: "dashed",
-  },
-  submitButtonContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: colors.page,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(0,0,0,0.1)",
-  },
-  submitButton: {
-    flexDirection: "row",
-    backgroundColor: colors.primary,
-    borderRadius: 14,
-    padding: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    shadowColor: colors.primary,
+    padding: 2,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 2,
     },
     shadowOpacity: 0.25,
-    shadowRadius: 10,
+    shadowRadius: 3.84,
     elevation: 5,
-    height: 56,
   },
-  submitButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 0.5,
-  },
-  submitIcon: {
-    marginRight: 2,
-  },
-  modalOverlay: {
+  modalContainer: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
-    paddingHorizontal: 20,
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: "white",
+    width: "90%",
+    maxHeight: "80%",
+    backgroundColor: colors.page,
     borderRadius: 20,
-    maxHeight: "70%",
-    width: "100%",
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.secondary,
+    marginBottom: 20,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "600",
     color: colors.primary,
   },
   closeButton: {
     padding: 4,
   },
-  scrollContent: {
-    padding: 20,
+  modalItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.secondary,
   },
-  optionButton: {
-    padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.secondary,
-    marginBottom: 8,
+  selectedModalItem: {
+    backgroundColor: colors.secondary,
   },
-  selectedOption: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  optionText: {
-    color: colors.primary,
-    fontSize: 15,
-  },
-  selectedOptionText: {
-    color: "white",
-    fontWeight: "500",
-  },
-  noDataText: {
+  modalItemText: {
     fontSize: 16,
     color: colors.primary,
-    opacity: 0.7,
-    textAlign: "center",
-    marginTop: 20,
   },
-  footer: {
-    padding: 20,
-    borderTopWidth: 1,
-    borderTopColor: colors.secondary,
-  },
-  applyButton: {
-    padding: 14,
-    borderRadius: 8,
-    backgroundColor: colors.primary,
-    alignItems: "center",
-  },
-  applyButtonText: {
-    color: "white",
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  inventorItemContainer: {
+  inventorItemContent: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
   },
   inventorImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  inventorInfo: {
-    flex: 1,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
   inventorName: {
     fontSize: 16,
+    color: colors.primary,
+  },
+  submitButtonContainer: {
+    marginTop: 24,
+    marginBottom: 40,
+  },
+  submitButton: {
+    backgroundColor: colors.primary,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  submitButtonText: {
+    color: colors.page,
+    fontSize: 16,
     fontWeight: "600",
-    color: colors.primary,
-    marginBottom: 4,
   },
-  inventorBio: {
+  documentsSection: {
+    gap: 12,
+  },
+  sectionTitle: {
     fontSize: 14,
+    fontWeight: "500",
     color: colors.primary,
-    opacity: 0.7,
+    marginLeft: 4,
   },
-  checkmark: {
-    marginLeft: 8,
+  documentsList: {
+    gap: 8,
   },
-  inventorItemButton: {
+  documentItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: colors.secondary,
     padding: 12,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.secondary,
-    marginBottom: 8,
+  },
+  documentInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flex: 1,
+  },
+  documentName: {
+    fontSize: 14,
+    color: colors.primary,
+    flex: 1,
+  },
+  removeDocButton: {
+    padding: 4,
+  },
+  addDocumentButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
     backgroundColor: colors.secondary,
+    padding: 12,
+    borderRadius: 12,
+  },
+  addDocumentText: {
+    fontSize: 14,
+    color: colors.primary,
+    fontWeight: "500",
   },
 });
 

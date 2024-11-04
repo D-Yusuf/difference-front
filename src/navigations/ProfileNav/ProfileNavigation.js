@@ -28,10 +28,10 @@ const ProfileNavigation = () => {
         name={NAVIGATION.PROFILE.EDIT_PROFILE}
         component={EditProfile}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name={NAVIGATION.PROFILE.USER_PROFILE}
         component={UserProfile}
-      />
+      /> */}
       <Stack.Screen
         name="AddInvention"
         component={invention}
@@ -64,7 +64,7 @@ const ProfileNavigation = () => {
         name={NAVIGATION.PROFILE.ORDERS}
         component={Orders}
         options={{
-          headerTitle: "Orders",
+          headerTitle: "Investment Requests",
           headerShadowVisible: false,
         }}
       />

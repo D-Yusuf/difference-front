@@ -219,6 +219,7 @@ const OrderList = ({ orders, own = false }) => {
                 style={styles.inventionImage}
               />
               <Text style={styles.title}>{order.invention?.name}</Text>
+
               <Text
                 style={[
                   styles.status,
@@ -340,13 +341,17 @@ const styles = StyleSheet.create({
   },
   approvedStatus: {
     backgroundColor: "green",
+    borderRadius: 10,
   },
   declinedStatus: {
     backgroundColor: "red",
+    borderRadius: 10,
   },
   pendingStatus: {
     backgroundColor: "orange",
+    borderRadius: 10,
   },
+
   details: {
     padding: 12,
     backgroundColor: colors.page,
