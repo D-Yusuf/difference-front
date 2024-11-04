@@ -27,6 +27,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from "react-native-reanimated";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const LoadingView = () => {
   const opacity = useSharedValue(0.3);
@@ -205,12 +206,12 @@ const Profile = ({ navigation }) => {
                   })
                 }
               >
-                <Icon
-                  name="document-text-outline"
+                <FontAwesome5
+                  name="handshake"
                   size={20}
                   color={colors.primary}
                 />
-                <Text style={styles.buttonText}>Investment Requests</Text>
+                <Text style={styles.buttonText}>Requests</Text>
               </TouchableOpacity>
             )}
 
@@ -224,7 +225,7 @@ const Profile = ({ navigation }) => {
                   size={20}
                   color={colors.primary}
                 />
-                <Text style={styles.buttonText}>View CV</Text>
+                <Text style={styles.buttonText}>CV</Text>
               </TouchableOpacity>
             )}
 
@@ -238,7 +239,7 @@ const Profile = ({ navigation }) => {
                   size={20}
                   color={colors.primary}
                 />
-                <Text style={styles.buttonText}>Add Invention</Text>
+                <Text style={styles.buttonText}>Invention</Text>
               </TouchableOpacity>
             )}
           </View>
