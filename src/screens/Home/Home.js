@@ -175,15 +175,17 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [sortBy, setSortBy] = useState(null);
-
   const { data: inventions, isPending: inventionsPending } = useQuery({
     queryKey: ["inventions"],
     queryFn: getAllInventions,
   });
-
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
+  });
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: getProfile,
   });
   const { setBackgroundColor } = useContext(ThemeContext);
 
@@ -267,7 +269,7 @@ const Home = () => {
         <ScrollView style={styles.scrollView} stickyHeaderIndices={[1]}>
           <View style={styles.headerSection}>
             <Text style={styles.headerTitle}>
-              Hello, {user?.firstName || "there"}!
+              Hello, {profile?.firstName || "there"}!
             </Text>
             <Text style={styles.headerSubtitle}>
               Find your next inspiration

@@ -13,6 +13,7 @@ import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../Colors";
+import getTimeAgo from "../utils/getTimeAgo";
 
 const OrderList = ({ orders, own = false }) => {
   const [statusFilter, setStatusFilter] = useState("all");
@@ -99,8 +100,13 @@ const OrderList = ({ orders, own = false }) => {
                   source={{ uri: BASE_URL + order.investor?.image }}
                   style={styles.profilePic}
                 />
-                <Text style={styles.investorText}>
-                  {order.investor?.firstName} {order.investor?.lastName}
+                <View style={styles.investorTextContainer}>
+                  <Text style={styles.investorText}>
+                    {order.investor?.firstName} {order.investor?.lastName}
+                  </Text>
+                </View>
+                <Text style={styles.timeAgo}>
+                  {getTimeAgo(order.createdAt)}
                 </Text>
               </View>
               <View style={styles.actionButtons}>
@@ -234,6 +240,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.page,
     borderRadius: 12,
     marginVertical: 12,
+    gap: 20,
     width: "100%",
   },
   filterButton: {
@@ -260,12 +267,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 4,
+    margin: 5,
   },
   approveButton: {
     backgroundColor: "green",
+    width: "50%",
   },
   declineButton: {
     backgroundColor: "red",
+    width: "50%",
   },
   actionButtonText: {
     color: "white",
@@ -282,6 +292,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
+  },
+  timeAgo: {
+    fontSize: 12,
+    color: colors.primary,
+    opacity: 0.8,
+  },
+  investorTextContainer: {
+    flex: 1,
   },
 });
 

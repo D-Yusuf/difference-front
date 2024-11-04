@@ -99,7 +99,7 @@ const EditProfile = ({ route, navigation }) => {
       navigation.goBack();
     },
     onError: (error) => {
-      alert(userInfo);
+      alert(error.message);
     },
   });
 

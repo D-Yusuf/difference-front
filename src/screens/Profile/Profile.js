@@ -235,17 +235,19 @@ const Profile = ({ navigation }) => {
                 </TouchableOpacity>
               )}
             </View>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => navigation.navigate("AddInvention")}
-            >
-              <Icon
-                name="add-circle-outline"
-                size={20}
-                color={colors.primary}
-              />
-              <Text style={styles.buttonText}>Add Invention</Text>
-            </TouchableOpacity>
+            {user.role === "inventor" && (
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => navigation.navigate("AddInvention")}
+              >
+                <Icon
+                  name="add-circle-outline"
+                  size={20}
+                  color={colors.primary}
+                />
+                <Text style={styles.buttonText}>Add Invention</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
