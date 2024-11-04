@@ -47,7 +47,6 @@ const Invention = ({ navigation }) => {
     mutationKey: ["create-invention"],
     onSuccess: () => {
       invalidateInventionQueries(queryClient);
-      alert("Invention created successfully");
       navigation.goBack();
     },
     onError: (error) => {
