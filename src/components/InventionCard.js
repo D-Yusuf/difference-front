@@ -19,6 +19,7 @@ const InventionCard = ({
   showInvestButton = true,
   showEditButton = true,
   refetch,
+  page,
 }) => {
   const queryClient = useQueryClient();
   const navigation = useNavigation();
@@ -55,12 +56,17 @@ const InventionCard = ({
     mutationFn: () => incrementInventionViews(invention._id),
     onSuccess: () => {
       // queryClient.invalidateQueries({ queryKey: ["invention", invention._id] });
-      navigation.navigate(NAVIGATION.INVENTION.INVENTION_DETAILS, {
-        inventionId: invention._id,
-        image: images[0],
-        showInvestButton: showInvestButton,
-        showEditButton: showEditButton,
-      });
+      navigation.navigate(
+        page === "home"
+          ? NAVIGATION.HOME.INVENTION_DETAILS
+          : NAVIGATION.PROFILE.INVENTION_DETAILS,
+        {
+          inventionId: invention._id,
+          image: images[0],
+          showInvestButton: showInvestButton,
+          showEditButton: showEditButton,
+        }
+      );
     },
   });
   if (!invention || !invention._id) {

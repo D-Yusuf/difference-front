@@ -1,17 +1,14 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/Ionicons";
-import Invention from "../screens/Invention";
-import Home from "../screens/Home/Home";
-import ProfileNavigation from "./ProfileNav/ProfileNavigation";
 import NAVIGATION from "./index";
-import InvestNavigation from "./InvestNav/InvestNavigation";
 import HomeNavigation from "./HomeNav/HomeNavigation";
-import InventionNavigation from "./InventionNav/InventionNavigation";
+import ProfileNavigation from "./ProfileNav/ProfileNavigation";
 import ChatNavigation from "./ChatNav/ChatNavigation";
-
 import { colors } from "../../Colors";
+
 const Tab = createBottomTabNavigator();
+
 const MainNavigation = () => {
   return (
     <Tab.Navigator
@@ -28,7 +25,6 @@ const MainNavigation = () => {
           height: 60,
           paddingBottom: 8,
           paddingTop: 8,
-          marginBottom: 20,
         },
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.secondary,
@@ -42,7 +38,7 @@ const MainNavigation = () => {
         name={NAVIGATION.HOME.INDEX}
         component={HomeNavigation}
         options={{
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Icon name="home-outline" size={24} color={color} />
           ),
           tabBarLabel: "Discover",
@@ -52,7 +48,7 @@ const MainNavigation = () => {
         name={NAVIGATION.CHAT.INDEX}
         component={ChatNavigation}
         options={{
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Icon name="chatbubble-outline" size={24} color={color} />
           ),
           tabBarLabel: "Chat",
@@ -62,7 +58,7 @@ const MainNavigation = () => {
         name={NAVIGATION.PROFILE.INDEX}
         component={ProfileNavigation}
         options={{
-          tabBarIcon: ({ color, size }) => (
+          tabBarIcon: ({ color }) => (
             <Icon name="person-outline" size={24} color={color} />
           ),
           tabBarLabel: "Profile",
@@ -71,4 +67,5 @@ const MainNavigation = () => {
     </Tab.Navigator>
   );
 };
+
 export default MainNavigation;

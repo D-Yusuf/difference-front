@@ -2,7 +2,9 @@ const NAVIGATION = {
   HOME: {
     INDEX: "HomeIndex",
     HOME: "Home",
-    INVEST_DETAILS: "InvestDetails-Home",
+    INVEST_DETAILS: "InvestDetails",
+    USER_PROFILE: "UserProfile",
+    INVENTION_DETAILS: "InventionDetails",
   },
   AUTH: {
     INDEX: "AuthIndex",
@@ -14,23 +16,20 @@ const NAVIGATION = {
     PROFILE: "Profile",
     EDIT_PROFILE: "EditProfile",
     ORDERS: "Orders",
-    INVEST_DETAILS: "InvestDetails-Profile",
-    USER_PROFILE: "UserProfile",
+    USER_PROFILE: "UserProfile-Profile",
+    ADD_INVENTION: "AddInvention",
+    INVENTION_DETAILS: "InventionDetails-Profile",
   },
-  // INVEST: {
-  //   INDEX: "InvestIndex",
-  //   INVEST: "Invest",
-  //   INVENTION_DETAILS: "InventionDetails",
-  // }, // not needed
   INVENTION: {
     INDEX: "InventionIndex",
     INVENTION_DETAILS: "InventionDetails",
+    USER_PROFILE: "UserProfile",
     INVEST: "InvestInInvention",
     CREATE_INVENTION: "CreateInvention",
     EDIT_INVENTION: "EditInvention",
   },
   CHAT: {
-    INDEX: "Chat",
+    INDEX: "ChatIndex",
     CHAT_LIST: "ChatList",
     CHAT_ROOM: "ChatRoom",
   },

@@ -250,7 +250,11 @@ const Profile = ({ navigation }) => {
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>My Inventions</Text>
             </View>
-            <InventionList inventions={profile?.inventions} numColumns={2} />
+            <InventionList
+              page="profile"
+              inventions={profile?.inventions}
+              numColumns={2}
+            />
           </View>
         )}
 
