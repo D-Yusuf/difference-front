@@ -75,6 +75,7 @@ const OrderList = ({ orders, own = false }) => {
                 style={styles.inventionImage}
               />
               <Text style={styles.title}>{order.invention?.name}</Text>
+
               <Text
                 style={[
                   styles.status,
@@ -149,7 +150,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.page,
     padding: 10,
-
   },
   card: {
     backgroundColor: "white",
@@ -194,17 +194,21 @@ const styles = StyleSheet.create({
     backgroundColor: "orange",
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 8,
+    borderRadius: 10,
   },
   approvedStatus: {
     backgroundColor: "green",
+    borderRadius: 10,
   },
   declinedStatus: {
     backgroundColor: "red",
+    borderRadius: 10,
   },
   pendingStatus: {
     backgroundColor: "orange",
+    borderRadius: 10,
   },
+
   details: {
     padding: 16,
   },
