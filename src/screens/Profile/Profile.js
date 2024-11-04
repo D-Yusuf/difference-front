@@ -217,7 +217,7 @@ const Profile = ({ navigation }) => {
                 }
               >
                 <Icon name="document-text-outline" size={20} color="#003863" />
-                <Text style={styles.buttonText}>Orders</Text>
+                <Text style={styles.buttonText}>Investment Requests</Text>
               </TouchableOpacity>
             )}
             <View style={styles.buttonContainer}>
@@ -263,7 +263,7 @@ const Profile = ({ navigation }) => {
         {user.role === "investor" && (
           <View>
             <View style={styles.investorHeader}>
-              <Text style={styles.ordersTitle}>Number of Orders:</Text>
+              <Text style={styles.ordersTitle}>Number of Investments:</Text>
               <Text style={styles.ordersTitle}>
                 {allOrders?.filter(
                   (order) => order?.investor?._id === profile?._id

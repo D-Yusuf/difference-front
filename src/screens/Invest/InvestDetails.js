@@ -20,14 +20,15 @@ const InvestDetails = ({ route, navigation }) => {
   const [amount, setAmount] = useState(0);
 
   // Calculate remaining percentage
-  const remainingPercentage = Math.floor((remainingFunds / invention.cost) * 100);
+  const remainingPercentage = Math.floor(
+    (remainingFunds / invention.cost) * 100
+  );
 
   const { mutate } = useMutation({
     mutationKey: ["create-order"],
     mutationFn: () => createOrder(invention._id, amount, Number(percentage)),
     onSuccess: () => {
       invalidateOrderQueries(queryClient);
-      alert("Success", "Investment order created successfully!");
       navigation.goBack();
     },
     onError: (error) => {
@@ -53,7 +54,7 @@ const InvestDetails = ({ route, navigation }) => {
     // Allow only whole numbers
     const regex = /^\d*$/;
     const numValue = parseInt(text);
-    
+
     if (
       regex.test(text) && // Must be whole number
       (!numValue || (numValue > 0 && numValue <= remainingPercentage)) // Must be within remaining percentage
@@ -71,7 +72,9 @@ const InvestDetails = ({ route, navigation }) => {
       <View style={styles.container}>
         <Text style={styles.title}>{invention.name}</Text>
         <Text style={styles.cost}>Cost: ${invention.cost}</Text>
-        <Text style={styles.remainingFunds}>Remaining Funds: ${remainingFunds}</Text>
+        <Text style={styles.remainingFunds}>
+          Remaining Funds: ${remainingFunds}
+        </Text>
         <Text style={styles.remainingPercentage}>
           Remaining Percentage: {remainingPercentage}%
         </Text>
