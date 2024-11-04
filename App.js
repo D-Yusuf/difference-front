@@ -11,6 +11,7 @@ import { getProfile } from "./src/api/profile";
 import { ThemeContext } from "./src/context/ThemeContext";
 import { UserProvider } from "./src/context/UserProvider";
 import { LogBox } from "react-native";
+import { socket } from "./src/api";
 LogBox.ignoreLogs(["Warning: ..."]); // Ignore log notification by message
 LogBox.ignoreAllLogs();
 
@@ -42,6 +43,7 @@ export default function App() {
 
   useEffect(() => {
     checkToken();
+    socket.connect();
   }, []);
 
   if (loading) {

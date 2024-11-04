@@ -38,9 +38,9 @@ const ProfileNavigation = () => {
         options={{
           headerTitle: "Add Invention",
           headerStyle: {
-            backgroundColor: colors.primary,
+            backgroundColor: "transparent",
           },
-          headerTintColor: "white",
+          headerTintColor: colors.primary,
           headerShadowVisible: false,
         }}
       />

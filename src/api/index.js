@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getToken } from "./storage";
+import { io } from "socket.io-client";
 
 const BASE_URL = "http://192.168.2.58:8000/";
 
@@ -31,6 +32,10 @@ export const invalidateProfileQueries = (queryClient) => {
   queryClient.invalidateQueries(["profile"]);
   queryClient.invalidateQueries(["inventors"]);
 };
+
+export const socket = io("http://192.168.2.122:3000", {
+  autoConnect: false,
+});
 
 export default instance;
 export { BASE_URL };

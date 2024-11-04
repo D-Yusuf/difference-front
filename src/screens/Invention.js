@@ -10,6 +10,7 @@ import {
   Modal,
   FlatList,
   StatusBar,
+  Platform,
 } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -209,154 +210,211 @@ const Invention = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="light-content" />
 
-      <View style={styles.decorativeDots}>
-        {[...Array(24)].map((_, index) => (
-          <View key={`dot-${index}`} style={styles.dot} />
+      {/* Enhanced Decorative Elements */}
+      <View style={styles.topLeftCurve}>
+        <View style={styles.curve1} />
+      </View>
+
+      <View style={styles.topRightDots}>
+        {[...Array(35)].map((_, index) => (
+          <View key={`dot-tr-${index}`} style={styles.dot} />
         ))}
       </View>
 
-      <View style={styles.decorativeCurves}>
-        {[...Array(4)].map((_, index) => (
+      <View style={styles.centerDots}>
+        {[...Array(20)].map((_, index) => (
+          <View key={`dot-c-${index}`} style={styles.dot} />
+        ))}
+      </View>
+
+      <View style={styles.bottomLeftDots}>
+        {[...Array(28)].map((_, index) => (
+          <View key={`dot-bl-${index}`} style={styles.dot} />
+        ))}
+      </View>
+
+      <View style={styles.bottomRightCurves}>
+        {[...Array(6)].map((_, index) => (
           <View
             key={`curve-${index}`}
             style={[
               styles.curve,
               {
-                width: 200 + index * 40,
-                height: 200 + index * 40,
-                bottom: -100 - index * 20,
-                right: -100 - index * 20,
+                width: 180 + index * 35,
+                height: 180 + index * 35,
+                bottom: -90 - index * 17.5,
+                right: -90 - index * 17.5,
               },
             ]}
           />
         ))}
       </View>
 
-      <View style={styles.bgCircle1} />
-      <View style={styles.bgCircle2} />
-      <View style={styles.bgCircle3} />
-
-      <ScrollView contentContainerStyle={styles.scrollView}>
-        <View style={styles.titleContainer}>
-          <Icon name="bulb" size={30} color="orange" />
-          <Text style={styles.title}>New Invention</Text>
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter invention title"
-            placeholderTextColor="white"
-            onChangeText={(text) => setInvention({ ...invention, name: text })}
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.descriptionInput}
-            placeholder="Describe your invention"
-            placeholderTextColor="white"
-            multiline={true}
-            numberOfLines={6}
-            textAlignVertical="top"
-            onChangeText={(text) =>
-              setInvention({ ...invention, description: text })
-            }
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Total Costs in KWD"
-            placeholderTextColor="white"
-            keyboardType="numeric"
-            onChangeText={(text) => setInvention({ ...invention, cost: text })}
-          />
-        </View>
-
-        <TouchableOpacity
-          style={styles.dropdownButton}
-          onPress={() => setInventorModalVisible(true)}
-        >
-          <Text style={styles.dropdownButtonText}>
-            {selectedInventors.length > 0
-              ? `${selectedInventors.length} Inventor${
-                  selectedInventors.length > 1 ? "s" : ""
-                } Selected`
-              : "Select Inventors"}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.dropdownButton}
-          onPress={() => setCategoryModalVisible(true)}
-        >
-          <Text style={styles.dropdownButtonText}>
-            {selectedCategory
-              ? categories.find((c) => c._id === selectedCategory).name
-              : "Select Category"}
-          </Text>
-        </TouchableOpacity>
-
-        {selectedCategory && (
-          <TouchableOpacity
-            style={styles.dropdownButton}
-            onPress={() => setPhaseModalVisible(true)}
-          >
-            <Text style={styles.dropdownButtonText}>
-              {selectedPhase
-                ? phases.find((p) => p === selectedPhase)
-                : "Select Phase"}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+      >
+        <View style={styles.contentContainer}>
+          {/* Header Section */}
+          <View style={styles.titleContainer}>
+            <Text style={styles.title}>New Invention</Text>
+            <Text style={styles.subtitle}>
+              Share your innovation with the world
             </Text>
-          </TouchableOpacity>
-        )}
+          </View>
 
-        <TouchableOpacity
-          style={styles.uploadButton}
-          onPress={handleImagePicker}
-        >
-          <Text style={styles.buttonText}>Upload Images</Text>
-        </TouchableOpacity>
-
-        <View style={styles.imageContainer}>
-          {images.map((image, index) => (
-            <Image
-              key={index}
-              source={{ uri: image.uri }}
-              style={styles.image}
-            />
-          ))}
-        </View>
-
-        <TouchableOpacity
-          style={styles.uploadButton}
-          onPress={handleDocumentPicker}
-        >
-          <Text style={styles.buttonText}>Upload Documents</Text>
-        </TouchableOpacity>
-
-        <View style={styles.documentContainer}>
-          {documents.map((doc, index) => (
-            <View key={index} style={styles.documentItem}>
-              <Icon name="document-text" size={24} color="white" />
+          {/* Input Card */}
+          <View style={styles.card}>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Title</Text>
               <TextInput
-                style={styles.documentNameInput}
-                value={doc.displayName}
-                onChangeText={(newName) => updateDocumentName(index, newName)}
-                placeholder="Enter document name"
-                placeholderTextColor="rgba(255, 255, 255, 0.6)"
+                style={styles.input}
+                placeholder="Enter invention title"
+                placeholderTextColor={colors.secondary}
+                onChangeText={(text) =>
+                  setInvention({ ...invention, name: text })
+                }
               />
             </View>
-          ))}
-        </View>
 
-        <TouchableOpacity
-          style={styles.createButton}
-          onPress={handleCreateInvention}
-        >
-          <Text style={styles.buttonText}>Post Invention</Text>
-        </TouchableOpacity>
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Description</Text>
+              <TextInput
+                style={styles.descriptionInput}
+                placeholder="Describe your invention"
+                placeholderTextColor={colors.secondary}
+                multiline={true}
+                numberOfLines={6}
+                textAlignVertical="top"
+                onChangeText={(text) =>
+                  setInvention({ ...invention, description: text })
+                }
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <Text style={styles.inputLabel}>Cost (KWD)</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter total cost"
+                placeholderTextColor={colors.secondary}
+                keyboardType="numeric"
+                onChangeText={(text) =>
+                  setInvention({ ...invention, cost: text })
+                }
+              />
+            </View>
+          </View>
+
+          {/* Selection Card */}
+          <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.selectionButton}
+              onPress={() => setInventorModalVisible(true)}
+            >
+              <Text style={styles.selectionLabel}>Inventors</Text>
+              <Text style={styles.selectionValue}>
+                {selectedInventors.length > 0
+                  ? `${selectedInventors.length} Selected`
+                  : "Select Inventors"}
+              </Text>
+              <Icon name="chevron-forward" size={24} color={colors.primary} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.selectionButton}
+              onPress={() => setCategoryModalVisible(true)}
+            >
+              <Text style={styles.selectionLabel}>Category</Text>
+              <Text style={styles.selectionValue}>
+                {selectedCategory
+                  ? categories.find((c) => c._id === selectedCategory).name
+                  : "Select Category"}
+              </Text>
+              <Icon name="chevron-forward" size={24} color={colors.primary} />
+            </TouchableOpacity>
+
+            {selectedCategory && (
+              <TouchableOpacity
+                style={styles.selectionButton}
+                onPress={() => setPhaseModalVisible(true)}
+              >
+                <Text style={styles.selectionLabel}>Phase</Text>
+                <Text style={styles.selectionValue}>
+                  {selectedPhase || "Select Phase"}
+                </Text>
+                <Icon name="chevron-forward" size={24} color={colors.primary} />
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Upload Card */}
+          <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.uploadButton}
+              onPress={handleImagePicker}
+            >
+              <Icon name="images-outline" size={24} color={colors.primary} />
+              <Text style={styles.uploadButtonText}>Upload Images</Text>
+            </TouchableOpacity>
+
+            <View style={styles.imageContainer}>
+              {images.map((image, index) => (
+                <Image
+                  key={index}
+                  source={{ uri: image.uri }}
+                  style={styles.uploadedImage}
+                />
+              ))}
+            </View>
+
+            <TouchableOpacity
+              style={styles.uploadButton}
+              onPress={handleDocumentPicker}
+            >
+              <Icon
+                name="document-text-outline"
+                size={24}
+                color={colors.primary}
+              />
+              <Text style={styles.uploadButtonText}>Upload Documents</Text>
+            </TouchableOpacity>
+
+            <View style={styles.documentContainer}>
+              {documents.map((doc, index) => (
+                <View key={index} style={styles.documentItem}>
+                  <Icon
+                    name="document-text-outline"
+                    size={24}
+                    color={colors.primary}
+                  />
+                  <TextInput
+                    style={styles.documentNameInput}
+                    value={doc.displayName}
+                    onChangeText={(newName) =>
+                      updateDocumentName(index, newName)
+                    }
+                    placeholder="Enter document name"
+                    placeholderTextColor={colors.secondary}
+                  />
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Submit Button */}
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleCreateInvention}
+          >
+            <Icon name="checkmark-circle-outline" size={24} color="white" />
+            <Text style={styles.submitButtonText}>Post Invention</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
 
       <Modal
@@ -452,147 +510,155 @@ const Invention = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary,
-    padding: 10,
+    backgroundColor: "white",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  contentContainer: {
     position: "relative",
-    overflow: "hidden",
+    zIndex: 1,
+  },
+  titleContainer: {
+    marginBottom: 24,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: colors.primary,
+    marginBottom: 8,
+    letterSpacing: 0.5,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: colors.primary,
+    opacity: 0.8,
+  },
+  card: {
+    backgroundColor: "white",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: `${colors.primary}10`,
+  },
+  inputContainer: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.primary,
+    marginBottom: 8,
+  },
+  input: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.secondary,
+    paddingVertical: 8,
+    fontSize: 16,
+    color: colors.primary,
+  },
+  descriptionInput: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.secondary,
+    paddingVertical: 8,
+    fontSize: 16,
+    color: colors.primary,
+    height: 120,
+    textAlignVertical: "top",
+  },
+  selectionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.secondary,
+  },
+  selectionLabel: {
+    fontSize: 16,
+    color: colors.primary,
+  },
+  selectionValue: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.secondary,
+    textAlign: "right",
+    marginRight: 8,
+  },
+  uploadButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: colors.secondary,
+    marginBottom: 16,
+  },
+  uploadButtonText: {
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: "600",
+  },
+  imageContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 16,
+  },
+  uploadedImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+  },
+  documentItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.secondary,
+  },
+  documentNameInput: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.primary,
+  },
+  submitButton: {
+    flexDirection: "row",
+    backgroundColor: colors.primary,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    gap: 8,
+  },
+  submitButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-  },
-  bgCircle1: {
-    position: "absolute",
-    width: 300,
-    height: 300,
-    borderRadius: 150,
-    backgroundColor: colors.secondary,
-    top: 170,
-    right: -50,
-    opacity: 0.15,
-    zIndex: 0,
-  },
-  bgCircle2: {
-    position: "absolute",
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: colors.secondary,
-    top: 0,
-    left: -100,
-    opacity: 0.15,
-    zIndex: 0,
-  },
-  bgCircle3: {
-    position: "absolute",
-    width: 250,
-    height: 250,
-    borderRadius: 125,
-    backgroundColor: colors.secondary,
-    bottom: -50,
-    left: 20,
-    opacity: 0.15,
-    zIndex: 0,
-  },
-  scrollView: {
-    flexGrow: 1,
-    padding: 24,
-    zIndex: 1,
-    position: "relative",
-  },
-  titleContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 30,
-  },
-  title: {
-    fontSize: 29,
-    fontWeight: "800",
-    color: "white",
-    marginLeft: 10,
-    lineHeight: 56,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  input: {
-    backgroundColor: "transparent",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(241, 245, 249, 0.3)",
-    padding: 12,
-    fontSize: 16,
-    color: "#ffffff",
-    height: 50,
-  },
-  inventorsContainer: {
-    marginBottom: 20,
-  },
-  descriptionInput: {
-    backgroundColor: "transparent",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(241, 245, 249, 0.3)",
-    padding: 12,
-    fontSize: 16,
-    color: "#ffffff",
-    height: 120,
-    textAlignVertical: "top",
-  },
-  dropdownButton: {
-    backgroundColor: "transparent",
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(241, 245, 249, 0.3)",
-    padding: 15,
-    marginBottom: 20,
-  },
-  dropdownButtonText: {
-    fontSize: 16,
-    color: "white",
-  },
-  uploadButton: {
-    backgroundColor: "white",
-    padding: 15,
-    borderRadius: 30,
-    alignItems: "center",
-  },
-  createButton: {
-    flexDirection: "row",
-    backgroundColor: "#F8FAFC",
-    height: 60,
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 5,
-    marginHorizontal: 4,
-    paddingHorizontal: 24,
-    shadowColor: "#475569",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  buttonText: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  createButtonText: {
-    color: colors.primary,
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  imageContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginVertical: 10,
-    gap: 10,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
   },
   modalView: {
     margin: 20,
@@ -685,23 +751,6 @@ const styles = StyleSheet.create({
   documentContainer: {
     marginVertical: 10,
   },
-  documentItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 5,
-  },
-  documentNameInput: {
-    color: "white",
-    marginLeft: 10,
-    flex: 1,
-    fontSize: 14,
-    padding: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255, 255, 255, 0.3)",
-  },
   decorativeDots: {
     position: "absolute",
     top: 100,
@@ -729,8 +778,66 @@ const styles = StyleSheet.create({
   curve: {
     position: "absolute",
     borderRadius: 999,
-    borderWidth: 1,
-    borderColor: "white",
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+  },
+  topLeftCurve: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    opacity: 0.15,
+    zIndex: 0,
+  },
+  curve1: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    borderWidth: 20,
+    borderColor: colors.primary,
+    position: "absolute",
+    top: -100,
+    left: -100,
+  },
+  topRightDots: {
+    position: "absolute",
+    top: 40,
+    right: 20,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: 140,
+    gap: 8,
+    opacity: 0.15,
+    zIndex: 0,
+  },
+  centerDots: {
+    position: "absolute",
+    top: "40%",
+    left: 20,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: 80,
+    gap: 8,
+    opacity: 0.1,
+    zIndex: 0,
+    transform: [{ rotate: "45deg" }],
+  },
+  bottomLeftDots: {
+    position: "absolute",
+    bottom: 40,
+    left: 20,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: 120,
+    gap: 8,
+    opacity: 0.15,
+    zIndex: 0,
+  },
+  bottomRightCurves: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    opacity: 0.1,
+    zIndex: 0,
   },
 });
 
