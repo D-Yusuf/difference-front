@@ -42,10 +42,18 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   cardWrapper: {
-    padding: 6, // Reduced padding for tighter grid
+    padding: 6,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 2,
+      height: 4,
+    },
+    shadowOpacity: 0.22,
+    shadowRadius: 5,
+    elevation: 5,
   },
   noInventions: {
-    color: "#ffffff", // Changed to white for better visibility on blue background
+    color: "#ffffff",
     textAlign: "center",
     marginTop: 20,
     fontSize: 16,

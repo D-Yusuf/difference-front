@@ -31,6 +31,8 @@ import Animated, {
   useSharedValue,
   withDelay,
 } from "react-native-reanimated";
+import { shortNumber } from "../utils/shortNum";
+import CircularProgress from "react-native-circular-progress-indicator";
 
 const PHASES = ["idea", "work-in-progress", "prototype", "market-ready"];
 
@@ -132,6 +134,16 @@ const LoadingView = () => {
       </ScrollView>
     </SafeAreaView>
   );
+};
+
+const formatNumber = (num) => {
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + "M";
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + "K";
+  }
+  return num.toString();
 };
 
 const InventionDetails = ({ route }) => {
@@ -276,12 +288,56 @@ const InventionDetails = ({ route }) => {
         </View>
 
         <View style={styles.metaContainer}>
-          <View style={styles.metaItem}>
-            <Text style={styles.metaLabel}>Category</Text>
-            <Text style={styles.metaValue}>
-              {category?.name || "Loading..."}
-            </Text>
+          <View style={styles.metaRow}>
+            <View style={[styles.metaItem, styles.metaCard]}>
+              <Icon name="grid" size={24} color={colors.primary} />
+              <Text style={styles.metaLabel}>Category</Text>
+              <Text
+                style={styles.metaValue}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.5}
+              >
+                {category?.name || "Loading..."}
+              </Text>
+            </View>
+
+            <View style={[styles.metaItem, styles.metaCard]}>
+              <Icon name="eye-outline" size={24} color={colors.primary} />
+              <Text style={styles.metaLabel}>Views</Text>
+              <Text style={styles.metaValue}>
+                {formatNumber(invention?.views || 0)}
+              </Text>
+            </View>
+
+            <View style={[styles.metaItem, styles.metaCard]}>
+              <Text style={styles.metaLabel}>Funding Progress</Text>
+              <View style={styles.fundingCircleContainer}>
+                <CircularProgress
+                  value={Math.round(
+                    (1 - remainingFunds / invention.cost) * 100
+                  )}
+                  radius={25}
+                  duration={2000}
+                  progressValueColor={colors.primary}
+                  maxValue={100}
+                  title={"%"}
+                  titleColor={colors.primary}
+                  titleStyle={{ fontWeight: "600", fontSize: 10 }}
+                  activeStrokeColor={colors.primary}
+                  inActiveStrokeColor={colors.secondary}
+                  inActiveStrokeOpacity={0.2}
+                  activeStrokeWidth={8}
+                  inActiveStrokeWidth={8}
+                />
+                <Text style={styles.fundingSubtext}>
+                  {formatNumber(invention.cost - remainingFunds)} /{" "}
+                  {formatNumber(invention.cost)} KWD
+                </Text>
+              </View>
+            </View>
           </View>
+
           <View style={[styles.metaItem, styles.phaseItem]}>
             <Text style={styles.metaLabel}>Current Phase</Text>
             <Text style={styles.metaValue}>
@@ -321,7 +377,13 @@ const InventionDetails = ({ route }) => {
           </View>
         </View>
 
+        <View style={styles.descriptionContainer}>
+          <Text style={styles.sectionTitle}>Description</Text>
+          <Text style={styles.description}>{invention?.description}</Text>
+        </View>
+
         <View style={styles.inventorContainer}>
+          <Text style={styles.sectionTitle}>Inventors</Text>
           {invention?.inventors?.map((inventor) => (
             <View key={inventor._id} style={styles.inventorRow}>
               <TouchableOpacity
@@ -336,12 +398,14 @@ const InventionDetails = ({ route }) => {
                   source={{ uri: BASE_URL + inventor.image }}
                   style={styles.inventorImage}
                 />
-                <Text style={styles.inventor}>
-                  {inventor.firstName + " " + inventor.lastName}
-                </Text>
+                <View style={styles.inventorTextContainer}>
+                  <Text style={styles.inventorName}>
+                    {inventor.firstName + " " + inventor.lastName}
+                  </Text>
+                  <Text style={styles.inventorRole}>Inventor</Text>
+                </View>
               </TouchableOpacity>
 
-              {/* Add chat button if the user is not the inventor */}
               {user._id !== inventor._id && (
                 <TouchableOpacity
                   style={styles.chatButton}
@@ -357,11 +421,7 @@ const InventionDetails = ({ route }) => {
                     });
                   }}
                 >
-                  <Icon
-                    name="chatbubble-outline"
-                    size={20}
-                    color={colors.primary}
-                  />
+                  <Icon name="chatbubble-outline" size={20} color="white" />
                   <Text style={styles.chatButtonText}>Chat</Text>
                 </TouchableOpacity>
               )}
@@ -369,44 +429,30 @@ const InventionDetails = ({ route }) => {
           ))}
         </View>
 
-        {invention?.documents && invention.documents.length > 0 && (
-          <View style={styles.documentsContainer}>
-            <Text style={styles.sectionTitle}>Documents</Text>
-            {invention.documents.map((doc, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.documentItem}
-                onPress={() => handleDocumentPress(doc)}
-              >
-                <Icon name="document-text" size={24} color={colors.primary} />
-                <Text style={styles.documentName}>Document {index + 1}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-
-        <Text style={styles.description}>{invention?.description}</Text>
         <Text style={styles.cost}>Funds Needed: {invention?.cost} KWD</Text>
         <Text style={styles.cost}>Remaining Funds: {remainingFunds} KWD</Text>
         <View style={styles.actionButtonsContainer}>
           {!isOwner && (
             <TouchableOpacity
-              style={[
-                styles.actionButton,
-                isLiked && styles.actionButtonActive,
-              ]}
+              style={[styles.likeButton, isLiked && styles.likeButtonActive]}
               onPress={() => {
                 toggleLike();
                 setIsLiked(!isLiked);
               }}
             >
+              <Icon
+                name={isLiked ? "heart" : "heart-outline"}
+                size={20}
+                color={isLiked ? "white" : colors.primary}
+              />
               <Text
                 style={[
-                  styles.actionButtonText,
-                  isLiked && styles.actionButtonTextActive,
+                  styles.likeButtonText,
+                  isLiked && styles.likeButtonTextActive,
                 ]}
               >
-                {isLiked ? "Liked" : "Like"}
+                {isLiked ? "Liked" : "Like"} •{" "}
+                {formatNumber(invention?.likes?.length || 0)}
               </Text>
             </TouchableOpacity>
           )}
@@ -480,15 +526,34 @@ const styles = StyleSheet.create({
   },
   inventorContainer: {
     marginBottom: 20,
-    backgroundColor: "#f8f9fa", // Light background for inventor section
-    padding: 12,
+    backgroundColor: "white",
+    padding: 16,
     borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   inventorRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 10,
+    backgroundColor: colors.primary,
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 3,
   },
   inventorInfo: {
     flexDirection: "row",
@@ -496,21 +561,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   inventorImage: {
-    width: 50, // Made avatar slightly larger
-    height: 50,
-    borderRadius: 25,
+    width: 45,
+    height: 45,
+    borderRadius: 23,
     marginRight: 12,
-    borderWidth: 2, // Added border to avatar
-    borderColor: "#ffffff",
+    borderWidth: 2,
+    borderColor: "white",
   },
-  inventor: {
-    fontSize: 18,
-    color: "#2c3e50", // Softer color
+  inventorTextContainer: {
+    flex: 1,
+  },
+  inventorName: {
+    fontSize: 16,
     fontWeight: "600",
+    color: "white",
+    marginBottom: 2,
+  },
+  inventorRole: {
+    fontSize: 12,
+    color: "white",
+    opacity: 0.8,
   },
   description: {
     fontSize: 16,
-    marginBottom: 20,
     color: colors.primary,
     lineHeight: 24,
     letterSpacing: 0.3,
@@ -550,55 +623,99 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   actionButtonsContainer: {
+    marginTop: 16,
+    marginBottom: 8,
     flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 20,
-    gap: 12,
+    justifyContent: "center",
   },
-  actionButton: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-    padding: 12,
-    borderRadius: 10,
+  likeButton: {
+    flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#2563eb",
+    backgroundColor: "white",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    gap: 8,
+    minWidth: 140,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 3,
   },
-  actionButtonActive: {
-    backgroundColor: "#2563eb",
+  likeButtonActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
-  actionButtonText: {
-    color: "#2563eb",
-    fontSize: 16,
+  likeButtonText: {
+    fontSize: 14,
     fontWeight: "600",
+    color: colors.primary,
   },
-  actionButtonTextActive: {
-    color: "#ffffff",
+  likeButtonTextActive: {
+    color: "white",
   },
   metaContainer: {
     marginBottom: 20,
     gap: 12,
   },
-  metaItem: {
-    backgroundColor: colors.secondary,
-    padding: 16,
-    borderRadius: 12,
+  metaRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 8,
   },
-  phaseItem: {
-    padding: 16,
+  metaCard: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
+    minHeight: 90,
+    maxWidth: "33%",
+    backgroundColor: "white",
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   metaLabel: {
-    fontSize: 14,
+    fontSize: 11,
     color: colors.primary,
-    marginBottom: 8,
-    fontWeight: "500",
+    marginTop: 6,
+    marginBottom: 3,
+    fontWeight: "600",
+    opacity: 0.8,
+    textAlign: "center",
   },
   metaValue: {
-    fontSize: 18,
-    fontWeight: "600",
+    fontSize: 13,
+    fontWeight: "700",
     color: colors.primary,
-    marginBottom: 16,
+    textAlign: "center",
+    paddingHorizontal: 4,
+    width: "100%",
+  },
+  fundingCircleContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 4,
+  },
+  fundingSubtext: {
+    fontSize: 9,
+    color: colors.primary,
+    fontWeight: "600",
+    textAlign: "center",
+    marginTop: 6,
   },
   progressContainer: {
     marginTop: 8,
@@ -662,9 +779,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
-    color: "#1a1a1a",
+    color: colors.primary,
     marginBottom: 12,
   },
   documentItem: {
@@ -721,36 +838,31 @@ const styles = StyleSheet.create({
   chatButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: colors.secondary,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
     paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingVertical: 8,
     borderRadius: 20,
-    marginLeft: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
   },
   chatButtonText: {
-    color: colors.primary,
-    marginLeft: 4,
+    color: "white",
+    marginLeft: 6,
     fontSize: 14,
     fontWeight: "500",
   },
-  statsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 16,
-    gap: 16,
-  },
-  statItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: colors.secondary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    gap: 6,
-  },
-  statText: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: "500",
+  descriptionContainer: {
+    marginBottom: 20,
+    backgroundColor: "white",
+    padding: 16,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
