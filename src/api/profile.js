@@ -32,15 +32,17 @@ export const updateProfile = async (userInfo) => {
           uri: userInfo.image,
         });
       } else if (key === "cv") {
-        console.log(`
-          ${userInfo.cv.uri}
-          ${userInfo.cv.mimeType}`);
+        if (userInfo.cv?.uri) {
+          // console.log(`im here
+          //   ${userInfo.cv.uri}
+          //   ${userInfo.cv.mimeType}`);
 
-        formData.append("cv", {
-          uri: userInfo.cv.uri,
-          type: userInfo.cv.mimeType,
-          name: `cv.pdf`,
-        });
+          formData.append("cv", {
+            uri: userInfo.cv.uri,
+            type: userInfo.cv.mimeType,
+            name: `cv.pdf`,
+          });
+        }
       } else {
         formData.append(key, userInfo[key]);
       }
@@ -55,6 +57,6 @@ export const updateProfile = async (userInfo) => {
     return response.data;
   } catch (error) {
     console.log(error);
-    return error;
+    throw new Error(error);
   }
 };

@@ -13,23 +13,22 @@ import { BASE_URL } from "../api";
 import NAVIGATION from "../navigations";
 import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../Colors";
+import getTimeAgo from "../utils/getTimeAgo";
 
 const OrderList = ({ orders, own = false }) => {
   const [statusFilter, setStatusFilter] = useState("all");
   const queryClient = useQueryClient();
   const navigation = useNavigation();
-  console.log("orders", orders);
+
   // Mutation for updating order status
   const { mutate: updateOrderStatus } = useMutation({
     mutationFn: ({ orderId, newStatus }) =>
       updateOrder(orderId, { status: newStatus }),
     onSuccess: () => {
-      // Invalidate and refetch orders after successful update
       queryClient.invalidateQueries(["orders", "orders-profile"]);
     },
     onError: (error) => {
       console.error("Failed to update order status:", error);
-      // Implement your error handling here (e.g., show toast message)
     },
   });
 
@@ -44,80 +43,35 @@ const OrderList = ({ orders, own = false }) => {
   return (
     <View style={styles.container}>
       <View style={styles.filterContainer}>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            statusFilter === "all" && styles.activeFilter,
-          ]}
-          onPress={() => setStatusFilter("all")}
-        >
-          <Text
+        {["all", "pending", "approved", "declined"].map((status) => (
+          <TouchableOpacity
+            key={status}
             style={[
-              styles.filterText,
-              statusFilter === "all" && styles.activeFilterText,
+              styles.filterButton,
+              statusFilter === status && styles.activeFilter,
             ]}
+            onPress={() => setStatusFilter(status)}
           >
-            All
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            statusFilter === "pending" && styles.activeFilter,
-          ]}
-          onPress={() => setStatusFilter("pending")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              statusFilter === "pending" && styles.activeFilterText,
-            ]}
-          >
-            Pending
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            statusFilter === "approved" && styles.activeFilter,
-          ]}
-          onPress={() => setStatusFilter("approved")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              statusFilter === "approved" && styles.activeFilterText,
-            ]}
-          >
-            Approved
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.filterButton,
-            statusFilter === "declined" && styles.activeFilter,
-          ]}
-          onPress={() => setStatusFilter("declined")}
-        >
-          <Text
-            style={[
-              styles.filterText,
-              statusFilter === "declined" && styles.activeFilterText,
-            ]}
-          >
-            Declined
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[
+                styles.filterText,
+                statusFilter === status && styles.activeFilterText,
+              ]}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       <ScrollView>
         {filteredOrders?.map((order) => (
           <View key={order._id} style={styles.card}>
-            {/* <TouchableOpacity style={styles.header} onPress={() => navigation.navigate(NAVIGATION.INVENTION.INVENTION_DETAILS, { inventionId: order.invention })}> */}
-            {/* </TouchableOpacity> */}
             <View style={styles.header}>
               <Image
-                source={{ uri: BASE_URL + order.invention?.image }}
+                source={{
+                  uri: BASE_URL + order.invention?.images[0].replace("\\", "/"),
+                }}
                 style={styles.inventionImage}
               />
               <Text style={styles.title}>{order.invention?.name}</Text>
@@ -146,8 +100,13 @@ const OrderList = ({ orders, own = false }) => {
                   source={{ uri: BASE_URL + order.investor?.image }}
                   style={styles.profilePic}
                 />
-                <Text style={styles.investorText}>
-                  {order.investor?.firstName} {order.investor?.lastName}
+                <View style={styles.investorTextContainer}>
+                  <Text style={styles.investorText}>
+                    {order.investor?.firstName} {order.investor?.lastName}
+                  </Text>
+                </View>
+                <Text style={styles.timeAgo}>
+                  {getTimeAgo(order.createdAt)}
                 </Text>
               </View>
               <View style={styles.actionButtons}>
@@ -157,13 +116,13 @@ const OrderList = ({ orders, own = false }) => {
                       onPress={() => handleStatusUpdate(order._id, "approved")}
                       style={[styles.actionButton, styles.approveButton]}
                     >
-                      <Text style={styles.actionButtonText}>✓</Text>
+                      <Text style={styles.actionButtonText}>Accept</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => handleStatusUpdate(order._id, "declined")}
                       style={[styles.actionButton, styles.declineButton]}
                     >
-                      <Text style={styles.actionButtonText}>✕</Text>
+                      <Text style={styles.actionButtonText}>Reject</Text>
                     </TouchableOpacity>
                   </View>
                 ) : (
@@ -172,7 +131,7 @@ const OrderList = ({ orders, own = false }) => {
                       onPress={() => handleStatusUpdate(order._id, "pending")}
                       style={[styles.actionButton, styles.pendingButton]}
                     >
-                      <Text style={styles.actionButtonText}>←</Text>
+                      <Text style={styles.actionButtonText}>Cancel</Text>
                     </TouchableOpacity>
                   )
                 )}
@@ -188,74 +147,101 @@ const OrderList = ({ orders, own = false }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: colors.page,
+    padding: 10,
+
   },
   card: {
     backgroundColor: "white",
-    borderRadius: 10,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: 13,
+    marginVertical: 12,
+    overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    borderWidth: 1,
+    borderColor: colors.secondary,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.secondary,
   },
   inventionImage: {
     width: 40,
     height: 40,
-    borderRadius: 8,
-    marginRight: 8,
+    borderRadius: 10,
+    marginRight: 12,
   },
   title: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.primary,
     flex: 1,
   },
   status: {
     fontSize: 14,
-    color: "#666",
+    color: colors.page,
     textTransform: "capitalize",
-    backgroundColor: "#f0f0f0",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
+    backgroundColor: "orange",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  approvedStatus: {
+    backgroundColor: "green",
+  },
+  declinedStatus: {
+    backgroundColor: "red",
+  },
+  pendingStatus: {
+    backgroundColor: "orange",
   },
   details: {
-    marginBottom: 12,
+    padding: 16,
   },
   detailText: {
-    fontSize: 16,
-    color: "#444",
-    marginBottom: 4,
+    fontSize: 15,
+    color: colors.primary,
+    marginBottom: 8,
   },
   investorInfo: {
     borderTopWidth: 1,
-    borderTopColor: "#eee",
-    paddingTop: 12,
+    borderTopColor: colors.secondary,
+    padding: 16,
+    backgroundColor: colors.page,
+  },
+  investorProfile: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  profilePic: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 8,
   },
   investorText: {
     fontSize: 14,
-    color: "#666",
+    color: colors.primary,
+    opacity: 0.8,
   },
   filterContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    padding: 10,
+    padding: 12,
     backgroundColor: colors.page,
-    borderRadius: 10,
-    gap: 30,
-    marginVertical: 10,
+    borderRadius: 12,
+    marginVertical: 12,
+    gap: 20,
     width: "100%",
   },
   filterButton: {
@@ -268,65 +254,53 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
   },
   filterText: {
-    color: "#333",
-  },
-  investorProfile: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  profilePic: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    marginRight: 8,
+    color: colors.page,
   },
   actionButtons: {
     flexDirection: "row",
+    justifyContent: "center",
     marginTop: 8,
   },
   actionButton: {
-    width: 40,
+    width: 80,
     height: 40,
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 4,
+    margin: 5,
   },
   approveButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "green",
+    width: "50%",
   },
   declineButton: {
-    backgroundColor: "#F44336",
+    backgroundColor: "red",
+    width: "50%",
   },
   actionButtonText: {
     color: "white",
-    fontSize: 20,
-  },
-  activeFilterText: {
-    color: "white",
-  },
-  approvedStatus: {
-    backgroundColor: "#4CAF50",
-    color: "white",
-  },
-  declinedStatus: {
-    backgroundColor: "#F44336",
-    color: "white",
-  },
-  pendingStatus: {
-    backgroundColor: "#FFC107",
-    color: "black",
+    fontSize: 14,
   },
   buttonGroup: {
     flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   pendingButton: {
-    backgroundColor: "#FFC107",
+    backgroundColor: "red",
+    width: "100%",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  actionButtons: {
-    flexDirection: "row",
-    justifyContent: "flex-end", // Align buttons to the right
-    marginTop: 8,
+  timeAgo: {
+    fontSize: 12,
+    color: colors.primary,
+    opacity: 0.8,
+  },
+  investorTextContainer: {
+    flex: 1,
   },
 });
 

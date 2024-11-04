@@ -153,3 +153,12 @@ export const toggleInterestedInvention = async (inventionId) => {
     throw error;
   }
 };
+
+export const incrementInventionViews = async (inventionId) => {
+  try {
+    const { data } = await instance.put(`/inventions/${inventionId}/views`);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};

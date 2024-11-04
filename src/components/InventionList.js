@@ -7,6 +7,7 @@ const InventionList = ({
   numColumns = 1,
   showInvestButton = true,
   showEditButton = true,
+  refetch,
 }) => {
   if (inventions?.length === 0 || !inventions) {
     return <Text>No inventions found.</Text>;
@@ -20,7 +21,11 @@ const InventionList = ({
       data={validInventions}
       renderItem={({ item }) => (
         <View style={[styles.cardWrapper, { width: `${100 / numColumns}%` }]}>
-          <InventionCard invention={item} compact={numColumns === 2} />
+          <InventionCard
+            refetch={refetch}
+            invention={item}
+            compact={numColumns === 2}
+          />
         </View>
       )}
       keyExtractor={(item) => item._id?.toString() || Math.random().toString()}

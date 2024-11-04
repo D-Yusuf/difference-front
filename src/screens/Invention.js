@@ -47,7 +47,6 @@ const Invention = ({ navigation }) => {
     mutationKey: ["create-invention"],
     onSuccess: () => {
       invalidateInventionQueries(queryClient);
-      alert("Invention created successfully");
       navigation.goBack();
     },
     onError: (error) => {
@@ -648,7 +647,7 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   doneButton: {
-    backgroundColor: "#34A853",
+    backgroundColor: colors.secondary,
     padding: 12,
     borderRadius: 8,
     marginTop: 15,

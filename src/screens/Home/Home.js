@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -175,13 +175,22 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [sortBy, setSortBy] = useState(null);
-  const { data: inventions, isPending: inventionsPending } = useQuery({
+
+  const {
+    data: inventions,
+    isPending: inventionsPending,
+    refetch,
+  } = useQuery({
     queryKey: ["inventions"],
     queryFn: getAllInventions,
   });
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
+  });
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: getProfile,
   });
   const { setBackgroundColor } = useContext(ThemeContext);
 
@@ -190,6 +199,11 @@ const Home = () => {
   useEffect(() => {
     setBackgroundColor("white");
   }, []);
+
+  useLayoutEffect(() => {
+    refetch();
+    console.log("Refetching");
+  }, [refetch]);
 
   const filteredInventions = inventions
     ?.filter((invention) => {
@@ -265,7 +279,7 @@ const Home = () => {
         <ScrollView style={styles.scrollView} stickyHeaderIndices={[1]}>
           <View style={styles.headerSection}>
             <Text style={styles.headerTitle}>
-              Hello, {user?.firstName || "there"}!
+              Hello, {profile?.firstName || "there"}!
             </Text>
             <Text style={styles.headerSubtitle}>
               Find your next inspiration
@@ -334,6 +348,7 @@ const Home = () => {
           <View style={styles.listContainer}>
             <InventionList
               inventions={filteredInventions}
+              refetch={refetch}
               numColumns={gridColumns}
             />
           </View>
