@@ -12,49 +12,21 @@ import {
 import { colors } from "../../Colors";
 import Icon from "react-native-vector-icons/Ionicons";
 import UserContext from "../context/UserContext";
-import io from "socket.io-client";
-import { BASE_URL } from "../api";
 import { createMessageRoom, getMessageRoomById } from "../api/chat";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { socket } from "../api/index";
 
 const ChatRoom = ({ route }) => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [user] = useContext(UserContext);
-  const socket = useRef(null);
   const { recipientId, userName, messageRoomId } = route.params;
   const queryClient = useQueryClient();
 
-  //   useEffect(() => {
-  //     // Connect to Socket.IO
-  //     socket.current = io(BASE_URL);
-
-  //     // Login to socket
-  //     socket.current.emit("login", user._id);
-
-  //     // Listen for new messages
-  //     socket.current.on("newMessage", (newMessage) => {
-  //       setMessages((prev) => [...prev, newMessage]);
-  //     });
-
-  //     // Load existing messages
-  //     loadMessages();
-
-  //     return () => {
-  //       if (socket.current) {
-  //         socket.current.disconnect();
-  //       }
-  //     };
-  //   }, []);
-
-  //   const loadMessages = async () => {
-  //     try {
-  //       const chatMessages = await getChatMessages(recipientId);
-  //       setMessages(chatMessages);
-  //     } catch (error) {
-  //       console.error("Error loading messages:", error);
-  //     }
-  //   };
+  const { data, refetch: refetchMessages } = useQuery({
+    queryKey: ["messageRoom", messageRoomId],
+    queryFn: () => getMessageRoomById(messageRoomId),
+  });
 
   const { mutate } = useMutation({
     mutationFn: (message) => createMessageRoom(message),
@@ -63,17 +35,24 @@ const ChatRoom = ({ route }) => {
       console.log("Message room created successfully");
       queryClient.invalidateQueries({ queryKey: ["messageRoom"] });
       setMessage("");
+      socket.emit("message", message);
+      socket.on("message", (data) => {
+        console.log("Hi");
+        refetchMessages();
+      });
     },
     onError: (error) => {
       console.log("Error creating message room:", error);
     },
   });
 
-  const { data } = useQuery({
-    queryKey: ["messageRoom", messageRoomId],
-    queryFn: () => getMessageRoomById(messageRoomId),
-  });
-  console.log(data?.messages);
+  useEffect(() => {
+    socket.on("message", (data) => {
+      refetch();
+    });
+  }, []);
+
+  //   console.log(data?.messages);
   const handleSendMessage = async () => {
     if (message.trim()) {
       try {
@@ -86,7 +65,7 @@ const ChatRoom = ({ route }) => {
         mutate(newMessage);
 
         // Send to backend
-        console.log(newMessage);
+        // console.log(newMessage);
       } catch (error) {
         console.error("Error sending message:", error);
       }
@@ -102,8 +81,19 @@ const ChatRoom = ({ route }) => {
           isOwnMessage ? styles.ownMessage : styles.otherMessage,
         ]}
       >
-        <Text style={styles.messageText}>{item.content}</Text>
-        <Text style={styles.timestamp}>
+        <Text
+          style={isOwnMessage ? styles.ownMessageText : styles.otherMessageText}
+        >
+          {item.content}
+        </Text>
+        <Text
+          style={[
+            styles.timestamp,
+            {
+              color: isOwnMessage ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)",
+            },
+          ]}
+        >
           {new Date(item.createdAt).toLocaleTimeString()}
         </Text>
       </View>
@@ -142,6 +132,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.page,
+    flexGrow: 1,
   },
   messagesList: {
     padding: 16,
@@ -158,12 +149,16 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   otherMessage: {
-    backgroundColor: colors.secondary,
+    backgroundColor: "#E8E8E8",
     alignSelf: "flex-start",
     borderBottomLeftRadius: 4,
   },
-  messageText: {
-    color: "#fff",
+  ownMessageText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+  },
+  otherMessageText: {
+    color: "#333333",
     fontSize: 16,
   },
   timestamp: {
@@ -174,19 +169,19 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: "row",
     padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
     borderTopWidth: 1,
-    borderTopColor: colors.secondary,
+    borderTopColor: "#E8E8E8",
   },
   input: {
     flex: 1,
-    backgroundColor: colors.secondary,
+    backgroundColor: "#F5F5F5",
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 8,
     marginRight: 8,
     fontSize: 16,
-    color: colors.primary,
+    color: "#000000",
   },
   sendButton: {
     width: 44,

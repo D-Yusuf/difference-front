@@ -274,18 +274,7 @@ const InventionDetails = ({ route }) => {
           </View>
         </View>
         <Text style={styles.title}>{invention?.name}</Text>
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Icon name="eye-outline" size={20} color={colors.primary} />
-            <Text style={styles.statText}>{invention?.views} views</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Icon name="heart-outline" size={20} color={colors.primary} />
-            <Text style={styles.statText}>
-              {invention?.likes?.length || 0} likes
-            </Text>
-          </View>
-        </View>
+        <View style={styles.statsContainer}></View>
 
         <View style={styles.metaContainer}>
           <View style={styles.metaRow}>
@@ -434,7 +423,11 @@ const InventionDetails = ({ route }) => {
         <View style={styles.actionButtonsContainer}>
           {!isOwner && (
             <TouchableOpacity
-              style={[styles.likeButton, isLiked && styles.likeButtonActive]}
+              style={[
+                styles.actionButton,
+                styles.likeButton,
+                isLiked && styles.likeButtonActive,
+              ]}
               onPress={() => {
                 toggleLike();
                 setIsLiked(!isLiked);
@@ -442,17 +435,38 @@ const InventionDetails = ({ route }) => {
             >
               <Icon
                 name={isLiked ? "heart" : "heart-outline"}
-                size={20}
+                size={22}
                 color={isLiked ? "white" : colors.primary}
               />
               <Text
                 style={[
-                  styles.likeButtonText,
-                  isLiked && styles.likeButtonTextActive,
+                  styles.actionButtonText,
+                  isLiked && styles.actionButtonTextActive,
                 ]}
               >
-                {isLiked ? "Liked" : "Like"} •{" "}
-                {formatNumber(invention?.likes?.length || 0)}
+                {isLiked ? "Liked" : "Like"}{" "}
+                <Text style={styles.actionButtonCount}>
+                  • {formatNumber(invention?.likes?.length || 0)}
+                </Text>
+              </Text>
+            </TouchableOpacity>
+          )}
+
+          {canInvest && (
+            <TouchableOpacity
+              style={[styles.actionButton, styles.investButton]}
+              onPress={() =>
+                navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {
+                  invention,
+                  remainingFunds,
+                })
+              }
+            >
+              <Icon name="trending-up" size={22} color="white" />
+              <Text
+                style={[styles.actionButtonText, styles.actionButtonTextActive]}
+              >
+                Invest <Text style={styles.actionButtonCount}></Text>
               </Text>
             </TouchableOpacity>
           )}
@@ -460,28 +474,19 @@ const InventionDetails = ({ route }) => {
 
         {isOwner && (
           <TouchableOpacity
-            style={styles.button}
+            style={[styles.actionButton, styles.editButton]}
             onPress={() =>
               navigation.navigate(NAVIGATION.INVENTION.EDIT_INVENTION, {
                 invention,
               })
             }
           >
-            <Text style={styles.buttonText}>Edit</Text>
-          </TouchableOpacity>
-        )}
-
-        {canInvest && (
-          <TouchableOpacity
-            style={[styles.button, styles.investButton]}
-            onPress={() =>
-              navigation.navigate(NAVIGATION.HOME.INVEST_DETAILS, {
-                invention,
-                remainingFunds,
-              })
-            }
-          >
-            <Text style={styles.buttonText}>Invest</Text>
+            <Icon name="create-outline" size={22} color="white" />
+            <Text
+              style={[styles.actionButtonText, styles.actionButtonTextActive]}
+            >
+              Edit Invention
+            </Text>
           </TouchableOpacity>
         )}
       </ScrollView>
@@ -623,23 +628,23 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   actionButtonsContainer: {
-    marginTop: 16,
-    marginBottom: 8,
     flexDirection: "row",
     justifyContent: "center",
+    gap: 12,
+    marginTop: 24,
+    marginBottom: 16,
+    paddingHorizontal: 16,
   },
-  likeButton: {
+  actionButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "white",
     paddingVertical: 12,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
     gap: 8,
-    minWidth: 140,
+    flex: 1,
+    maxWidth: "48%",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -647,19 +652,40 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
-    elevation: 3,
+    elevation: 5,
+  },
+  likeButton: {
+    backgroundColor: "white",
+    borderWidth: 1.5,
+    borderColor: colors.primary,
   },
   likeButtonActive: {
     backgroundColor: colors.primary,
     borderColor: colors.primary,
   },
-  likeButtonText: {
-    fontSize: 14,
+  investButton: {
+    backgroundColor: "#16a34a",
+    borderWidth: 1.5,
+    borderColor: "#16a34a",
+  },
+  editButton: {
+    backgroundColor: colors.primary,
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 24,
+    maxWidth: "none",
+  },
+  actionButtonText: {
+    fontSize: 15,
     fontWeight: "600",
     color: colors.primary,
   },
-  likeButtonTextActive: {
+  actionButtonTextActive: {
     color: "white",
+  },
+  actionButtonCount: {
+    fontSize: 14,
+    opacity: 0.9,
   },
   metaContainer: {
     marginBottom: 20,
