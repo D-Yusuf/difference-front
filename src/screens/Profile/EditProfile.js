@@ -11,13 +11,14 @@ import {
   Linking,
 } from "react-native";
 import React, { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { updateProfile } from "../../api/profile";
 import { BASE_URL } from "../../api";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 import { colors } from "../../../Colors";
 import Icon from "react-native-vector-icons/Ionicons";
+import { getCategories } from "../../api/categories";
 
 const EditProfile = ({ route, navigation }) => {
   const queryClient = useQueryClient();
@@ -28,8 +29,21 @@ const EditProfile = ({ route, navigation }) => {
     bio: profile.bio,
     cv: profile.cv,
   });
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+  });
   const [image, setImage] = useState(null);
-
+  const [selectedInterests, setSelectedInterests] = useState(profile.intrests || []);
+  const handleInterestChange = (categoryId) => {
+    const updatedInterests = selectedInterests.includes(categoryId)
+      ? selectedInterests.filter((id) => id !== categoryId)
+      : [...selectedInterests, categoryId];
+  
+    setSelectedInterests(updatedInterests);
+    setUserInfo({ ...userInfo, intrests: updatedInterests });
+    console.log(userInfo);
+  };
   const pickDocument = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
@@ -160,7 +174,6 @@ const EditProfile = ({ route, navigation }) => {
               textAlignVertical="top"
             />
           </View>
-
           {/* CV Upload Button */}
           <TouchableOpacity style={styles.cvButton} onPress={handleCvPress}>
             <Icon
@@ -180,7 +193,31 @@ const EditProfile = ({ route, navigation }) => {
             </Text>
           )}
         </View>
-
+        <View style={styles.formSection}>
+          <Text style={styles.sectionTitle}>Select Interests</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+            {categories?.map((category) => (
+              <TouchableOpacity
+                onPress={() => handleInterestChange(category._id)}
+                key={category._id}
+                style={[
+                  styles.categoryItem,
+                  selectedInterests.includes(category._id) && styles.selectedCategory,
+                ]}
+              >
+                <Text style={styles.categoryText}>{category.name}</Text>
+                {selectedInterests.includes(category._id) && (
+                  <TouchableOpacity
+                    style={styles.removeButton}
+                    onPress={() => handleInterestChange(category._id)}
+                >
+                    <Text style={styles.removeButtonText}>X</Text>
+                  </TouchableOpacity>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
         {/* Save Button */}
         <TouchableOpacity
           style={styles.saveButton}
@@ -284,6 +321,32 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "500",
+  },
+  categoryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e0e0e0',
+    borderRadius: 20,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    margin: 5,
+  },
+  selectedCategory: {
+    backgroundColor: '#4caf50',
+  },
+  categoryText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  removeButton: {
+    marginLeft: 10,
+    backgroundColor: '#f44336',
+    borderRadius: 15,
+    padding: 5,
+  },
+  removeButtonText: {
+    color: '#fff',
+    fontSize: 12,
   },
 });
 
