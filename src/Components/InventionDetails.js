@@ -146,8 +146,7 @@ const formatNumber = (num) => {
   return num.toString();
 };
 
-const InventionDetails = ({ route }) => {
-  const navigation = useNavigation();
+const InventionDetails = ({ route, navigation }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const [user, setUser] = useContext(UserContext);
@@ -231,6 +230,28 @@ const InventionDetails = ({ route }) => {
   );
   console.log("WIDTH", width);
   console.log("IMAGES", dataImages);
+
+  const handleInventorPress = (inventor) => {
+    // Get the current route name
+    const currentRouteName = route.name;
+
+    // Determine which USER_PROFILE screen to use
+    let targetScreen;
+    if (currentRouteName === NAVIGATION.PROFILE.INVENTION_DETAILS) {
+      targetScreen = NAVIGATION.PROFILE.USER_PROFILE;
+    } else if (currentRouteName === NAVIGATION.HOME.INVENTION_DETAILS) {
+      targetScreen = NAVIGATION.HOME.USER_PROFILE;
+    } else if (currentRouteName === NAVIGATION.INVENTION.INVENTION_DETAILS) {
+      targetScreen = NAVIGATION.INVENTION.USER_PROFILE;
+    } else {
+      // Default fallback
+      targetScreen = NAVIGATION.HOME.USER_PROFILE;
+    }
+
+    navigation.push(targetScreen, {
+      userId: inventor._id,
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -377,11 +398,7 @@ const InventionDetails = ({ route }) => {
             <View key={inventor._id} style={styles.inventorRow}>
               <TouchableOpacity
                 style={styles.inventorInfo}
-                onPress={() => {
-                  navigation.push(NAVIGATION.HOME.USER_PROFILE, {
-                    userId: inventor._id,
-                  });
-                }}
+                onPress={() => handleInventorPress(inventor)}
               >
                 <Image
                   source={{ uri: BASE_URL + inventor.image }}

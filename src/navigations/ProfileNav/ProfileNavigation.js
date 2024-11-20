@@ -28,7 +28,9 @@ const ProfileNavigation = () => {
         name={NAVIGATION.PROFILE.USER_PROFILE}
         component={UserProfile}
         options={{
-          headerShown: false,
+          headerTitle: "Profile",
+          headerShown: true,
+          headerShadowVisible: false,
         }}
       />
       <Stack.Screen
@@ -50,6 +52,10 @@ const ProfileNavigation = () => {
       <Stack.Screen
         name={NAVIGATION.PROFILE.INVENTION_DETAILS}
         component={InventionDetails}
+        options={{
+          headerTitle: "Invention",
+          headerShadowVisible: false,
+        }}
       />
       <Stack.Screen
         name={NAVIGATION.PROFILE.ORDERS}
