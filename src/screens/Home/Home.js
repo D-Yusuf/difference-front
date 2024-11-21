@@ -175,7 +175,6 @@ const Home = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedPhase, setSelectedPhase] = useState(null);
   const [sortBy, setSortBy] = useState(null);
-
   const {
     data: inventions,
     isPending: inventionsPending,
@@ -183,12 +182,13 @@ const Home = () => {
   } = useQuery({
     queryKey: ["inventions"],
     queryFn: getAllInventions,
+    onSuccess: () => {},
   });
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
   });
-  const { data: profile } = useQuery({
+  const { data: profile, isPending: profilePending } = useQuery({
     queryKey: ["profile"],
     queryFn: getProfile,
   });
@@ -204,6 +204,14 @@ const Home = () => {
     refetch();
     console.log("Refetching");
   }, [refetch]);
+  // useEffect(() => {
+  //   if (inventions && profile) {
+  //     const filteredSuggestions = inventions.filter((invention) =>
+  //       profile.intrests.includes(invention.category)
+  //     );
+  //     setSuggestedInventions(filteredSuggestions);
+  //   }
+  // }, [inventions, profile]);
 
   const filteredInventions = inventions
     ?.filter((invention) => {
@@ -232,6 +240,12 @@ const Home = () => {
   if (inventionsPending) {
     return <LoadingView />;
   }
+  if (profilePending) {
+    return <LoadingView />;
+  }
+  const suggestedInventions = inventions?.filter((invention) =>
+    profile?.intrests?.includes(invention.category)
+  );
   return (
     <SafeAreaView style={styles.container}>
       {/* Add decorative elements */}
@@ -349,6 +363,19 @@ const Home = () => {
             </View>
           </View>
 
+          {suggestedInventions && suggestedInventions.length > 0 && (
+            <View style={styles.suggestedSection}>
+              <Text style={styles.suggestedTitle}>
+                Suggested for you{console.log(suggestedInventions)}
+              </Text>
+              <InventionList
+                page="suggested"
+                inventions={suggestedInventions}
+                refetch={refetch}
+                numColumns={gridColumns}
+              />
+            </View>
+          )}
           <View style={styles.listContainer}>
             <InventionList
               page="home"
@@ -564,6 +591,16 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     borderWidth: 1,
     borderColor: colors.primary,
+  },
+  suggestedSection: {
+    marginTop: 20,
+    paddingHorizontal: 20,
+  },
+  suggestedTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: colors.primary,
+    marginBottom: 10,
   },
 });
 

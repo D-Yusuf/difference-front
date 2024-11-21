@@ -20,6 +20,6 @@ export const getInventors = async () => {
 };
 
 export const getProfile = async () => {
-  const response = await instance.get("/users/profile");
+  const response = await instance.get("/auth/profile");
   return response.data;
 };
