@@ -74,17 +74,19 @@ export default function App() {
             value={{ backgroundColor, setBackgroundColor }}
           >
             <UserContext.Provider value={[user, setUser]}>
-              <ScrollView
-                contentContainerStyle={{ flexGrow: 1 }}
-                refreshControl={
-                  <RefreshControl
-                    refreshing={refreshing}
-                    onRefresh={onRefresh}
-                  />
-                }
-              >
-                {user.loggedIn ? <MainNavigation /> : <AuthNavigation />}
-              </ScrollView>
+              <SafeAreaView style={{ flex: 1 }}>
+                <ScrollView
+                  contentContainerStyle={{ flexGrow: 1 }}
+                  refreshControl={
+                    <RefreshControl
+                      refreshing={refreshing}
+                      onRefresh={onRefresh}
+                    />
+                  }
+                >
+                  {user.loggedIn ? <MainNavigation /> : <AuthNavigation />}
+                </ScrollView>
+              </SafeAreaView>
             </UserContext.Provider>
           </ThemeContext.Provider>
         </QueryClientProvider>

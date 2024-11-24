@@ -2,7 +2,6 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   TextInput,
   ScrollView,
   TouchableOpacity,
@@ -209,8 +208,8 @@ const Invention = ({ navigation }) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" />
+    <View style={{ flex: 1 }}>
+      <StatusBar barStyle="dark-content" />
 
       {/* Enhanced Decorative Elements */}
       <View style={styles.topLeftCurve}>
@@ -503,7 +502,7 @@ const Invention = ({ navigation }) => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 
