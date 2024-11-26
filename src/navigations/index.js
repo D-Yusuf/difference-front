@@ -33,6 +33,10 @@ const NAVIGATION = {
     CHAT_LIST: "ChatList",
     CHAT_ROOM: "ChatRoom",
   },
+  LIVE_PITCH: {
+    LIST: "LivePitchList",
+    ROOM: "LivePitchRoom",
+  },
 };
 
 export default NAVIGATION;

@@ -5,6 +5,7 @@ import NAVIGATION from "./index";
 import HomeNavigation from "./HomeNav/HomeNavigation";
 import ProfileNavigation from "./ProfileNav/ProfileNavigation";
 import ChatNavigation from "./ChatNav/ChatNavigation";
+import LivePitchNavigation from "./LivePitchNav/LivePitchNavigation";
 import { colors } from "../../Colors";
 
 const Tab = createBottomTabNavigator();
@@ -62,6 +63,15 @@ const MainNavigation = () => {
             <Icon name="person-outline" size={24} color={color} />
           ),
           tabBarLabel: "Profile",
+        }}
+      />
+      <Tab.Screen
+        name="LivePitch"
+        component={LivePitchNavigation}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Icon name="videocam" size={size} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>
